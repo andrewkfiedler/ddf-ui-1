@@ -20,6 +20,7 @@ define(['application',
         'js/model/source',
         'underscore',
         'properties',
+        'js/store',
         // Load non attached libs and plugins
         'datepicker',
         'datepickerOverride',
@@ -27,7 +28,7 @@ define(['application',
         'multiselect',
         'multiselectfilter'
     ],
-    function(Application, Cometd, Marionette, WorkspaceView, Workspace, wreqr, poller, Source, _, properties) {
+    function(Application, Cometd, Marionette, WorkspaceView, Workspace, wreqr, poller, Source, _, properties, store) {
 
         Application.App.module('WorkspaceModule', function(WorkspaceModule) {
 
@@ -86,14 +87,7 @@ define(['application',
                 return WorkspaceModule.types;
             });
 
-            WorkspaceModule.workspaces = Workspace.WorkspaceResult;
-            WorkspaceModule.workspaces.fetch();
-
-            wreqr.reqres.setHandler('workspace:getworkspaces', function () {
-                return WorkspaceModule.workspaces;
-            });
-
-            var workspaceView = new WorkspaceView.PanelLayout({model: WorkspaceModule.workspaces});
+            var workspaceView = new WorkspaceView.PanelLayout({model: store.get('workspaces')});
 
             var Controller = Marionette.Controller.extend({
 

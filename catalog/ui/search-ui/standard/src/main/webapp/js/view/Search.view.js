@@ -30,12 +30,13 @@ define([
         'js/model/Query',
         'js/view/WorkspaceSaveResults.view',
         'js/controllers/Filter.controller',
+        'js/store',
         // Load non attached libs and plugins
         'perfectscrollbar'
     ],
     function ($, _, Marionette, SlidingRegion, QueryView, Progress, MetacardList, MetacardDetail,
               MetacardModel, Backbone, dir, ich, wreqr, searchPanel, SearchControl, QueryModel,
-              WorkspaceSaveResults, FilterController) {
+              WorkspaceSaveResults, FilterController, store) {
         "use strict";
         var Search = {};
 
@@ -100,7 +101,7 @@ define([
             },
 
             saveResultsToWorkspace: function(search, records) {
-                var workspaces = wreqr.reqres.request('workspace:getworkspaces');
+                var workspaces = store.get('workspaces');
                 this.searchRegion.show(new WorkspaceSaveResults({model: workspaces, search: search, records: records}), dir.forward);
             },
 
