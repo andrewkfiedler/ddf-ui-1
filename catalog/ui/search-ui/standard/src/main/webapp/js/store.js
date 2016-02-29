@@ -13,21 +13,28 @@
 
 define([
     'backbone',
+    'poller',
     'js/model/Workspace',
     'js/model/Source',
-], function (Backbone, Workspace) {
+], function (Backbone, poller, Workspace, Source) {
 
-    var init = function (Model) {
+    // initialize a backbone model and fetch it's state from the server
+    var init = function (Model, opts) {
+        opts = opts || {};
         var m = new Model();
         m.fetch();
-        return m
-    }
+        if (opts.poll !== undefined) {
+            poller.get(m, opts.poll).start();
+        }
+        return m;
+    };
 
     var Store = Backbone.Model.extend({
       initialize: function () {
         this.set('workspaces', init(Workspace.WorkspaceResult));
+        this.set('sources', init(Source, { poll: { delay: 60000 } }));
       }
-    })
+    });
 
     return new Store();
 });

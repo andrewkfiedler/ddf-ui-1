@@ -11,18 +11,62 @@
  **/
 /*global define*/
 define([
-        'backbone'
-    ],
-    function (Backbone) {
-        "use strict";
+    'underscore',
+    'backbone',
+    'properties'
+], function (_, Backbone, properties) {
+    "use strict";
 
-        return  {
-            Collection: Backbone.Collection.extend({
-                url: "/services/catalog/sources",
-                useAjaxSync: true
-            }),
-            Types: Backbone.Collection.extend({
+    var Types = Backbone.Collection.extend({
+    });
 
-            })
-        };
+    var computeTypes = function (sources) {
+        if (_.size(properties.typeNameMapping) > 0) {
+            return _.map(properties.typeNameMapping, function(value, key) {
+                if (_.isArray(value)) {
+                    return {
+                        name: key,
+                        value: value.join(',')
+                    };
+                }
+            });
+        } else {
+            return sources.chain()
+                .map(function (source) {
+                    return source.get('contentTypes');
+                })
+                .flatten()
+                .filter(function (element) {
+                    return element.name !== '';
+                })
+                .sortBy(function (element) {
+                    return element.name.toUpperCase();
+                })
+                .uniq(false, function (type) {
+                    return type.name;
+                })
+                .map(function (element) {
+                    element.value = element.name;
+                    return element;
+                })
+                .value();
+        }
+    };
+
+    var Sources = Backbone.Collection.extend({
+        url: "/services/catalog/sources",
+        useAjaxSync: true,
+        initialize: function () {
+          this._types = new Types();
+          this.on('change', function () {
+            this._types.set(computeTypes(this));
+          }.bind(this));
+        },
+        types: function () {
+          return this._types;
+        }
+    });
+
+    return Sources;
+
 });

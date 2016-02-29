@@ -29,11 +29,12 @@ define([
         'text!templates/resultlist/counthigh.handlebars',
         'text!templates/resultlist/statusItem.handlebars',
         'text!templates/resultlist/status.handlebars',
-        'properties'
+        'properties',
+        'js/store'
     ],
     function (Marionette, Backbone, $, _, ich, dir, Spinner, spinnerConfig, wreqr, FilterLayoutView,
               resultListItemTemplate, resultListTemplate, metacardTableTemplate, countLowTemplate,
-              countHighTemplate, statusItemTemplate, statusTemplate, properties) {
+              countHighTemplate, statusItemTemplate, statusTemplate, properties, store) {
         "use strict";
 
         var List = {};
@@ -317,7 +318,7 @@ define([
                 if (view.model.get("status")) {
                     view.statusRegion.show(new List.StatusTable({
                         collection: view.model.get("status"),
-                        sources: wreqr.reqres.request('workspace:getsources')
+                        sources: store.get('sources')
                     }));
                 }
                 view.countRegion.show(new List.CountView({

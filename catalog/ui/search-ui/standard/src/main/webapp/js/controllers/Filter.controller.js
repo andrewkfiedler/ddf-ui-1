@@ -17,8 +17,9 @@ define([
     'wreqr',
     'moment',
     'js/model/source',
-    'properties'
-], function (_, Backbone, Marionette, wreqr, moment, Source, Properties) {
+    'properties',
+    'js/store'
+], function (_, Backbone, Marionette, wreqr, moment, Source, Properties, store) {
         'use strict';
         var FilterController;
 
@@ -187,7 +188,7 @@ define([
 
             registerFacetCounts: function(facetCounts, numberOfResults){
                 var controller = this;
-                var contentTypes = wreqr.reqres.request("workspace:gettypes");
+                var contentTypes = store.get('sources').types();
                 var contentTypeIds = contentTypes.pluck('name');
                 controller.facetCounts = _.pick(facetCounts,[Properties.filters.METADATA_CONTENT_TYPE]);
                 var defaults = {};

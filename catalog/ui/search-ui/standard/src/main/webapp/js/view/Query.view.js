@@ -25,9 +25,10 @@ define([
         'text!templates/search/searchForm.handlebars',
         'direction',
         'maptype',
+        'js/store',
         'bootstrapselect'
     ],
-    function ($, Backbone, Cesium, Marionette, _, ich, properties, MetaCard, Progress, wreqr, searchFormTemplate, dir, maptype) {
+    function ($, Backbone, Cesium, Marionette, _, ich, properties, MetaCard, Progress, wreqr, searchFormTemplate, dir, maptype, store) {
         "use strict";
         var Query = {};
 
@@ -108,13 +109,8 @@ define([
                         '<option></option>', typesBindings));
 
                 this.isWorkspace = options.isWorkspace;
-
-                if (wreqr.reqres.hasHandler('workspace:getsources')) {
-                    this.sources = wreqr.reqres.request('workspace:getsources');
-                }
-                if (wreqr.reqres.hasHandler('workspace:gettypes')) {
-                    this.types = wreqr.reqres.request('workspace:gettypes');
-                }
+                this.sources = store.get('sources');
+                this.types = this.sources.types();
             },
 
             updateScheduling: function(e) {

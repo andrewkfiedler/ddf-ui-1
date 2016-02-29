@@ -32,61 +32,6 @@ define(['application',
 
         Application.App.module('WorkspaceModule', function(WorkspaceModule) {
 
-            var setTypes = function () {
-                var allTypes = [];
-                if (_.size(properties.typeNameMapping) > 0) {
-                    _.each(properties.typeNameMapping, function(value, key) {
-                        if (_.isArray(value)) {
-                            allTypes.push({
-                                name: key,
-                                value: value.join(',')
-                            });
-                        }
-                    });
-                } else {
-                    allTypes = _.chain(WorkspaceModule.sources.map(function (source) {
-                        return source.get('contentTypes');
-                    }))
-                    .flatten()
-                    .filter(function (element) {
-                        return element.name !== '';
-                    })
-                    .sortBy(function (element) {
-                        return element.name.toUpperCase();
-                    })
-                    .uniq(false, function (type) {
-                        return type.name;
-                    })
-                    .map(function (element) {
-                        element.value = element.name;
-                        return element;
-                    })
-                    .value();
-                }
-                WorkspaceModule.types.set(allTypes);
-            };
-
-            WorkspaceModule.sources = new Source.Collection();
-            WorkspaceModule.sources.fetch().success(function() {
-                setTypes();
-            });
-
-            WorkspaceModule.types = new Source.Types();
-
-            // Poll the server for changes to Sources every 60 seconds -
-            // This matches the DDF SourcePoller polling interval
-            poller.get(WorkspaceModule.sources, { delay: 60000 }).start();
-
-            wreqr.reqres.setHandler('workspace:getsources', function () {
-                return WorkspaceModule.sources;
-            });
-
-            this.listenTo(WorkspaceModule.sources, 'change', setTypes);
-
-            wreqr.reqres.setHandler('workspace:gettypes', function () {
-                return WorkspaceModule.types;
-            });
-
             var workspaceView = new WorkspaceView.PanelLayout({model: store.get('workspaces')});
 
             var Controller = Marionette.Controller.extend({

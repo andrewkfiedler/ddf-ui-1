@@ -24,9 +24,10 @@ define([
         'js/view/Modal',
         'text!templates/metacardActionModal.handlebars',
         'js/view/NearbyLocation.view',
-        'js/model/NearbyLocation'
+        'js/model/NearbyLocation',
+        'js/store'
     ],
-    function ($, _, Marionette, ich, dir, maptype, wreqr, Cometd, metacardTemplate, Modal, metacardActionTemplate, NearbyLocationView, NearbyLocation) {
+    function ($, _, Marionette, ich, dir, maptype, wreqr, Cometd, metacardTemplate, Modal, metacardActionTemplate, NearbyLocationView, NearbyLocation, store) {
 
         "use strict";
 
@@ -82,9 +83,7 @@ define([
 
                 this.listenTo(wreqr.vent, 'search:beginMerge', this.invalidateList);
 
-                if (wreqr.reqres.hasHandler('workspace:gettypes')) {
-                    this.types = wreqr.reqres.request('workspace:gettypes');
-                }
+                this.types = store.get('sources').types();
             },
             onRender: function () {
                 this.updateIterationControls();
