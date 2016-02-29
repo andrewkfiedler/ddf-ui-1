@@ -1052,7 +1052,7 @@ button.ui-multiselect {
 
 .login-container {
     padding: 10px;
-    width: 250px;
+    width: 100%;
 }
 
 .logout-container {

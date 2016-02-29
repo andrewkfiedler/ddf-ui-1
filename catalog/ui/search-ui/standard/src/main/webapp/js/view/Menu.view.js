@@ -300,7 +300,6 @@ define([
         template: 'loginTemplate',
         events: {
             'click .btn-signin': 'logInUser',
-            'click .btn-clear': 'clearFields',
             'keypress #username': 'logInEnter',
             'keypress #password': 'logInEnter'
         },
@@ -337,11 +336,6 @@ define([
                 this.select();
                 }
             );
-        },
-        clearFields: function() {
-            this.$('#username').val('');
-            this.$('#password').val('');
-            this.$('#loginError').hide();
         },
         deleteCookie: function() {
             document.cookie = "JSESSIONID=;path=/;domain=;expires=Thu, 01 Jan 1970 00:00:00 GMT;secure";
