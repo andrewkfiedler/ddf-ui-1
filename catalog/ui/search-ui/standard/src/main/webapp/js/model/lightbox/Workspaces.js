@@ -12,21 +12,13 @@
 /*global define*/
 define([
     'underscore',
-    'backbone'
-], function (_, Backbone) {
+    'backbone',
+    'js/model/lightbox/Lightbox'
+], function (_, Backbone, Lightbox) {
 
-    var Lightbox = Backbone.Model.extend({
-        defaults: {
-            open: false,
-            title: 'Default Title'
-        },
-        close: function(){
+    var Workspaces = Lightbox.extend({
 
-        },
-        open: function(){
-
-        }
     });
 
-    return new Lightbox();
+    return Workspaces;
 });

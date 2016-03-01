@@ -20,9 +20,8 @@ define([
     'jquery',
     'text!templates/workspace/workspaceSelector.handlebars',
     'js/CustomElements',
-    'js/model/lightbox/Lightbox',
-    'js/view/lightbox/lightbox.view'
-], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements, Lightbox) {
+    'js/view/lightbox/lightbox.view.instance'
+], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements, LightboxViewInstance) {
 
     ich.addTemplate('workspaceSelectorTemplate', workspaceSelectorTemplate);
 
@@ -44,7 +43,7 @@ define([
             this.render();
         },
         openWorkspaces: function () {
-            Lightbox.open();
+            LightboxViewInstance.model.open();
         }
     });
 
