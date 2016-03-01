@@ -9,24 +9,27 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-/*global define, window, performance*/
-/*jshint bitwise: false*/
+/*global define*/
 define([
-], function () {
+    'underscore',
+    'backbone'
+], function (_, Backbone) {
 
-
-    return {
-        generateUUID: function(){
-            var d = new Date().getTime();
-            if(window.performance && typeof window.performance.now === "function"){
-                d += performance.now(); //use high-precision timer if available
-            }
-            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = (d + Math.random()*16)%16 | 0;
-                d = Math.floor(d/16);
-                return (c==='x' ? r : (r&0x3|0x8)).toString(16);
-            });
-            return uuid;
+    var Lightbox = Backbone.Model.extend({
+        defaults: {
+            open: false,
+            title: 'Default Title'
+        },
+        close: function(){
+            this.set('open',false);
+        },
+        open: function(){
+            this.set('open',true);
+        },
+        isOpen: function(){
+            return this.get('open');
         }
-    };
+    });
+
+    return new Lightbox();
 });

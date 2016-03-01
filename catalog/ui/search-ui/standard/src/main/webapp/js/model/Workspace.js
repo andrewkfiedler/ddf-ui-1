@@ -30,6 +30,20 @@ define([
             model: Query.Model
         });
 
+        var fakeShares = ['Andrew', 'Chris', 'Team 1', 'Team 2'];
+        var fakeSources = ['local', 'Remote 1', 'Remote 2'];
+        var getRandomValue = function(arr){
+            return arr[Math.floor(arr.length*Math.random())];
+        };
+        var getMultipleRandomValue = function(arr){
+            var randomValues = [];
+            var multiple = Math.ceil(Math.random()*2);
+            for (var i = 0; i<multiple; i++){
+                randomValues.push(getRandomValue(arr));
+            }
+            return randomValues;
+        };
+
         Workspace.Model = Backbone.AssociatedModel.extend({
             relations: [
                 {
@@ -50,8 +64,23 @@ define([
                 if(!this.get('metacards')) {
                     this.set({metacards: new Workspace.MetacardList()});
                 }
-                if (!this.get('id')){
+                this.addMetacardProperties();
+            },
+            addMetacardProperties: function(){
+                if (this.get('id')===undefined){
                     this.set('id', Common.generateUUID());
+                }
+                if (this.get('createdDate')===undefined){
+                    this.set('createdDate', (new Date()).toString());
+                }
+                if (this.get('lastModifiedDate')===undefined){
+                    this.set('lastModifiedDate',(new Date()).toString());
+                }
+                if (this.get('sharedWith') === undefined){
+                    this.set('sharedWith',getMultipleRandomValue(fakeShares));
+                }
+                if (this.get('source')=== undefined){
+                    this.set('source',getRandomValue(fakeSources));
                 }
             }
         });

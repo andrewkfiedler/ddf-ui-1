@@ -55,7 +55,7 @@
   .menu-items.collapsed.is-open {
     .normalNav {
       display: block;
-      z-index: 1000;
+      z-index: @zIndexMenubar;
       border-bottom: 1px solid @border-color;
       .nav {
         display: block;
@@ -69,7 +69,7 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: @smallScreenSize) {
   @{customElementNamespace}menu-bar {
     .navbar-brand {
       display: none;

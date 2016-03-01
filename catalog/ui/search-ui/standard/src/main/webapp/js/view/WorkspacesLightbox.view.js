@@ -19,14 +19,12 @@ define([
     'underscore',
     'jquery',
     'text!templates/workspace/workspaceSelector.handlebars',
-    'js/CustomElements',
-    'js/model/lightbox/Lightbox',
-    'js/view/lightbox/lightbox.view'
-], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements, Lightbox) {
+    'js/CustomElements'
+], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements) {
 
     ich.addTemplate('workspaceSelectorTemplate', workspaceSelectorTemplate);
 
-    var WorkspaceSelectorView = Marionette.ItemView.extend({
+    var WorkspacesModal = Marionette.ItemView.extend({
         template: 'workspaceSelectorTemplate',
         tagName: CustomElements.register('workspace-selector'),
         modelEvents: {
@@ -35,18 +33,18 @@ define([
         events: {
             'click': 'openWorkspaces'
         },
-        initialize: function () {
+        initialize: function(){
         },
-        serializeData: function () {
+        serializeData: function(){
             return _.extend(this.model.toJSON(), {currentWorkspace: this.model.getCurrentWorkspaceName()});
         },
-        rerender: function () {
+        rerender: function(){
             this.render();
         },
-        openWorkspaces: function () {
-            Lightbox.open();
+        openWorkspaces: function(){
+            alert('test');
         }
     });
 
-    return WorkspaceSelectorView;
+    return WorkspacesModal;
 });
