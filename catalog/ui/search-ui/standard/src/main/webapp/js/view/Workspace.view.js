@@ -343,9 +343,6 @@ define([
             showWorkspace: function() {
                 if(!this.editing) {
                     var view = this;
-                    wreqr.reqres.setHandler('workspace:getCurrent', function () {
-                        return view.model;
-                    });
                     wreqr.vent.trigger('workspace:show', dir.forward, this.model);
                 }
             },
@@ -467,9 +464,6 @@ define([
                             view.currentWorkspace.get('searches').models[this.currentSearchIndex] = search;
                         }
                     }
-                    wreqr.reqres.setHandler('workspace:getCurrent', function () {
-                        return view.currentWorkspace;
-                    });
                 }
                 this.undoManager.stopTracking();
                 this.undoManager.clear();
@@ -478,12 +472,6 @@ define([
                 this.model.save();
             },
             workspaceCancelEdit: function() {
-                var view = this;
-                if(view.currentWorkspace) {
-                    wreqr.reqres.setHandler('workspace:getCurrent', function () {
-                        return view.currentWorkspace;
-                    });
-                }
                 wreqr.vent.trigger('workspace:show', dir.backward, this.currentWorkspace);
             },
 
@@ -562,7 +550,7 @@ define([
             },
 
             onRender: function() {
-                this.workspaceControlRegion.show(new WorkspaceControl.WorkspaceControlView());
+                this.workspaceControlRegion.show(new WorkspaceControl.WorkspaceControlView({workspace: this.model}));
                 this.workspaceRegion.show(new WorkspaceView.WorkspaceList({collection: this.model.get('workspaces')}));
             }
         });

@@ -53,10 +53,7 @@ define([
                 });
             },
             setWorkspaceViewState: function() {
-                var model;
-                if (wreqr.reqres.hasHandler('workspace:getCurrent')) {
-                    model = wreqr.reqres.request('workspace:getCurrent');
-                }
+                var model = this.model;
                 this.set({
                     back: 'Workspaces',
                     title: model ? model.get('name') : 'View Workspace',
@@ -67,10 +64,7 @@ define([
                 });
             },
             setWorkspaceEditState: function() {
-                var model;
-                if (wreqr.reqres.hasHandler('workspace:getCurrent')) {
-                    model = wreqr.reqres.request('workspace:getCurrent');
-                }
+                var model = this.model;
                 this.set({
                     back: 'Cancel',
                     title: model ? model.get('name') : 'Edit Workspace',
@@ -145,7 +139,6 @@ define([
 
         WorkspaceControl.WorkspaceControlView = Marionette.ItemView.extend({
             template : 'workspaceControlTemplate',
-            model: new WorkspaceControl.WorkspaceControlModel(),
             events: {
                 'click .back': 'action',
                 'click .forward': 'action'
@@ -156,6 +149,7 @@ define([
             },
 
             initialize: function() {
+                this.model = new WorkspaceControl.WorkspaceControlModel({ model: this.options.workspace });
                 this.setupEvents('#workspaces');
                 this.listenTo(wreqr.vent, 'workspace:tabshown', this.setupEvents);
             },
