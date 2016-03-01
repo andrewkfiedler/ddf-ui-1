@@ -33,14 +33,14 @@ define([
     'properties',
     'js/CustomElements',
     'js/view/WorkspaceSelector.view',
-    'js/model/Workspace',
+    'js/store',
     'modelbinder',
     'perfectscrollbar',
     'backbonecometd',
     'progressbar'
 ], function(Marionette, ich, menubarTemplate, menubarItemTemplate, Backbone, notificationMenuTemplate,
         notificationCategoryTemplate, wreqr, _, loginTemplate, logoutTemplate,
-        taskTemplate, taskCategoryTemplate, helpTemplate, Cometd, $, IngestMenu, PreferencesMenu, Application, properties, CustomElements, WorkspaceSelector, Workspace) {
+        taskTemplate, taskCategoryTemplate, helpTemplate, Cometd, $, IngestMenu, PreferencesMenu, Application, properties, CustomElements, WorkspaceSelector, store) {
 
     if (!ich.menubarItemTemplate) {
         ich.addTemplate('menubarItemTemplate', menubarItemTemplate);
@@ -602,7 +602,7 @@ define([
             this.preferences.show(preferences);
 
             var workspaces = new WorkspaceSelector({
-                model: Workspace.WorkspaceResult
+                model: store.get('workspaces')
             });
             this.workspaces.show(workspaces);
 
