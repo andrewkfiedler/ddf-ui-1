@@ -342,7 +342,6 @@ define([
             },
             showWorkspace: function() {
                 if(!this.editing) {
-                    var view = this;
                     wreqr.vent.trigger('workspace:show', dir.forward, this.model);
                 }
             },

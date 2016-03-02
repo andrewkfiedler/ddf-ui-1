@@ -14,11 +14,11 @@
  **/
 /*global define, alert*/
 define([
-    'js/view/lightbox/lightbox.view',
-    'js/model/lightbox/LightboxInstance'
-], function (LightboxView, LightboxInstance) {
+    'component/lightbox/lightbox.view',
+    'component/lightbox/lightboxInstance'
+], function (LightboxView, lightboxInstance) {
 
     return new LightboxView({
-        model: LightboxInstance
+        model: lightboxInstance
     });
 });

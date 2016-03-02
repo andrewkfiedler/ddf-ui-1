@@ -12,7 +12,7 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-/*global define, alert*/
+/*global define*/
 define([
     'marionette',
     'icanhaz',
@@ -20,10 +20,10 @@ define([
     'jquery',
     'text!templates/workspace/workspaceSelector.handlebars',
     'js/CustomElements',
-    'js/view/lightbox/lightbox.view.instance',
+    'component/lightbox/lightbox.view.instance',
     'js/view/Workspaces.view',
-    'js/model/Workspace'
-], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements, LightboxViewInstance, WorkspacesView, Workspace) {
+    'js/store'
+], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements, lightboxViewInstance, WorkspacesView, store) {
 
     ich.addTemplate('workspaceSelectorTemplate', workspaceSelectorTemplate);
 
@@ -45,10 +45,10 @@ define([
             this.render();
         },
         openWorkspaces: function () {
-            LightboxViewInstance.model.updateTitle('Workspaces');
-            LightboxViewInstance.model.open();
-            LightboxViewInstance.lightboxContent.show(new WorkspacesView({
-                model: Workspace.WorkspaceResult
+            lightboxViewInstance.model.updateTitle('Workspaces');
+            lightboxViewInstance.model.open();
+            lightboxViewInstance.lightboxContent.show(new WorkspacesView({
+                model: store.get('workspaces')
             }));
         }
     });

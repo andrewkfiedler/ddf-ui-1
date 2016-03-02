@@ -18,14 +18,14 @@ define([
     'icanhaz',
     'underscore',
     'jquery',
-    'text!templates/lightbox/lightbox.handlebars',
+    'text!component/lightbox/Lightbox.handlebars',
     'js/CustomElements'
-], function (Marionette, ich, _, $, lightboxTemplate, CustomElements) {
+], function (Marionette, ich, _, $, LightboxTemplate, CustomElements) {
 
-    ich.addTemplate('lightbox', lightboxTemplate);
+    ich.addTemplate('Lightbox', LightboxTemplate);
 
     var LightboxView = Marionette.LayoutView.extend({
-        template: 'lightbox',
+        template: 'Lightbox',
         tagName: CustomElements.register('lightbox'),
         modelEvents: {
             'all': 'rerender',
