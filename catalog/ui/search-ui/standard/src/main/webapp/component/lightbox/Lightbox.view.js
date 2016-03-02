@@ -18,7 +18,7 @@ define([
     'icanhaz',
     'underscore',
     'jquery',
-    'text!component/lightbox/Lightbox.handlebars',
+    'text!./Lightbox.hbs',
     'js/CustomElements'
 ], function (Marionette, ich, _, $, LightboxTemplate, CustomElements) {
 

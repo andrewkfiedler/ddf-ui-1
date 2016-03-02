@@ -18,7 +18,7 @@ define([
     'icanhaz',
     'underscore',
     'jquery',
-    'text!templates/workspace/workspaces.handlebars',
+    'text!./workspaces.hbs',
     'js/CustomElements'
 ], function (Marionette, ich, _, $, workspacesTemplate, CustomElements) {
 

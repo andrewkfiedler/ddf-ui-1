@@ -14,8 +14,8 @@
  **/
 /*global define, alert*/
 define([
-    'component/lightbox/lightbox.view',
-    'component/lightbox/lightboxInstance'
+    './lightbox.view',
+    './lightboxInstance'
 ], function (LightboxView, lightboxInstance) {
 
     return new LightboxView({

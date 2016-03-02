@@ -21,7 +21,7 @@ define([
     'text!templates/workspace/workspaceSelector.handlebars',
     'js/CustomElements',
     'component/lightbox/lightbox.view.instance',
-    'js/view/Workspaces.view',
+    'component/workspaces/Workspaces.view',
     'js/store'
 ], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements, lightboxViewInstance, WorkspacesView, store) {
 
