@@ -65,12 +65,21 @@ define([
                     this.set({metacards: new Workspace.MetacardList()});
                 }
                 this.addMetacardProperties();
-                this.on('nested-change',function(change){
-                    this.get('id');
+                this.on('nested-change',function(){
+                    var attributesChanged = Object.keys(this.changedAttributes());
+                    if (!(attributesChanged.length === 1 && attributesChanged[0] === 'lastModifiedDate')){
+                        this.updateLastModifiedDate();
+                    }
                 });
-                this.on('change',function(change){
-                   this.get('id');
+                this.on('change',function(){
+                    var attributesChanged = Object.keys(this.changedAttributes());
+                    if (!(attributesChanged.length === 1 && attributesChanged[0] === 'lastModifiedDate')){
+                        this.updateLastModifiedDate();
+                    }
                 });
+            },
+            updateLastModifiedDate: function(){
+                this.set('lastModifiedDate',(new Date()).toString());
             },
             addMetacardProperties: function(){
                 if (this.get('id')===undefined){
@@ -80,7 +89,7 @@ define([
                     this.set('createdDate', (new Date()).toString());
                 }
                 if (this.get('lastModifiedDate')===undefined){
-                    this.set('lastModifiedDate',(new Date()).toString());
+                    this.updateLastModifiedDate();
                 }
                 if (this.get('sharedWith') === undefined){
                     this.set('sharedWith',getMultipleRandomValue(fakeShares));
@@ -96,6 +105,14 @@ define([
 
         Workspace.WorkspaceList = Backbone.Collection.extend({
             model: Workspace.Model,
+            initialize: function(){
+                var collection = this;
+                collection.on('add',function(workspace){
+                    workspace.on('change:lastModifiedDate',function(){
+                        collection.sort();
+                    });
+                });
+            },
             comparator: function(workspace){
                 return -(new Date(workspace.get('lastModifiedDate'))).getTime();
             }
