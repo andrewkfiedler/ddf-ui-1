@@ -1,0 +1,34 @@
+@{customElementNamespace}tabs {
+  @tabHeight: 44px;
+  @tabBackground: rgba(255,255,255,.9);
+  @tabColor: contrast(@tabBackground);
+
+  .customElement;
+
+  .tabs-list {
+    height: @tabHeight;
+    margin: 0px 50px;
+  }
+
+  .tabs-tab {
+    padding: 10px;
+    float: left;
+    height: 100%;
+    border: 1px solid @border-color;
+    color: @tabColor;
+    background: @tabBackground;
+  }
+
+  .tabs-content {
+    height: ~"calc(100% - @{tabHeight})";
+    border: 1px solid @border-color;
+  }
+
+}
+
+@media (max-width: @smallScreenSize) {
+  @{customElementNamespace}tabs {
+
+  }
+
+}

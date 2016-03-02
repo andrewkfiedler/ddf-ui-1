@@ -158,7 +158,7 @@
                         <phase>test</phase>
                         <configuration>
                             <skip>${skipTests}</skip>
-                            <arguments>test</arguments>
+                            <arguments>test:unit</arguments>
                         </configuration>
                     </execution>
                 </executions>

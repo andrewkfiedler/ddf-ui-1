@@ -139,6 +139,14 @@ module.exports = function (grunt) {
                 }
             }
         },
+        simplemocha: {
+            options: {
+                fullTrace: true
+            },
+            test: {
+                src: ['src/main/webapp/**/*.spec.js']
+            }
+        },
         express: {
             options: {
                 port: 8282,
@@ -184,6 +192,7 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.registerTask('test:unit', ['simplemocha:test']);
     grunt.registerTask('test', ['port:allocator', 'express:test', 'mochaWebdriver:phantom']);
     grunt.registerTask('test:selenium', ['port:allocator', 'express:test', 'mochaWebdriver:selenium']);
     grunt.registerTask('test:sauce', ['port:allocator', 'express:test', 'mochaWebdriver:sauce']);

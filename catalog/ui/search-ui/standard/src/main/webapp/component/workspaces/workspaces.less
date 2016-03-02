@@ -39,6 +39,13 @@
 
   .workspace {
     padding: 10px;
+    transition: padding @transitionTime linear;
+
+    &.is-selected {
+      padding: 20px;
+      background: @select-background-color;
+      color: contrast(@select-background-color);
+    }
 
     > div {
       white-space: nowrap;

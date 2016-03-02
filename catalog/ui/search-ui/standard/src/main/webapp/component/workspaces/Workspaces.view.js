@@ -19,25 +19,30 @@ define([
     'underscore',
     'jquery',
     'text!./workspaces.hbs',
-    'js/CustomElements'
-], function (Marionette, ich, _, $, workspacesTemplate, CustomElements) {
+    'js/CustomElements',
+    'component/tabs/tabs',
+    'component/tabs/tabs.view'
+], function (Marionette, ich, _, $, workspacesTemplate, CustomElements, TabsModel, TabsView) {
 
     ich.addTemplate('workspaces', workspacesTemplate);
 
     var selectedWorkspace;
 
-    var Workspaces = Marionette.ItemView.extend({
+    var Workspaces = Marionette.LayoutView.extend({
         template: 'workspaces',
         tagName: CustomElements.register('workspaces'),
         modelEvents: {
             'all': 'rerender'
         },
         events: {
-            'click .workspaces-list .workspace': 'showWorkspace',
+            'click .workspaces-list .workspace': 'changeWorkspace',
             'click .workspaces-add': 'createWorkspace'
         },
         ui: {
             workspaceList: '.workspaces-list'
+        },
+        regions: {
+            'workspaceDetails': '.workspaces-details'
         },
         initialize: function(){
         },
@@ -47,17 +52,25 @@ define([
         rerender: function(){
             this.render();
         },
-        showWorkspace: function(event){
+        changeWorkspace: function(event){
             var workspace = event.currentTarget;
             selectedWorkspace = workspace.getAttribute('data-id');
-            
+            this.highlightSelectedWorkspace();
+            this.workspaceDetails.show(new TabsView({
+                model: new TabsModel()
+            }));
+        },
+        highlightSelectedWorkspace: function(){
+            this.$el.find('.workspaces-list .workspace').removeClass('is-selected');
+            this.$el.find('[data-id='+selectedWorkspace+']').addClass('is-selected');
         },
         createWorkspace: function(){
-            this.model.createWorkspace();
+            selectedWorkspace = this.model.createWorkspace();
             this.scrollToNewWorkspace();
+            this.highlightSelectedWorkspace();
         },
         scrollToNewWorkspace: function(){
-            this.ui.workspaceList[0].scrollTop = this.ui.workspaceList[0].scrollHeight;
+            this.ui.workspaceList[0].scrollTop = 0;
         }
     });
 

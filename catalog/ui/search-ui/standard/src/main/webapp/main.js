@@ -192,6 +192,8 @@ require(['underscore',
             'pluck': _.pluck || lodash.pluck
         });
 
+        Backbone.Associations.EVENTS_NC = true;
+
         var document = window.document;
 
         //in here we drop in any top level patches, etc.

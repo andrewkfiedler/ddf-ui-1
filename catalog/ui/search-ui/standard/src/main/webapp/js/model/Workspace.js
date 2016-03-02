@@ -65,6 +65,12 @@ define([
                     this.set({metacards: new Workspace.MetacardList()});
                 }
                 this.addMetacardProperties();
+                this.on('nested-change',function(change){
+                    this.get('id');
+                });
+                this.on('change',function(change){
+                   this.get('id');
+                });
             },
             addMetacardProperties: function(){
                 if (this.get('id')===undefined){
@@ -89,7 +95,10 @@ define([
         });
 
         Workspace.WorkspaceList = Backbone.Collection.extend({
-            model: Workspace.Model
+            model: Workspace.Model,
+            comparator: function(workspace){
+                return -(new Date(workspace.get('lastModifiedDate'))).getTime();
+            }
         });
 
         Workspace.WorkspaceResult = Backbone.AssociatedModel.extend({
@@ -146,6 +155,7 @@ define([
                 var workspace = new Workspace.Model({name: 'New Workspace'});
                 this.get('workspaces').add(workspace);
                 this.save();
+                return workspace.get('id');
             }
         });
 
