@@ -20,8 +20,10 @@ define([
     'jquery',
     'text!templates/workspace/workspaceSelector.handlebars',
     'js/CustomElements',
-    'js/view/lightbox/lightbox.view.instance'
-], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements, LightboxViewInstance) {
+    'js/view/lightbox/lightbox.view.instance',
+    'js/view/Workspaces.view',
+    'js/model/Workspace'
+], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements, LightboxViewInstance, WorkspacesView, Workspace) {
 
     ich.addTemplate('workspaceSelectorTemplate', workspaceSelectorTemplate);
 
@@ -43,7 +45,11 @@ define([
             this.render();
         },
         openWorkspaces: function () {
+            LightboxViewInstance.model.updateTitle('Workspaces');
             LightboxViewInstance.model.open();
+            LightboxViewInstance.lightboxContent.show(new WorkspacesView({
+                model: Workspace.WorkspaceResult
+            }));
         }
     });
 

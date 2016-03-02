@@ -82,6 +82,9 @@ define([
                 if (this.get('source')=== undefined){
                     this.set('source',getRandomValue(fakeSources));
                 }
+                if (this.get('local')=== undefined){
+                    this.set('local',this.get('source')==='local');
+                }
             }
         });
 
@@ -138,6 +141,11 @@ define([
                 } else {
                     return undefined;
                 }
+            },
+            createWorkspace: function(){
+                var workspace = new Workspace.Model({name: 'New Workspace'});
+                this.get('workspaces').add(workspace);
+                this.save();
             }
         });
 

@@ -28,6 +28,9 @@ define([
         },
         isOpen: function(){
             return this.get('open');
+        },
+        updateTitle: function(title){
+            this.set('title',title);
         }
     });
 

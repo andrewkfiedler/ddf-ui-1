@@ -18,20 +18,26 @@ define([
     'icanhaz',
     'underscore',
     'jquery',
-    'text!templates/workspace/workspaceSelector.handlebars',
+    'text!templates/workspace/workspaces.handlebars',
     'js/CustomElements'
-], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements) {
+], function (Marionette, ich, _, $, workspacesTemplate, CustomElements) {
 
-    ich.addTemplate('workspaceSelectorTemplate', workspaceSelectorTemplate);
+    ich.addTemplate('workspaces', workspacesTemplate);
 
-    var WorkspacesModal = Marionette.ItemView.extend({
-        template: 'workspaceSelectorTemplate',
-        tagName: CustomElements.register('workspace-selector'),
+    var selectedWorkspace;
+
+    var Workspaces = Marionette.ItemView.extend({
+        template: 'workspaces',
+        tagName: CustomElements.register('workspaces'),
         modelEvents: {
             'all': 'rerender'
         },
         events: {
-            'click': 'openWorkspaces'
+            'click .workspaces-list .workspace': 'showWorkspace',
+            'click .workspaces-add': 'createWorkspace'
+        },
+        ui: {
+            workspaceList: '.workspaces-list'
         },
         initialize: function(){
         },
@@ -41,10 +47,19 @@ define([
         rerender: function(){
             this.render();
         },
-        openWorkspaces: function(){
-            alert('test');
+        showWorkspace: function(event){
+            var workspace = event.currentTarget;
+            selectedWorkspace = workspace.getAttribute('data-id');
+            
+        },
+        createWorkspace: function(){
+            this.model.createWorkspace();
+            this.scrollToNewWorkspace();
+        },
+        scrollToNewWorkspace: function(){
+            this.ui.workspaceList[0].scrollTop = this.ui.workspaceList[0].scrollHeight;
         }
     });
 
-    return WorkspacesModal;
+    return Workspaces;
 });

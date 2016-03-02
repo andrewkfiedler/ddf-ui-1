@@ -1,4 +1,8 @@
 @{customElementNamespace}lightbox {
+  @lightboxTitleBarFontSize: 2rem;
+  @paddingVertical: 4px;
+  @paddingHorizontal: 7px;
+  @borderSize: 1px;
 
   .customElement;
 
@@ -22,13 +26,14 @@
     top: 20%;
     height: 60%;
     width: 60%;
-    background: black;
+    background: @background-color;
     border: 1px solid @border-color;
   }
 
   .lightbox-title-bar {
     border-bottom: 1px solid @border-color;
     text-align: center;
+    font-size: @lightboxTitleBarFontSize;
   }
 
   .lightbox-close {
@@ -43,22 +48,23 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 100%;
-    max-width: ~"calc(100% - 25px)";
+    max-width: ~"calc(100% - 2*@{paddingHorizontal} - @{lightboxTitleBarFontSize})";
+  }
+
+  .lightbox-content {
+    height: ~"calc(100% - 2*@{paddingVertical} - @{borderSize} - @{lightboxTitleBarFontSize} - 8px)";
+    overflow: auto;
   }
 }
 
 @media (max-width: @smallScreenSize) {
-  @{customElementNamespace}modal {
+  @{customElementNamespace}lightbox {
 
     .lightbox-container {
-      position: relative;
       left: 5%;
       top: 5%;
       height: 90%;
       width: 90%;
-      background: black;
-      border: 1px solid @border-color;
     }
 
     .lightbox-close {
