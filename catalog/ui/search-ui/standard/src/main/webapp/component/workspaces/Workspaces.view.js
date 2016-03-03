@@ -35,7 +35,7 @@ define([
             'all': 'rerender'
         },
         events: {
-            'click .workspaces-list .workspace': 'changeWorkspace',
+            'click .workspaces-list .workspace': 'clickWorkspace',
             'click .workspaces-add': 'createWorkspace',
             'dblclick .workspaces-list .workspace': 'openWorkspace'
         },
@@ -53,9 +53,12 @@ define([
         rerender: function(){
             this.render();
         },
-        changeWorkspace: function(event){
+        clickWorkspace: function(event){
             var workspace = event.currentTarget;
             selectedWorkspace = workspace.getAttribute('data-id');
+            this.changeWorkspace();
+        },
+        changeWorkspace: function(event){
             this.highlightSelectedWorkspace();
             this.workspaceDetails.show(new TabsView({
                 model: new TabsModel({
@@ -70,7 +73,7 @@ define([
         createWorkspace: function(){
             selectedWorkspace = this.model.createWorkspace();
             this.scrollToNewWorkspace();
-            this.highlightSelectedWorkspace();
+            this.changeWorkspace();
         },
         scrollToNewWorkspace: function(){
             this.ui.workspaceList[0].scrollTop = 0;
