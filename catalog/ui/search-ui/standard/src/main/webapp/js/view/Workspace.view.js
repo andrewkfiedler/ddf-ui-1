@@ -37,6 +37,8 @@ define([
     'js/view/MetacardList.view',
     'js/view/MetacardDetail.view',
     'js/view/Search.view',
+
+    'component/side-panel/index',
     // Load non attached libs and plugins
     'backboneundo',
     'perfectscrollbar'
@@ -44,9 +46,10 @@ define([
              workspaceList, workspaceItem, workspaceAdd, workspace, workspaceQueryItem,
              workspaceMetacardItem, workspaceVisibility, workspaceContainer, WorkspaceSaveResults,
              maptype, WorkspaceControl, SlidingRegion, QueryView, QueryModel, MetacardList,
-             MetacardDetail, Search) {
+             MetacardDetail, Search, SidePanelView) {
     'use strict';
     var WorkspaceView = {};
+
     WorkspaceView.WorkspaceAdd = Marionette.ItemView.extend({
         template: workspaceAdd,
         events: {
@@ -54,26 +57,28 @@ define([
             'click #cancel': 'cancel',
             'keypress #workspaceName': 'addWorkspaceOnEnter'
         },
-        initialize: function (options) {
+        initialize: function(options) {
             this.collection = options.collection;
         },
-        addWorkspaceOnEnter: function (e) {
+        addWorkspaceOnEnter: function(e) {
             if (e.keyCode === 13) {
                 this.addWorkspace();
                 e.preventDefault();
             }
         },
-        addWorkspace: function () {
-            var workspace = new Workspace.Model({ name: this.$('#workspaceName').val() });
+        addWorkspace: function() {
+            var workspace = new Workspace.Model({name: this.$('#workspaceName').val()});
             this.collection.add(workspace);
+
             this.collection.parents[0].save();
             wreqr.vent.trigger('workspace:list', this.model);
         },
-        cancel: function () {
+        cancel: function() {
             this.destroy();
             wreqr.vent.trigger('workspace:list', this.model);
         }
     });
+
     WorkspaceView.MetacardItem = Marionette.ItemView.extend({
         template: workspaceMetacardItem,
         tagName: 'tr',
@@ -89,6 +94,7 @@ define([
             wreqr.vent.trigger('workspace:metacard', this.model);
         }
     });
+
     WorkspaceView.SearchItem = Marionette.ItemView.extend({
         template: workspaceQueryItem,
         tagName: 'tr',
@@ -168,16 +174,19 @@ define([
             clearInterval(this.updateInterval);
         }
     });
+
     WorkspaceView.MetacardList = Marionette.CollectionView.extend({
         childView: WorkspaceView.MetacardItem,
         tagName: 'table',
         className: 'table'
     });
+
     WorkspaceView.SearchList = Marionette.CollectionView.extend({
         childView: WorkspaceView.SearchItem,
         tagName: 'table',
         className: 'table'
     });
+
     WorkspaceView.Workspace = Marionette.LayoutView.extend({
         template: workspace,
         className: 'search-form',
@@ -231,6 +240,7 @@ define([
             this.render();
         }
     });
+
     WorkspaceView.WorkspaceItem = Marionette.ItemView.extend({
         template: workspaceItem,
         tagName: 'tr',
@@ -324,12 +334,14 @@ define([
             }
         }
     });
+
     WorkspaceView.WorkspaceList = Marionette.CollectionView.extend({
         template: workspaceList,
         childView: WorkspaceView.WorkspaceItem,
         tagName: 'table',
         className: 'table workspace-table'
     });
+
     WorkspaceView.WorkspacesLayoutView = Marionette.LayoutView.extend({
         template: workspaceList,
         className: 'height-full',
@@ -420,136 +432,55 @@ define([
                     }
                 }
             }
-            this.undoManager.stopTracking();
-            this.undoManager.clear();
-            this.model.unset('editingList', { silent: true });
-            this.model.save();
-        },
-        workspaceCancelEdit: function () {
-            wreqr.vent.trigger('workspace:show', dir.backward, this.currentWorkspace);
-        },
-        workspaceRemove: function (workspace) {
-            this.workspaces.remove(workspace);
-        },
-        editWorkspaceList: function () {
-            this.undoManager.startTracking();
-            this.model.set('editingList', true, { silent: true });
-        },
-        cancelEditWorkspaceList: function () {
-            this.undoManager.undoAll();
-            this.undoManager.stopTracking();
-            this.undoManager.clear();
-            this.model.unset('editingList', { silent: true });
-            this.showWorkspaceList(dir.backward);
-        },
-        showWorkspace: function (direction, model) {
-            if (model) {
-                this.currentWorkspace = model;
-            }
-            this.workspaceRegion.show(new WorkspaceView.Workspace({ model: this.currentWorkspace }), direction);
-        },
-        showWorkspaceList: function (direction) {
-            this.workspaceRegion.show(new WorkspaceView.WorkspaceList({ collection: this.model.get('workspaces') }), direction);
-        },
-        showWorkspaceSearchEdit: function (direction, model, index) {
-            var queryModel = model ? model : new QueryModel.Model();
-            this.currentSearchIndex = index;
-            this.workspaceRegion.show(new QueryView.QueryView({
-                isWorkspace: true,
-                model: queryModel
-            }), direction);
-        },
-        showWorkspaceAdd: function (direction) {
-            this.workspaceRegion.show(new WorkspaceView.WorkspaceAdd({ collection: this.model.get('workspaces') }), direction);
-        },
-        showWorkspaceResults: function (direction, model) {
-            if (model) {
-                if (model.models) {
-                    var tmpResult = new Backbone.Model();
-                    tmpResult.set({ results: model });
-                    this.currentSearch = new Backbone.Model();
-                    this.currentSearch.set({ result: tmpResult });
-                } else {
-                    this.currentSearch = model;
-                }
-            }
-            this.updateMapPrimitive();
-            this.workspaceRegion.show(new MetacardList.MetacardListView({ model: this.currentSearch.get('result') }), direction);
-            wreqr.vent.trigger('map:clear');
-            wreqr.vent.trigger('map:results', this.currentSearch.get('result'));
-        },
-        showWorkspaceMetacard: function (direction, model) {
-            this.workspaceRegion.show(new MetacardDetail.MetacardDetailView({ model: model }), direction);
-        },
-        updateMapPrimitive: function () {
-            wreqr.vent.trigger('search:drawend');
-            if (this.currentSearch.get('north') && this.currentSearch.get('south') && this.currentSearch.get('east') && this.currentSearch.get('west')) {
-                wreqr.vent.trigger('search:bboxdisplay', this.currentSearch);
-                this.currentSearch.trigger('EndExtent');
-            } else if (this.currentSearch.get('lat') && this.currentSearch.get('lon') && this.currentSearch.get('radius')) {
-                wreqr.vent.trigger('search:circledisplay', this.currentSearch);
-                this.currentSearch.trigger('EndExtent');
-            }
-        },
-        onRender: function () {
-            this.workspaceControlRegion.show(new WorkspaceControl.WorkspaceControlView({ workspace: this.model }));
-            this.workspaceRegion.show(new WorkspaceView.WorkspaceList({ collection: this.model.get('workspaces') }));
         }
     });
-    WorkspaceView.WorkspaceLayout = Marionette.LayoutView.extend({
-        template: workspacePanel,
-        className: 'partialaffix span3 row-fluid nav well well-small search-controls',
-        regions: {
-            workspacesRegion: '#workspaces',
-            searchRegion: '#search'
-        },
-        events: { 'shown.bs.tab .tabs-below>.nav-tabs>li>a': 'tabShown' },
-        tabShown: function (e) {
-            wreqr.vent.trigger('workspace:tabshown', e.target.hash);
-        },
-        onRender: function () {
-            this.workspacesRegion.show(new WorkspaceView.WorkspacesLayoutView({ model: this.model }));
-            this.searchRegion.show(new Search.SearchLayout());
-            if (maptype.isNone()) {
-                this.$el.addClass('full-screen-search');
-            }
-            wreqr.vent.trigger('workspace:tabshown', this.$('.nav-tabs > .active a').attr('href'));
-        }
-    });
+
     WorkspaceView.WorkspaceVisibility = Marionette.ItemView.extend({
         template: workspaceVisibility,
         className: 'panel-collapse',
-        events: { 'click .collapse-btn': 'collapseSearchPanel' },
-        model: new Backbone.Model(),
-        modelEvents: { 'change': 'render' },
-        collapseSearchPanel: function () {
-            var $el = $('.search-controls');
-            var zIndex = $el.css('zIndex');
-            if (zIndex !== '-1') {
-                $el.css('zIndex', -1);
-                this.model.set({ isCollapsed: true });
-            } else {
-                $el.css('zIndex', 100);
-                this.model.set({ isCollapsed: false });
-            }
+        events: {
+            'click .collapse-btn': 'collapseSearchPanel'
         },
+        model: new Backbone.Model(),
+        modelEvents: {
+            'change': 'render'
+        },
+
+        collapseSearchPanel: function() {
+            var $el = $('.search-controls');
+
+            var zIndex = $el.css('zIndex');
+
+            if (zIndex !== "-1") {
+                $el.css('zIndex', -1);
+                this.model.set({isCollapsed: true});
+            }
+            else {
+                $el.css('zIndex', 100);
+                this.model.set({isCollapsed: false});
+            }
+         },
+
         initialize: function () {
             _.bindAll(this);
             if (!maptype.isNone()) {
-                this.model.set({ isMap: true });
+                this.model.set({isMap: true});
             }
         }
     });
+
     WorkspaceView.PanelLayout = Marionette.LayoutView.extend({
-        template: workspaceContainer,
-        regions: {
-            panelRegion: '#workspace-panel',
-            visibilityRegion: '#workspace-visibility'
+        template : workspaceContainer,
+        regions : {
+            panelRegion: "#workspace-panel",
+            visibilityRegion: "#workspace-visibility"
         },
-        onRender: function () {
-            this.panelRegion.show(new WorkspaceView.WorkspaceLayout({ model: this.model }));
+
+        onRender : function(){
+            this.panelRegion.show(new SidePanelView({ model: this.model.getCurrentWorkspace() }));
             this.visibilityRegion.show(new WorkspaceView.WorkspaceVisibility());
         }
     });
+
     return WorkspaceView;
 });

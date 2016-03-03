@@ -1,0 +1,29 @@
+@import 'explore/styles';
+@import 'query-editor/styles';
+
+.side-panel {
+
+  // positioning
+  z-index: 100;
+  position: absolute;
+  top: 51px;
+  bottom: 15px;
+  left: 15px;
+  white-space: nowrap;
+  font-size: 0;
+
+  .panel-content {
+    font-size: 12pt;
+    white-space: normal;
+    display: inline-block;
+    vertical-align:top;
+    background-color: rgba(36, 36, 36, 0.9);
+    border: 1px solid @border-color;
+    border-left: none;
+    height: 100%;
+    width: 400px;
+  }
+
+  border-left: 1px solid @border-color;
+
+} 

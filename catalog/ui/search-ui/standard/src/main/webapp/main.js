@@ -167,11 +167,11 @@ require.config({
     },
     waitSeconds: 0
 });
-require.onError = function (err) {
+/*require.onError = function (err) {
     if (typeof console !== 'undefined') {
         console.error('RequireJS failed to load a module', err);
     }
-};
+};*/
 require([
     'underscore',
     'jquery',

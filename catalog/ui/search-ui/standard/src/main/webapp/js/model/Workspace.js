@@ -58,6 +58,14 @@ define([
                     relatedModel: Metacard.MetacardResult
                 }
             ],
+            addQuery: function () {
+                this.get('searches').add({ selected: true });
+            },
+            getSelectedQuery: function () {
+                return this.get('searches').find(function (query) {
+                    return query.get('selected')
+                });
+            },
             initialize: function() {
                 if(!this.get('searches')) {
                     this.set({searches: new Workspace.SearchList()});
@@ -172,12 +180,13 @@ define([
                     this.set('currentWorkspace',workspaces.models[0].get('id'));
                 }
             },
+            getCurrentWorkspace: function () {
+                return this.getWorkspace(this.get('currentWorkspace'));
+            },
             getCurrentWorkspaceName: function(){
-                var currentWorkspace = this.get('currentWorkspace');
+                var currentWorkspace = this.getCurrentWorkspace()
                 if (currentWorkspace){
-                    return this.get('workspaces').get(currentWorkspace).get('name');
-                } else {
-                    return undefined;
+                    return currentWorkspace.get('name');
                 }
             },
             createWorkspace: function(){
@@ -190,7 +199,7 @@ define([
                 this.set('currentWorkspace', workspaceId);
             },
             getWorkspace: function(workspaceId){
-                this.get('workspaces').get(workspaceId);
+                return this.get('workspaces').get(workspaceId);
             }
         });
 

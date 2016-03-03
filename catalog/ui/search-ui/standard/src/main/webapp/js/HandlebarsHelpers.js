@@ -329,7 +329,10 @@ define([
                     return encodeURIComponent(str);
                 }
                 return str;
-            }
+            },
+          json: function (obj) {
+            return JSON.stringify(obj)
+          }
         };
     // Export helpers
     for (helper in helpers) {
