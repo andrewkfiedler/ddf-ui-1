@@ -28,7 +28,6 @@ define([
         template: 'Tabs',
         tagName: CustomElements.register('tabs'),
         modelEvents: {
-            'all': 'rerender',
             'change:activeTab': 'showTab'
         },
         events: {
@@ -39,13 +38,17 @@ define([
         },
         initialize: function () {
         },
-        rerender: function () {
-            this.render();
+        onRender: function(){
+            this.showTab();
+            this.determineContent();
         },
         showTab: function(){
             var currentTab = this.model.getActiveTab();
             this.$el.find('.tabs-tab').removeClass('is-active');
             this.$el.find('[data-id='+currentTab+']').addClass('is-active');
+        },
+        determineContent: function(){
+          //abstract method
         },
         changeTab: function(event){
             var tab = event.currentTarget.getAttribute('data-id');

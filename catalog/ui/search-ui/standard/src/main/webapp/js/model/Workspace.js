@@ -176,6 +176,9 @@ define([
             },
             setCurrentWorkspace: function(workspaceId){
                 this.set('currentWorkspace', workspaceId);
+            },
+            getWorkspace: function(workspaceId){
+                this.get('workspaces').get(workspaceId);
             }
         });
 

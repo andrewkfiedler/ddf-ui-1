@@ -20,8 +20,8 @@ define([
     'jquery',
     'text!./workspaces.hbs',
     'js/CustomElements',
-    'component/tabs/tabs',
-    'component/tabs/tabs.view'
+    'component/tabs/workspace/tabs-workspace',
+    'component/tabs/workspace/tabs-workspace.view'
 ], function (Marionette, ich, _, $, workspacesTemplate, CustomElements, TabsModel, TabsView) {
 
     ich.addTemplate('workspaces', workspacesTemplate);
@@ -58,7 +58,9 @@ define([
             selectedWorkspace = workspace.getAttribute('data-id');
             this.highlightSelectedWorkspace();
             this.workspaceDetails.show(new TabsView({
-                model: new TabsModel()
+                model: new TabsModel({
+                    workspaceId: selectedWorkspace
+                })
             }));
         },
         highlightSelectedWorkspace: function(){
