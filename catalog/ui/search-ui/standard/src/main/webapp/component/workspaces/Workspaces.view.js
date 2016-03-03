@@ -36,7 +36,8 @@ define([
         },
         events: {
             'click .workspaces-list .workspace': 'changeWorkspace',
-            'click .workspaces-add': 'createWorkspace'
+            'click .workspaces-add': 'createWorkspace',
+            'dblclick .workspaces-list .workspace': 'openWorkspace'
         },
         ui: {
             workspaceList: '.workspaces-list'
@@ -71,6 +72,9 @@ define([
         },
         scrollToNewWorkspace: function(){
             this.ui.workspaceList[0].scrollTop = 0;
+        },
+        openWorkspace: function(){
+            window.location.hash = '#workspace/'+selectedWorkspace;
         }
     });
 

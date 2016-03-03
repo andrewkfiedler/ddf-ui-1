@@ -33,7 +33,8 @@ define(['jquery',
         'backbonecometd',
         'jquerycometd',
         'modelbinder',
-        'collectionbinder'
+        'collectionbinder',
+        'js/router'
     ], function ($, _, Marionette, Backbone, ich, properties, maptype, map, header, footer,
                  ApplicationController, ModalController, SystemUsageController, User) {
         'use strict';

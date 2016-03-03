@@ -12,17 +12,39 @@
 /*global define*/
 
 define([
-    'marionette'
-], function (Marionette) {
+    'marionette',
+    'component/lightbox/lightbox.view.instance',
+    'component/workspaces/Workspaces.view',
+    'js/store'
+], function (Marionette, lightboxViewInstance, WorkspacesView, store) {
+
+    function closeLightbox(){
+        lightboxViewInstance.model.close();
+    }
 
     var Router = Marionette.AppRouter.extend({
         controller: {
-
+            openWorkspaces: function(){
+                lightboxViewInstance.model.updateTitle('Workspaces');
+                lightboxViewInstance.model.open();
+                lightboxViewInstance.lightboxContent.show(new WorkspacesView({
+                    model: store.get('workspaces')
+                }));
+            },
+            openWorkspace: function(workspaceId){
+                closeLightbox();
+                store.get('workspaces').setCurrentWorkspace(workspaceId);
+            },
+            home: function(){
+                closeLightbox();
+            }
         },
         appRoutes: {
-
+            'workspaces': 'openWorkspaces',
+            'workspace/:id': 'openWorkspace',
+            'home': 'home'
         }
     });
 
-    return Router;
+    return new Router();
 });

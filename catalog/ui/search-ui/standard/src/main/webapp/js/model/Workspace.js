@@ -137,7 +137,7 @@ define([
                     this.set({workspaces: new Workspace.WorkspaceList()});
                 }
                 this.on({
-                   'all': this.setCurrentWorkspace
+                   'all': this.setDefaultCurrentWorkspace
                 });
             },
             parse: function (resp) {
@@ -152,7 +152,7 @@ define([
                     this.set('currentWorkspace',undefined);
                 }
             },
-            setCurrentWorkspace: function(){
+            setDefaultCurrentWorkspace: function(){
                 this.clearDeletedWorkspace();
                 var currentWorkspace = this.get('currentWorkspace');
                 var workspaces = this.get('workspaces');
@@ -173,6 +173,9 @@ define([
                 this.get('workspaces').add(workspace);
                 this.save();
                 return workspace.get('id');
+            },
+            setCurrentWorkspace: function(workspaceId){
+                this.set('currentWorkspace', workspaceId);
             }
         });
 

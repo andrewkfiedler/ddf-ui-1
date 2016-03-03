@@ -49,11 +49,11 @@ define([
         },
         handleOutsideClick: function (event) {
             if (event.target === this.el) {
-                this.model.close();
+                this.close();
             }
         },
         close: function () {
-            this.model.close();
+            window.location.hash = '#home';
         }
     });
 
