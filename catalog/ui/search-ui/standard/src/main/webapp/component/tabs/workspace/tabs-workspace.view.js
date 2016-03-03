@@ -17,10 +17,8 @@ define([
     'marionette',
     'underscore',
     'jquery',
-    '../tabs.view',
-    'component/workspace-basic/workspace-basic.view',
-    'js/store'
-], function (Marionette, _, $, TabsView, BasicView, store) {
+    '../tabs.view'
+], function (Marionette, _, $, TabsView) {
 
     var WorkspaceTabsView = TabsView.extend({
         initialize: function(){
@@ -32,35 +30,10 @@ define([
             });
         },
         determineContent: function(){
-            var activeTab = this.model.getActiveTab();
-            switch(activeTab){
-                case 'Basic':
-                    this.openBasicView();
-                    break;
-                case 'Advanced':
-                    this.openAdvancedView();
-                    break;
-                case 'History':
-                    this.openHistoryView();
-                    break;
-                case 'Associations':
-                    this.openAssocationsView();
-                    break;
-            }
-        },
-        openBasicView: function(){
-            this.tabsContent.show(new BasicView({
+            var activeTab = this.model.getActiveView();
+            this.tabsContent.show(new activeTab({
                 model: this.model.getAssociatedWorkspace()
             }));
-        },
-        openAdvancedView: function(){
-
-        },
-        openHistoryView: function(){
-
-        },
-        openAssocationsView: function(){
-
         }
     });
 

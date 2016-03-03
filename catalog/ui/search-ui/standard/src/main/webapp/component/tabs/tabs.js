@@ -17,7 +17,7 @@ define([
 
     var Tabs = Backbone.Model.extend({
         defaults: {
-            tabs: ['test','test2','test3'],
+            tabs: {},
             activeTab: undefined
         },
         initialize: function(){
@@ -25,8 +25,8 @@ define([
         },
         setDefaultActiveTab: function(){
             var tabs = this.get('tabs');
-            if (tabs.length > 0 && !this.getActiveTab()){
-                this.set('activeTab',tabs[0]);
+            if (Object.keys(tabs).length > 0 && !this.getActiveTab()){
+                this.set('activeTab',Object.keys(tabs)[0]);
             }
         },
         setActiveTab: function(tab){
@@ -34,6 +34,9 @@ define([
         },
         getActiveTab: function(){
             return this.get('activeTab');
+        },
+        getActiveView: function(){
+            return this.get('tabs')[this.getActiveTab()];
         }
     });
 

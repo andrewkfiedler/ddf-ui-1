@@ -33,7 +33,7 @@ require.config({
         backboneundo: 'lib/Backbone.Undo.js/Backbone.Undo',
         poller: 'lib/backbone-poller/backbone.poller',
         underscore: 'lib/lodash/lodash.min',
-        marionette: 'lib/marionette/lib/backbone.marionette.min',
+        marionette: 'lib/marionette/lib/backbone.marionette',
         // TODO test combining
         modelbinder: 'lib/backbone.modelbinder/Backbone.ModelBinder.min',
         collectionbinder: 'lib/backbone.modelbinder/Backbone.CollectionBinder.min',

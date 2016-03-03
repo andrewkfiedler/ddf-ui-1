@@ -24,6 +24,10 @@ define([
 
     ich.addTemplate('Tabs', TabsTemplate);
 
+    /** This is an abstract view.  It should not be used directly.  It should be extended,
+     *  and determineContent should be overwritten.
+     */
+
     var TabsView = Marionette.LayoutView.extend({
         template: 'Tabs',
         tagName: CustomElements.register('tabs'),
@@ -47,8 +51,11 @@ define([
             this.$el.find('.tabs-tab').removeClass('is-active');
             this.$el.find('[data-id='+currentTab+']').addClass('is-active');
         },
+        serializeData: function () {
+            return _.extend(this.model.toJSON(), {tabTitles: Object.keys(this.model.get('tabs'))});
+        },
         determineContent: function(){
-          //abstract method
+            throw 'You need to override determine content by extending this view.';
         },
         changeTab: function(event){
             var tab = event.currentTarget.getAttribute('data-id');
