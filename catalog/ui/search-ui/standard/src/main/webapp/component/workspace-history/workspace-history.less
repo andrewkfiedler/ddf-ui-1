@@ -1,0 +1,76 @@
+@{customElementNamespace}workspace-history {
+
+  @valueWidth: 60%;
+
+  .customElement;
+
+  overflow: auto;
+  padding: 10px 50px;
+
+  .workspaceHistory-row {
+    transition: padding @transitionTime linear;
+
+    > div:nth-of-type(1) {
+      width: 20%;
+    }
+    > div:nth-of-type(2) {
+      width: 50%;
+    }
+    > div:nth-of-type(3) {
+      width: 30%;
+    }
+
+    &.is-selected {
+      padding-left: 10px;
+      background: @select-background-color;
+      color: contrast(@select-background-color);
+    }
+  }
+
+  .workspaceHistory-header {
+    height: 50px;
+  }
+  .workspaceHistory-body {
+    max-height: ~"calc(100% - 50px - @{minimumButtonSize})";
+    overflow: auto;
+  }
+
+  .workspaceHistory-cell {
+    float: left;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .workspaceHistory-version {
+
+  }
+
+  .workspaceHistory-date {
+
+  }
+
+  .workspaceHistory-user {
+
+  }
+
+  button {
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    height: @minimumButtonSize;
+    display: none;
+  }
+
+  &.has-selection {
+    button {
+      display: block;
+    }
+  }
+
+}
+
+@media (max-width: @smallScreenSize) {
+  @{customElementNamespace}workspace-history {
+
+  }
+}

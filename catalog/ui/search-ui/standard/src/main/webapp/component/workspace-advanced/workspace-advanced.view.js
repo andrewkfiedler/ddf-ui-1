@@ -18,17 +18,15 @@ define([
     'icanhaz',
     'underscore',
     'jquery',
-    'text!./workspace-basic.hbs',
+    'text!./workspace-advanced.hbs',
     'js/CustomElements',
-], function (Marionette, ich, _, $, workspaceBasicTemplate, CustomElements) {
+], function (Marionette, ich, _, $, workspaceAdvancedTemplate, CustomElements) {
 
-    ich.addTemplate('workspaceBasic', workspaceBasicTemplate);
+    ich.addTemplate('workspaceAdvanced', workspaceAdvancedTemplate);
 
-    var editMode = false;
-
-    var WorkspaceBasic = Marionette.LayoutView.extend({
-        template: 'workspaceBasic',
-        tagName: CustomElements.register('workspace-basic'),
+    var WorkspaceAdvanced = Marionette.LayoutView.extend({
+        template: 'workspaceAdvanced',
+        tagName: CustomElements.register('workspace-advanced'),
         modelEvents: {
             'all': 'render'
         },
@@ -39,8 +37,14 @@ define([
         regions: {
         },
         initialize: function(){
-        }
+        },
+        serializeData: function () {
+            return _.extend(this.model.toJSON(), {
+                numSavedItems: this.model.get('metacards').length,
+                numSearches: this.model.get('searches').length
+            });
+        },
     });
 
-    return WorkspaceBasic;
+    return WorkspaceAdvanced;
 });

@@ -30,11 +30,10 @@
     overflow: auto;
   }
 
-  .workspaces-add {
-    > button {
+  button {
       width: 100%;
+      height: @minimumButtonSize;
       padding: 10px;
-    }
   }
 
   .workspace {
@@ -42,7 +41,7 @@
     transition: padding @transitionTime linear;
 
     &.is-selected {
-      padding: 20px;
+      padding-left: 20px;
       background: @select-background-color;
       color: contrast(@select-background-color);
     }

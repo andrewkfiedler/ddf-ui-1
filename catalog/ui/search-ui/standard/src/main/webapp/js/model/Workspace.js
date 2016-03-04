@@ -30,6 +30,7 @@ define([
             model: Query.Model
         });
 
+        var fakeUsers = ['Andrew', 'Chris', 'Korben', 'Leon', 'Krauser','Wesker'];
         var fakeShares = ['Andrew', 'Chris', 'Team 1', 'Team 2'];
         var fakeSources = ['local', 'Remote 1', 'Remote 2'];
         var getRandomValue = function(arr){
@@ -67,26 +68,37 @@ define([
                 this.addMetacardProperties();
                 this.on('nested-change',function(){
                     var attributesChanged = Object.keys(this.changedAttributes());
-                    if (!(attributesChanged.length === 1 && attributesChanged[0] === 'lastModifiedDate')){
+                    if (!(attributesChanged.length === 1 && attributesChanged[0] === 'lastModifiedDate' && attributesChanged[0] === 'history')){
                         this.updateLastModifiedDate();
                     }
                 });
                 this.on('change',function(){
                     var attributesChanged = Object.keys(this.changedAttributes());
-                    if (!(attributesChanged.length === 1 && attributesChanged[0] === 'lastModifiedDate')){
+                    if (!(attributesChanged.length === 1 && attributesChanged[0] === 'lastModifiedDate' && attributesChanged[0] === 'history')){
                         this.updateLastModifiedDate();
                     }
                 });
             },
             updateLastModifiedDate: function(){
-                this.set('lastModifiedDate',(new Date()).toString());
+                this.set('lastModifiedDate',(new Date()).toLocaleString());
+                this.addNewHistory();
+            },
+            addNewHistory: function(){
+                var history = this.get('history') || [];
+                history.unshift({
+                    version: history.length + 1,
+                    date: this.get('lastModifiedDate'),
+                    user: getRandomValue(fakeUsers),
+                    id: Common.generateUUID()
+                });
+                this.set('history',history);
             },
             addMetacardProperties: function(){
                 if (this.get('id')===undefined){
                     this.set('id', Common.generateUUID());
                 }
                 if (this.get('createdDate')===undefined){
-                    this.set('createdDate', (new Date()).toString());
+                    this.set('createdDate', (new Date()).toLocaleString());
                 }
                 if (this.get('lastModifiedDate')===undefined){
                     this.updateLastModifiedDate();

@@ -18,17 +18,15 @@ define([
     'icanhaz',
     'underscore',
     'jquery',
-    'text!./workspace-basic.hbs',
+    'text!./workspace-associations.hbs',
     'js/CustomElements',
-], function (Marionette, ich, _, $, workspaceBasicTemplate, CustomElements) {
+], function (Marionette, ich, _, $, workspaceAssociationsTemplate, CustomElements) {
 
-    ich.addTemplate('workspaceBasic', workspaceBasicTemplate);
+    ich.addTemplate('workspaceAssociations', workspaceAssociationsTemplate);
 
-    var editMode = false;
-
-    var WorkspaceBasic = Marionette.LayoutView.extend({
-        template: 'workspaceBasic',
-        tagName: CustomElements.register('workspace-basic'),
+    var WorkspaceAssociations = Marionette.LayoutView.extend({
+        template: 'workspaceAssociations',
+        tagName: CustomElements.register('workspace-associations'),
         modelEvents: {
             'all': 'render'
         },
@@ -42,5 +40,5 @@ define([
         }
     });
 
-    return WorkspaceBasic;
+    return WorkspaceAssociations;
 });

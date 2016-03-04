@@ -14,13 +14,22 @@ define([
     'underscore',
     '../tabs',
     'js/store',
-    'component/workspace-basic/workspace-basic.view'
-], function (_, Tabs, store, workspaceBasicView) {
+    'component/workspace-basic/workspace-basic.view',
+    'component/workspace-advanced/workspace-advanced.view',
+    'component/workspace-history/workspace-history.view',
+    'component/workspace-associations/workspace-associations.view',
+    'component/workspace-sharing/workspace-sharing.view'
+], function (_, Tabs, store, workspaceBasicView, workspaceAdvancedView, workspaceHistoryView,
+workspaceAssociationsView, workspaceSharingView) {
 
     var WorkspaceTabs = Tabs.extend({
         defaults: {
             tabs: {
-                'Basic': workspaceBasicView
+                'Basic': workspaceBasicView,
+                'Advanced': workspaceAdvancedView,
+                'History': workspaceHistoryView,
+                'Associations': workspaceAssociationsView,
+                'Sharing': workspaceSharingView
             },
             activeTab: undefined,
             workspaceId: undefined

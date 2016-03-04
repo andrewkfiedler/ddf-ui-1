@@ -18,17 +18,15 @@ define([
     'icanhaz',
     'underscore',
     'jquery',
-    'text!./workspace-basic.hbs',
+    'text!./workspace-sharing.hbs',
     'js/CustomElements',
-], function (Marionette, ich, _, $, workspaceBasicTemplate, CustomElements) {
+], function (Marionette, ich, _, $, workspaceSharingTemplate, CustomElements) {
 
-    ich.addTemplate('workspaceBasic', workspaceBasicTemplate);
+    ich.addTemplate('workspaceSharing', workspaceSharingTemplate);
 
-    var editMode = false;
-
-    var WorkspaceBasic = Marionette.LayoutView.extend({
-        template: 'workspaceBasic',
-        tagName: CustomElements.register('workspace-basic'),
+    var WorkspaceSharing = Marionette.LayoutView.extend({
+        template: 'workspaceSharing',
+        tagName: CustomElements.register('workspace-sharing'),
         modelEvents: {
             'all': 'render'
         },
@@ -42,5 +40,5 @@ define([
         }
     });
 
-    return WorkspaceBasic;
+    return WorkspaceSharing;
 });
