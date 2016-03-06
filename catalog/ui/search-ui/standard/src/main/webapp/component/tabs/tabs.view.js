@@ -32,7 +32,7 @@ define([
         template: 'Tabs',
         tagName: CustomElements.register('tabs'),
         modelEvents: {
-            'change:activeTab': 'showTab'
+            'change:activeTab': 'handleTabChange'
         },
         events: {
             'click .tabs-tab': 'changeTab'
@@ -41,14 +41,25 @@ define([
             'tabsContent': '.tabs-content'
         },
         initialize: function () {
+            var view = this;
+            $(window).on('resize',function(){
+                view._resizeHandler();
+            });
         },
         onRender: function(){
             this.showTab();
             this.determineContent();
         },
+        onShow: function(){
+            this._resizeHandler();
+        },
+        handleTabChange: function(){
+            this.showTab();
+            this.determineContent();
+        },
         showTab: function(){
             var currentTab = this.model.getActiveTab();
-            this.$el.find('.tabs-tab').removeClass('is-active');
+            this.$el.find('.is-active').removeClass('is-active');
             this.$el.find('[data-id='+currentTab+']').addClass('is-active');
         },
         serializeData: function () {
@@ -60,6 +71,41 @@ define([
         changeTab: function(event){
             var tab = event.currentTarget.getAttribute('data-id');
             this.model.setActiveTab(tab);
+        },
+        _collapsed: false,
+        _widthWhenCollapsed: 0,
+        _resizeHandler: function(){
+            var view = this;
+            var menu = view.el.querySelector('.tabs-list');
+            var collapsedDropdown = view.el.querySelector('.tabs-collapsed');
+            if (view._collapsed) {
+                if (menu.clientWidth > view._widthWhenCollapsed) {
+                    view._collapsed = false;
+                    menu.classList.remove('is-collapsed');
+                    menu.classList.remove('is-dropdown');
+                    $(menu).off('click');
+                }
+            } else {
+                if (menu.scrollWidth !== menu.clientWidth) {
+                    view._collapsed = true;
+                    view._widthWhenCollapsed = menu.scrollWidth;
+                    menu.classList.add('is-collapsed');
+                    menu.classList.add('is-dropdown');
+                    $(collapsedDropdown).off('click').on('click', function () {
+                        menu.classList.toggle('is-open');
+                        if (menu.classList.contains('is-open')) {
+                            $('body').on('click.menubar', function (e) {
+                                if (e.target !== menu && $(menu).find(e.target).length === 0) {
+                                    $('body').off('click.menubar');
+                                    menu.classList.remove('is-open');
+                                }
+                            });
+                        } else {
+                            $('body').off('click.menubar');
+                        }
+                    });
+                }
+            }
         }
     });
 

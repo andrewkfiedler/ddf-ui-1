@@ -21,14 +21,6 @@ define([
 ], function (Marionette, _, $, TabsView) {
 
     var WorkspaceTabsView = TabsView.extend({
-        initialize: function(){
-            var view = this;
-            this.model.on({
-                'change:activeTab': function(){
-                    view.determineContent();
-                }
-            });
-        },
         determineContent: function(){
             var activeTab = this.model.getActiveView();
             this.tabsContent.show(new activeTab({

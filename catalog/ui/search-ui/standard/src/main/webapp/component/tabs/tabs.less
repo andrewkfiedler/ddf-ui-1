@@ -8,11 +8,38 @@
   .tabs-list {
     height: @tabHeight;
     margin: 0px 50px;
+    white-space: nowrap;
+    overflow: auto;
+
+    .tabs-expanded {
+      display: block;
+    }
+    .tabs-collapsed {
+      display: none;
+    }
+
+    &.is-collapsed {
+      .tabs-expanded {
+        display: none;
+      }
+      .tabs-collapsed {
+        display: block;
+      }
+    }
+  }
+
+  .tabs-collapsed {
+    .tabs-title {
+      display: none;
+      &.is-active{
+        display: inline-block;
+      }
+    }
   }
 
   .tabs-tab {
     padding: 10px 10px;
-    float: left;
+    display: inline-block;
     height: 100%;
     border: 1px solid @border-color;
     transition: padding @transitionTime linear;

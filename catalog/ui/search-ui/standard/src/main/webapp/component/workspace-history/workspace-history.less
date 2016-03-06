@@ -33,6 +33,7 @@
   .workspaceHistory-body {
     max-height: ~"calc(100% - 50px - @{minimumButtonSize})";
     overflow: auto;
+    width: 100%;
   }
 
   .workspaceHistory-cell {
@@ -59,6 +60,9 @@
     text-align: center;
     height: @minimumButtonSize;
     display: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &.has-selection {
