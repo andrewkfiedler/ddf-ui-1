@@ -7,35 +7,31 @@
 
   .tabs-list {
     height: @tabHeight;
-    margin: 0px 50px;
+    padding: 0px 50px;
     white-space: nowrap;
     overflow: auto;
-
-    .tabs-expanded {
-      display: block;
-    }
-    .tabs-collapsed {
-      display: none;
-    }
+    width: 100%;
 
     &.is-collapsed {
-      .tabs-expanded {
-        display: none;
-      }
-      .tabs-collapsed {
-        display: block;
+      .tabs-dropdown {
+        display: inline-block;
       }
     }
   }
 
   .tabs-collapsed {
-    .tabs-title {
-      display: none;
-      &.is-active{
-        display: inline-block;
-      }
-    }
+    display: none;
   }
+
+  .tabs-title {
+    display: none;
+  }
+
+  .tabs-dropdown {
+    display: none;
+  }
+
+
 
   .tabs-tab {
     padding: 10px 10px;
@@ -48,6 +44,10 @@
       padding: 10px 20px;
       background: @tabBackground;
       color: @tabColor;
+    }
+
+    &.is-merged {
+      display: none;
     }
   }
 

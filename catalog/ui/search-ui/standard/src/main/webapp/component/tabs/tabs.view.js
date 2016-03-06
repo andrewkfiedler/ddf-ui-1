@@ -42,70 +42,74 @@ define([
         },
         initialize: function () {
             var view = this;
-            $(window).on('resize',function(){
+            $(window).on('resize', function () {
                 view._resizeHandler();
             });
         },
-        onRender: function(){
+        onRender: function () {
             this.showTab();
             this.determineContent();
         },
-        onShow: function(){
+        onShow: function () {
             this._resizeHandler();
         },
-        handleTabChange: function(){
+        handleTabChange: function () {
             this.showTab();
             this.determineContent();
         },
-        showTab: function(){
+        showTab: function () {
             var currentTab = this.model.getActiveTab();
             this.$el.find('.is-active').removeClass('is-active');
-            this.$el.find('[data-id='+currentTab+']').addClass('is-active');
+            this.$el.find('[data-id=' + currentTab + ']').addClass('is-active');
         },
         serializeData: function () {
             return _.extend(this.model.toJSON(), {tabTitles: Object.keys(this.model.get('tabs'))});
         },
-        determineContent: function(){
+        determineContent: function () {
             throw 'You need to override determine content by extending this view.';
         },
-        changeTab: function(event){
+        changeTab: function (event) {
             var tab = event.currentTarget.getAttribute('data-id');
             this.model.setActiveTab(tab);
         },
-        _collapsed: false,
-        _widthWhenCollapsed: 0,
-        _resizeHandler: function(){
+        _widthWhenCollapsed: [],
+        _resizeHandler: function () {
             var view = this;
             var menu = view.el.querySelector('.tabs-list');
-            var collapsedDropdown = view.el.querySelector('.tabs-collapsed');
-            if (view._collapsed) {
-                if (menu.clientWidth > view._widthWhenCollapsed) {
-                    view._collapsed = false;
-                    menu.classList.remove('is-collapsed');
-                    menu.classList.remove('is-dropdown');
-                    $(menu).off('click');
-                }
+            console.log('scrollWidth:'+menu.scrollWidth);
+            console.log('clientWidth:'+menu.clientWidth);
+            if (view._hasMergeableTabs() && menu.scrollWidth > menu.clientWidth) {
+                view._widthWhenCollapsed.push(menu.scrollWidth+1);
+                view._mergeTab();
+                view._resizeHandler();
             } else {
-                if (menu.scrollWidth !== menu.clientWidth) {
-                    view._collapsed = true;
-                    view._widthWhenCollapsed = menu.scrollWidth;
-                    menu.classList.add('is-collapsed');
-                    menu.classList.add('is-dropdown');
-                    $(collapsedDropdown).off('click').on('click', function () {
-                        menu.classList.toggle('is-open');
-                        if (menu.classList.contains('is-open')) {
-                            $('body').on('click.menubar', function (e) {
-                                if (e.target !== menu && $(menu).find(e.target).length === 0) {
-                                    $('body').off('click.menubar');
-                                    menu.classList.remove('is-open');
-                                }
-                            });
-                        } else {
-                            $('body').off('click.menubar');
-                        }
-                    });
+                if (view._widthWhenCollapsed.length !== 0
+                    && menu.clientWidth > view._widthWhenCollapsed[view._widthWhenCollapsed.length - 1]) {
+                    view._widthWhenCollapsed.pop();
+                    view._unmergeTab();
+                    view._resizeHandler();
                 }
             }
+            if (menu.querySelectorAll('.is-merged').length > 0) {
+                var alreadyCollapsed = menu.classList.contains('is-collapsed');
+                if (!alreadyCollapsed) {
+                    menu.classList.add('is-collapsed');
+                    view._resizeHandler();
+                }
+            } else {
+                menu.classList.remove('is-collapsed');
+            }
+        },
+        _hasMergeableTabs: function(){
+            return this.$el.find('.tabs-list .tabs-expanded > .tabs-tab:not(.is-merged)').length !==0;
+        },
+        _mergeTab: function () {
+            this.$el.find('.tabs-list .tabs-expanded > .tabs-tab:not(.is-merged)')
+                .last().addClass('is-merged');
+        },
+        _unmergeTab: function () {
+            this.$el.find('.tabs-list .tabs-expanded > .tabs-tab.is-merged')
+                .first().removeClass('is-merged');
         }
     });
 
