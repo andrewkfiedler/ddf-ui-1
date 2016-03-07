@@ -4,21 +4,15 @@
 
   .customElement;
 
-  overflow: auto;
-  padding: 10px 50px;
+  overflow: hidden;
+  padding: 10px 10px;
+
+  .workspaceHistory-row + .workspaceHistory-row {
+    border-top: 1px solid @border-color;
+  }
 
   .workspaceHistory-row {
     transition: padding @transitionTime linear;
-
-    > div:nth-of-type(1) {
-      width: 20%;
-    }
-    > div:nth-of-type(2) {
-      width: 50%;
-    }
-    > div:nth-of-type(3) {
-      width: 30%;
-    }
 
     &.is-selected {
       padding-left: 10px;
@@ -31,9 +25,11 @@
     height: 50px;
   }
   .workspaceHistory-body {
-    max-height: ~"calc(100% - 50px - @{minimumButtonSize})";
+    max-height: ~"calc(100% - @{minimumButtonSize}*2 - 20px)";
     overflow: auto;
+    overflow-x: hidden;
     width: 100%;
+    border: 1px solid @border-color;
   }
 
   .workspaceHistory-cell {
@@ -43,15 +39,15 @@
   }
 
   .workspaceHistory-version {
-
+    width: 20%;
   }
 
   .workspaceHistory-date {
-
+    width: 50%;
   }
 
   .workspaceHistory-user {
-
+    width: 30%;
   }
 
   button {
@@ -75,6 +71,14 @@
 
 @media (max-width: @smallScreenSize) {
   @{customElementNamespace}workspace-history {
+    .workspaceHistory-body {
+      max-height: ~"calc(100% - @{minimumButtonSize}*4 - 19px)";
+      overflow: auto;
+    }
 
+    .workspaceHistory-cell {
+      display: block;
+      width: 100%;
+    }
   }
 }
