@@ -22,6 +22,10 @@ define([
     'js/CustomElements'
 ], function (Marionette, ich, _, $, TabsTemplate, CustomElements) {
 
+    function namespacedEvent(event, view){
+        return event + '.' + view.cid;
+    }
+
     ich.addTemplate('Tabs', TabsTemplate);
 
     /** This is an abstract view.  It should not be used directly.  It should be extended,
@@ -43,7 +47,7 @@ define([
         },
         initialize: function () {
             var view = this;
-            $(window).on('resize', function () {
+            $(window).on(namespacedEvent('resize',view), function () {
                 view._resizeHandler();
             });
         },
@@ -54,6 +58,9 @@ define([
         },
         onShow: function () {
             this._resizeHandler();
+        },
+        onBeforeDestroy: function(){
+            $(window).off(namespacedEvent('resize',this));
         },
         handleTabChange: function () {
             this.showTab(true);
@@ -93,14 +100,14 @@ define([
             menu.off('click').on('click', function () {
                 tabList.toggleClass('is-open');
                 if (tabList.hasClass('is-open')) {
-                    $('body').on('click.menubar', function (e) {
+                    $('body').on(namespacedEvent('click',view), function (e) {
                         if (e.target !== menu[0] && menu.find(e.target).length === 0) {
-                            $('body').off('click.menubar');
+                            $('body').off(namespacedEvent('click',view));
                             tabList.removeClass('is-open');
                         }
                     });
                 } else {
-                    $('body').off('click.menubar');
+                    $('body').off(namespacedEvent('click',view));
                 }
             });
         },
