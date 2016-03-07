@@ -85,6 +85,11 @@
       }
     }
 
+    .tabs-tab + .tabs-tab,
+    .tabs-tab + .tabs-dropdown{
+      border-left: 1px solid @border-color;
+    }
+
     .tabs-tab {
       padding: 10px 10px;
       display: inline-block;
@@ -110,7 +115,26 @@
 
 @media (max-width: @smallScreenSize) {
   @{customElementNamespace}tabs {
+    .tabs-list {
 
+      &.is-open {
+        .tabs-dropdown {
+          position: fixed;
+          left: 0px;
+          top: 0px;
+          width: 100%;
+          text-align: center;
+          background: @within-background-color;
+          color: white;
+        }
+
+        .tabs-collapsed {
+          position: fixed;
+          left: 0px;
+          top: 50px;
+        }
+      }
+    }
   }
 
 }
