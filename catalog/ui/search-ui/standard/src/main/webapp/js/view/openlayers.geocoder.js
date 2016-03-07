@@ -10,7 +10,6 @@
  *
  **/
 /*global define*/
-
 define([
     'underscore',
     'marionette',
@@ -21,9 +20,7 @@ define([
     'jquery'
 ], function (_, Marionette, Backbone, wreqr, geocoderTemplate, ich, $) {
     var geocoder = {};
-
     ich.addTemplate('geocoderTemplate', geocoderTemplate);
-
     var url = '/services/REST/v1/Locations';
     var geocoderModel = new Backbone.Model();
     geocoder.View = Marionette.ItemView.extend({
@@ -32,16 +29,16 @@ define([
             'keypress #searchfield': 'searchOnEnter',
             'click #searchbutton': 'search'
         },
-        initialize: function() {
+        initialize: function () {
             this.model = geocoderModel;
             this.modelBinder = new Backbone.ModelBinder();
             this.listenTo(this.model, 'change', this.changedSearchText);
         },
-        onRender: function() {
+        onRender: function () {
             var searchBinding = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
             this.modelBinder.bind(this.model, this.$el, searchBinding);
         },
-        searchOnEnter: function(e) {
+        searchOnEnter: function (e) {
             if (e.keyCode === 13) {
                 //user pushed enter, perform search
                 this.model.set('searchText', this.$('#searchfield').val());
@@ -51,14 +48,14 @@ define([
                 e.preventDefault();
             }
         },
-        changedSearchText: function() {
+        changedSearchText: function () {
             if (this.model.get('searchText')) {
                 this.$('#searchfield').addClass('geocoder-input-wide');
             } else {
                 this.$('#searchfield').removeClass('geocoder-input-wide');
             }
         },
-        search: function() {
+        search: function () {
             var view = this;
             if (this.model.get('searchText')) {
                 $.ajax({
@@ -72,22 +69,18 @@ define([
                             view.model.set('searchText', view.model.get('searchText') + ' (not found)');
                             return;
                         }
-
                         var resourceSet = result.resourceSets[0];
                         if (resourceSet.resources.length === 0) {
                             view.model.set('searchText', view.model.get('searchText') + ' (not found)');
                             return;
                         }
-
                         var resource = resourceSet.resources[0];
-
                         view.model.set('searchText', resource.name);
                         var bbox = resource.bbox;
                         var south = bbox[2];
                         var west = bbox[1];
                         var north = bbox[0];
                         var east = bbox[3];
-
                         wreqr.vent.trigger('search:maprectanglefly', {
                             north: north,
                             south: south,
@@ -102,6 +95,5 @@ define([
             }
         }
     });
-
     return geocoder;
 });

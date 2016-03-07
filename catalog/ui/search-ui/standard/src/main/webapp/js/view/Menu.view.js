@@ -38,79 +38,64 @@ define([
     'perfectscrollbar',
     'backbonecometd',
     'progressbar'
-], function(Marionette, ich, menubarTemplate, menubarItemTemplate, Backbone, notificationMenuTemplate,
-        notificationCategoryTemplate, wreqr, _, loginTemplate, logoutTemplate,
-        taskTemplate, taskCategoryTemplate, helpTemplate, Cometd, $, IngestMenu, PreferencesMenu, Application, properties, CustomElements, WorkspaceSelector, store) {
-
+], function (Marionette, ich, menubarTemplate, menubarItemTemplate, Backbone, notificationMenuTemplate, notificationCategoryTemplate, wreqr, _, loginTemplate, logoutTemplate, taskTemplate, taskCategoryTemplate, helpTemplate, Cometd, $, IngestMenu, PreferencesMenu, Application, properties, CustomElements, WorkspaceSelector, store) {
     if (!ich.menubarItemTemplate) {
         ich.addTemplate('menubarItemTemplate', menubarItemTemplate);
     }
-
     ich.addTemplate('menubarTemplate', menubarTemplate);
-
     ich.addTemplate('notificationMenuTemplate', notificationMenuTemplate);
-
     ich.addTemplate('notificationCategoryTemplate', notificationCategoryTemplate);
-
     ich.addTemplate('loginTemplate', loginTemplate);
-
     ich.addTemplate('logoutTemplate', logoutTemplate);
-
     ich.addTemplate('taskTemplate', taskTemplate);
-
     ich.addTemplate('taskCategoryTemplate', taskCategoryTemplate);
-
     ich.addTemplate('helpTemplate', helpTemplate);
-
     var iconOnly = false;
-
     var Menu = {};
-
-    var MenuItem = Backbone.Model.extend({
-
-    });
-
+    var MenuItem = Backbone.Model.extend({});
     Menu.NotificationItem = Marionette.ItemView.extend({
         template: 'notificationMenuTemplate',
         tagName: 'li',
         events: {
-            'click' : 'clickBody',
+            'click': 'clickBody',
             'click a': 'removeNotification'
         },
-        modelEvents: {
-            'change': 'render'
-        },
-        onDestroy: function() {
+        modelEvents: { 'change': 'render' },
+        onDestroy: function () {
             clearTimeout(this.timeout);
         },
-        onRender: function() {
+        onRender: function () {
             this.timeout = setTimeout(this.render, 60000);
         },
-        clickBody: function(e) {
+        clickBody: function (e) {
             //stops the menu from closing
             e.stopPropagation();
         },
-        removeNotification: function(e) {
+        removeNotification: function (e) {
             var id = e.target.id;
-            if(id) {
-                if(id !== 'close' && id !== 'cancelRemove') {
-                    if(id === 'remove') {
+            if (id) {
+                if (id !== 'close' && id !== 'cancelRemove') {
+                    if (id === 'remove') {
                         this.model.collection.remove(this.model);
                         wreqr.vent.trigger('notification:delete', this.model);
-                        Cometd.Comet.publish(this.model.url, {data: [{id: this.model.get('id'), action: id}]});
+                        Cometd.Comet.publish(this.model.url, {
+                            data: [{
+                                    id: this.model.get('id'),
+                                    action: id
+                                }]
+                        });
                     }
                 } else {
-                    if(id === 'cancelRemove') {
-                        this.model.set({closeConfirm: false});
+                    if (id === 'cancelRemove') {
+                        this.model.set({ closeConfirm: false });
                     } else {
-                        this.model.set({closeConfirm: true});
+                        this.model.set({ closeConfirm: true });
                     }
                 }
             }
             e.stopPropagation();
         }
     });
-
     Menu.TaskItem = Marionette.ItemView.extend({
         template: 'taskTemplate',
         tagName: 'li',
@@ -118,43 +103,49 @@ define([
             'click a': 'clickLink',
             'click': 'clickBody'
         },
-        modelEvents: {
-            'change': 'render'
-        },
-        clickBody: function(e) {
+        modelEvents: { 'change': 'render' },
+        clickBody: function (e) {
             //stops the menu from closing
             e.stopPropagation();
-
         },
-        clickLink: function(e) {
+        clickLink: function (e) {
             var id = e.target.id;
-            if(id) {
-                if(id !== 'close' && id !== 'cancelRemove') {
-                    Cometd.Comet.publish(this.model.url, {data: [{id: this.model.get('id'), action: id}]});
-                    if(id === 'remove') {
+            if (id) {
+                if (id !== 'close' && id !== 'cancelRemove') {
+                    Cometd.Comet.publish(this.model.url, {
+                        data: [{
+                                id: this.model.get('id'),
+                                action: id
+                            }]
+                    });
+                    if (id === 'remove') {
                         this.model.collection.remove(this.model);
                         wreqr.vent.trigger('task:remove', this.model);
-                        Cometd.Comet.publish(this.model.url, {data: [{id: this.model.get('id'), action: id}]});
+                        Cometd.Comet.publish(this.model.url, {
+                            data: [{
+                                    id: this.model.get('id'),
+                                    action: id
+                                }]
+                        });
                     }
                 } else {
-                    if(id === 'cancelRemove') {
-                        this.model.set({closeConfirm: false});
+                    if (id === 'cancelRemove') {
+                        this.model.set({ closeConfirm: false });
                     } else {
-                        this.model.set({closeConfirm: true});
+                        this.model.set({ closeConfirm: true });
                     }
                 }
             }
             this.clickBody(e);
         },
-        onRender: function() {
-            if(parseInt(this.model.get('progress'), 10) <= 100) {
-                if(parseInt(this.model.get('progress'), 10) !== -1) {
-                    this.$('.task-progressbar').progressbar({value: parseInt(this.model.get('progress'), 10)});
+        onRender: function () {
+            if (parseInt(this.model.get('progress'), 10) <= 100) {
+                if (parseInt(this.model.get('progress'), 10) !== -1) {
+                    this.$('.task-progressbar').progressbar({ value: parseInt(this.model.get('progress'), 10) });
                 }
             }
         }
     });
-
     Menu.TaskCategory = Marionette.ItemView.extend({
         tagName: 'li',
         template: 'taskCategoryTemplate',
@@ -164,38 +155,34 @@ define([
             'click #cancelRemove': 'cancelRemoveAll',
             'click': 'clickBody'
         },
-          modelEvents: {
-            'change': 'render'
-        },
-        clickBody: function(e) {
+        modelEvents: { 'change': 'render' },
+        clickBody: function (e) {
             //stops the menu from closing
             e.stopPropagation();
         },
-        removeAll: function(e) {
+        removeAll: function (e) {
             var activitiesToDelete = [];
             var currentActivities = [];
-            currentActivities = this.model.get('collection').where({category: this.model.get('category')});
-
+            currentActivities = this.model.get('collection').where({ category: this.model.get('category') });
             this.model.get('collection').remove(currentActivities);
             wreqr.vent.trigger('task:remove', this.model);
-
-            _.each(currentActivities, function(activity) {
-                activitiesToDelete.push({id: activity.get('id'), action: 'remove'});
+            _.each(currentActivities, function (activity) {
+                activitiesToDelete.push({
+                    id: activity.get('id'),
+                    action: 'remove'
+                });
             });
-
-            Cometd.Comet.publish("/service/action", {data: activitiesToDelete});
-
+            Cometd.Comet.publish('/service/action', { data: activitiesToDelete });
             this.clickBody(e);
         },
-        cancelRemoveAll: function() {
-            this.model.set({closeConfirm: false});
+        cancelRemoveAll: function () {
+            this.model.set({ closeConfirm: false });
         },
-        dismissAll: function() {
-            this.model.set({closeConfirm: true});
+        dismissAll: function () {
+            this.model.set({ closeConfirm: true });
         }
     });
-
-     Menu.NotificationCategory = Marionette.ItemView.extend({
+    Menu.NotificationCategory = Marionette.ItemView.extend({
         tagName: 'li',
         template: 'notificationCategoryTemplate',
         events: {
@@ -204,60 +191,57 @@ define([
             'click #cancelRemove': 'cancelRemoveAll',
             'click': 'clickBody'
         },
-        modelEvents: {
-            'change': 'render'
-        },
-        clickBody: function(e) {
+        modelEvents: { 'change': 'render' },
+        clickBody: function (e) {
             //stops the menu from closing
             e.stopPropagation();
         },
-        removeAll: function(e) {
+        removeAll: function (e) {
             var notificationsInCategory = [];
             var notifications = [];
-            notificationsInCategory = this.model.get('collection').where({application: this.model.get('category')});
-
+            notificationsInCategory = this.model.get('collection').where({ application: this.model.get('category') });
             this.model.get('collection').remove(notificationsInCategory);
             wreqr.vent.trigger('notification:delete', this.model);
-
-            for (var i=0; i<notificationsInCategory.length; ++i){
-                notifications.push({id: notificationsInCategory[i].get('id'), action: 'remove'});
+            for (var i = 0; i < notificationsInCategory.length; ++i) {
+                notifications.push({
+                    id: notificationsInCategory[i].get('id'),
+                    action: 'remove'
+                });
             }
-            Cometd.Comet.publish("/notification/action", {data: notifications});
-
+            Cometd.Comet.publish('/notification/action', { data: notifications });
             this.clickBody(e);
         },
-        cancelRemoveAll: function() {
-            this.model.set({closeConfirm: false});
+        cancelRemoveAll: function () {
+            this.model.set({ closeConfirm: false });
         },
-        dismissAll: function() {
-            this.model.set({closeConfirm: true});
+        dismissAll: function () {
+            this.model.set({ closeConfirm: true });
         }
-
     });
-
     Menu.NotificationEmpty = Marionette.ItemView.extend({
-        render: function() {
-            this.$el.html("No recent notifications.");
+        render: function () {
+            this.$el.html('No recent notifications.');
         }
     });
-
     Menu.TaskEmpty = Marionette.ItemView.extend({
-        render: function() {
-            this.$el.html("No current tasks.");
+        render: function () {
+            this.$el.html('No current tasks.');
         }
     });
-
     Menu.TaskList = Marionette.CollectionView.extend({
         className: 'dropdown-width',
         childView: Menu.TaskItem,
         emptyView: Menu.TaskEmpty,
-        showCollection: function(){
+        showCollection: function () {
             var ItemView;
             var category;
             var view = this;
-            this.collection.each(function(item, index){
-                if(category !== item.get('category')) {
-                    this.addChild(new Backbone.Model({category: item.get('category'), collection: view.collection}), Menu.TaskCategory);
+            this.collection.each(function (item, index) {
+                if (category !== item.get('category')) {
+                    this.addChild(new Backbone.Model({
+                        category: item.get('category'),
+                        collection: view.collection
+                    }), Menu.TaskCategory);
                 }
                 category = item.get('category');
                 ItemView = this.getChildView(item);
@@ -265,18 +249,19 @@ define([
             }, this);
         }
     });
-
     Menu.NotificationList = Marionette.CollectionView.extend({
         childView: Menu.NotificationItem,
         emptyView: Menu.NotificationEmpty,
-
-        showCollection: function(){
+        showCollection: function () {
             var ItemView;
             var category;
             var view = this;
-            this.collection.each(function(item, index){
-                if(category !== item.get('application')) {
-                    this.addChild(new Backbone.Model({category: item.get('application'), collection: view.collection}), Menu.NotificationCategory);
+            this.collection.each(function (item, index) {
+                if (category !== item.get('application')) {
+                    this.addChild(new Backbone.Model({
+                        category: item.get('application'),
+                        collection: view.collection
+                    }), Menu.NotificationCategory);
                 }
                 category = item.get('application');
                 ItemView = this.getChildView(item);
@@ -284,18 +269,12 @@ define([
             }, this);
         }
     });
-
     Menu.Item = Marionette.LayoutView.extend({
         tagName: 'li',
         template: 'menubarItemTemplate',
-        regions: {
-            children: 'ul.dropdown-menu'
-        },
-        modelEvents: {
-            'change': 'render'
-        }
+        regions: { children: 'ul.dropdown-menu' },
+        modelEvents: { 'change': 'render' }
     });
-
     Menu.LoginForm = Marionette.ItemView.extend({
         template: 'loginTemplate',
         events: {
@@ -303,65 +282,60 @@ define([
             'keypress #username': 'logInEnter',
             'keypress #password': 'logInEnter'
         },
-        logInEnter: function(e) {
+        logInEnter: function (e) {
             if (e.keyCode === 13) {
                 this.logInUser();
             }
         },
-        logInUser: function() {
+        logInUser: function () {
             var view = this;
             this.deleteCookie();
             $.ajax({
-                type: "GET",
+                type: 'GET',
                 url: document.URL,
                 async: false,
                 beforeSend: function (xhr) {
-                    var base64 = window.btoa(view.$('#username').val() + ":" + view.$('#password').val());
-                    xhr.setRequestHeader ("Authorization", "Basic " + base64);
+                    var base64 = window.btoa(view.$('#username').val() + ':' + view.$('#password').val());
+                    xhr.setRequestHeader('Authorization', 'Basic ' + base64);
                 },
-                error: function() {
+                error: function () {
                     view.showErrorText();
                     view.setErrorState();
                 },
-                success: function() {
+                success: function () {
                     document.location.reload();
                 }
             });
         },
-        showErrorText: function() {
+        showErrorText: function () {
             this.$('#loginError').show();
         },
-        setErrorState: function() {
-            this.$('#password').focus(function() {
+        setErrorState: function () {
+            this.$('#password').focus(function () {
                 this.select();
-                }
-            );
+            });
         },
-        deleteCookie: function() {
-            document.cookie = "JSESSIONID=;path=/;domain=;expires=Thu, 01 Jan 1970 00:00:00 GMT;secure";
+        deleteCookie: function () {
+            document.cookie = 'JSESSIONID=;path=/;domain=;expires=Thu, 01 Jan 1970 00:00:00 GMT;secure';
         }
     });
-
     Menu.LogoutForm = Marionette.ItemView.extend({
         template: 'logoutTemplate',
-        events: {
-            'click .btn-logout': 'logout'
-        },
-        logout: function() {
+        events: { 'click .btn-logout': 'logout' },
+        logout: function () {
             //this function is only here to handle clearing basic auth credentials
             //if you aren't using basic auth, this shouldn't do anything
             $.ajax({
-                type: "GET",
+                type: 'GET',
                 url: document.URL,
                 async: false,
-                username: "1",
-                password: "1",
-            }).then( function(){
-                 window.location = '/logout';
+                username: '1',
+                password: '1'
+            }).then(function () {
+                window.location = '/logout';
             });
         }
     });
-
     Menu.Bar = Marionette.LayoutView.extend({
         template: 'menubarTemplate',
         className: 'navbar',
@@ -375,60 +349,56 @@ define([
             preferences: '#preferences',
             workspaces: '#workspaceSelector'
         },
-        onRender: function() {
+        onRender: function () {
             var menuBarView = this;
-            if(this.model.get('showWelcome')) {
+            if (this.model.get('showWelcome')) {
                 var Welcome = Menu.Item.extend({
                     className: 'dropdown',
-                    initialize: function() {
-                        if(this.isNotGuestUser()){
-                            this.model.set({name: Application.UserModel.get('user').get('username')});
-                        }
-                        else if (!this.isNotGuestUser() && properties.externalAuthentication){
-                            this.model.set({name: typeof Application.UserModel.get('user').get('username') === 'undefined' ? "ERROR" : Application.UserModel.get('user').get('username').split("@")[0]});
+                    initialize: function () {
+                        if (this.isNotGuestUser()) {
+                            this.model.set({ name: Application.UserModel.get('user').get('username') });
+                        } else if (!this.isNotGuestUser() && properties.externalAuthentication) {
+                            this.model.set({ name: typeof Application.UserModel.get('user').get('username') === 'undefined' ? 'ERROR' : Application.UserModel.get('user').get('username').split('@')[0] });
                         }
                         this.listenTo(Application.UserModel, 'change', this.updateUser);
                     },
-                    updateUser: function() {
-                        if(this.isNotGuestUser()) {
-                            this.model.set({name: Application.UserModel.get('user').get('username')});
+                    updateUser: function () {
+                        if (this.isNotGuestUser()) {
+                            this.model.set({ name: Application.UserModel.get('user').get('username') });
                         }
                         this.render();
                     },
-                    isNotGuestUser: function() {
+                    isNotGuestUser: function () {
                         return Application.UserModel && Application.UserModel.get('user') && Application.UserModel.get('user').get('username') && !Application.UserModel.get('user').isGuestUser();
                     },
-                    onRender: function() {
-                        if(this.isNotGuestUser() || properties.externalAuthentication) {
+                    onRender: function () {
+                        if (this.isNotGuestUser() || properties.externalAuthentication) {
                             this.children.show(new Menu.LogoutForm());
-                        }
-
-                        else if ( properties.externalAuthentication ) {
+                        } else if (properties.externalAuthentication) {
                             this.children.show(new Menu.LoginExternalForm());
-                        }
-                        else {
+                        } else {
                             this.children.show(new Menu.LoginForm());
                         }
                     }
                 });
-                this.welcome.show(new Welcome({model: new MenuItem({
-                    id: 'signin',
-                    name: 'Sign In',
-                    classes: 'fa fa-user',
-                    iconOnly: iconOnly,
-                    //change this to true when we can log in or out
-                    dropdown: true
-                })}));
+                this.welcome.show(new Welcome({
+                    model: new MenuItem({
+                        id: 'signin',
+                        name: 'Sign In',
+                        classes: 'fa fa-user',
+                        iconOnly: iconOnly,
+                        //change this to true when we can log in or out
+                        dropdown: true
+                    })
+                }));
             }
-
-            if(this.model.get('showTask')) {
+            if (this.model.get('showTask')) {
                 var Tasks = Menu.Item.extend({
                     className: 'dropdown',
                     initialize: function () {
                         if (wreqr.reqres.hasHandler('tasks')) {
                             this.collection = wreqr.reqres.request('tasks');
                         }
-
                         this.listenTo(wreqr.vent, 'task:update', this.updateTask);
                         this.listenTo(wreqr.vent, 'task:remove', this.updateTask);
                         this.modelBinder = new Backbone.ModelBinder();
@@ -449,9 +419,9 @@ define([
                         }
                         if (this.collection) {
                             if (this.collection.length === 0) {
-                                this.model.set({countNum: ''});
+                                this.model.set({ countNum: '' });
                             } else {
-                                this.model.set({countNum: this.collection.length});
+                                this.model.set({ countNum: this.collection.length });
                             }
                             this.render();
                             this.updateScrollbar();
@@ -460,7 +430,10 @@ define([
                     onRender: function () {
                         var view = this;
                         if (this.collection) {
-                            this.children.show(new Menu.TaskList({collection: this.collection, childViewContainer: this.children.$el}));
+                            this.children.show(new Menu.TaskList({
+                                collection: this.collection,
+                                childViewContainer: this.children.$el
+                            }));
                             var bindings = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
                             this.modelBinder.bind(this.model, this.$el, bindings);
                         } else {
@@ -471,19 +444,20 @@ define([
                         });
                     }
                 });
-                this.tasks.show(new Tasks({model: new MenuItem({
-                    id: 'tasks',
-                    name: 'Tasks',
-                    classes: 'fa fa-tasks',
-                    iconOnly: iconOnly,
-                    dropdown: true,
-                    count: true
-                })}));
+                this.tasks.show(new Tasks({
+                    model: new MenuItem({
+                        id: 'tasks',
+                        name: 'Tasks',
+                        classes: 'fa fa-tasks',
+                        iconOnly: iconOnly,
+                        dropdown: true,
+                        count: true
+                    })
+                }));
             }
-
             var Notification = Menu.Item.extend({
                 className: 'dropdown',
-                initialize: function() {
+                initialize: function () {
                     this.listenTo(wreqr.vent, 'notification:delete', this.deleteNotification);
                     this.listenTo(wreqr.vent, 'notification:new', this.addNotification);
                     this.listenTo(wreqr.vent, 'notification:close', this.removeNotification);
@@ -495,48 +469,51 @@ define([
                         view.children.$el.perfectScrollbar('update');
                     });
                 },
-                deleteNotification: function() {
-                        if (!this.collection) {
-                            if (wreqr.reqres.hasHandler('notifications')) {
-                                this.collection = wreqr.reqres.request('notifications');
-                                this.updateScrollbar();
-                            }
-                        }
-                        if (this.collection) {
-                            if (this.collection.length === 0) {
-                                this.model.set({countNum: ''});
-                            } else {
-                                this.model.set({countNum: this.collection.length});
-                            }
+                deleteNotification: function () {
+                    if (!this.collection) {
+                        if (wreqr.reqres.hasHandler('notifications')) {
+                            this.collection = wreqr.reqres.request('notifications');
                             this.updateScrollbar();
                         }
+                    }
+                    if (this.collection) {
+                        if (this.collection.length === 0) {
+                            this.model.set({ countNum: '' });
+                        } else {
+                            this.model.set({ countNum: this.collection.length });
+                        }
+                        this.updateScrollbar();
+                    }
                 },
-                removeNotification: function() {
-                    if(this.collection) {
+                removeNotification: function () {
+                    if (this.collection) {
                         var len;
-                        if(this.collection.length !== 0) {
+                        if (this.collection.length !== 0) {
                             len = this.collection.length;
                         } else {
                             len = '';
                         }
-                        this.model.set({countNum: len});
+                        this.model.set({ countNum: len });
                     }
                 },
-                addNotification: function() {
-                    if(!this.collection) {
-                        if(wreqr.reqres.hasHandler('notifications')) {
+                addNotification: function () {
+                    if (!this.collection) {
+                        if (wreqr.reqres.hasHandler('notifications')) {
                             this.collection = wreqr.reqres.request('notifications');
-                            this.model.set({countNum: this.collection.length});
+                            this.model.set({ countNum: this.collection.length });
                         }
                         this.render();
                     } else {
-                        this.model.set({countNum: this.collection.length});
+                        this.model.set({ countNum: this.collection.length });
                     }
                 },
-                onRender: function() {
-                var view = this;
-                    if(this.collection) {
-                        this.children.show(new Menu.NotificationList({collection: this.collection, childViewContainer: this.children.$el}));
+                onRender: function () {
+                    var view = this;
+                    if (this.collection) {
+                        this.children.show(new Menu.NotificationList({
+                            collection: this.collection,
+                            childViewContainer: this.children.$el
+                        }));
                         var bindings = Backbone.ModelBinder.createDefaultBindings(this.el, 'name');
                         this.modelBinder.bind(this.model, this.$el, bindings);
                     } else {
@@ -547,68 +524,69 @@ define([
                     });
                 }
             });
-            this.notification.show(new Notification({model: new MenuItem({
-                id: 'notification',
-                name: 'Notification',
-                classes: 'fa fa-bell',
-                iconOnly: iconOnly,
-                dropdown: true,
-                count: true
-            })}));
-
+            this.notification.show(new Notification({
+                model: new MenuItem({
+                    id: 'notification',
+                    name: 'Notification',
+                    classes: 'fa fa-bell',
+                    iconOnly: iconOnly,
+                    dropdown: true,
+                    count: true
+                })
+            }));
             var Help = Menu.Item.extend({
                 className: 'dropdown',
-                onRender: function() {
+                onRender: function () {
                     var HelpView = Marionette.ItemView.extend({
                         template: 'helpTemplate',
-                        serializeData: function(){
-                             return {
+                        serializeData: function () {
+                            return {
                                 branding: menuBarView.model.get('branding'),
                                 version: menuBarView.model.get('version'),
-                                helpUrl: properties.helpUrl || "help.html"
-                             };
+                                helpUrl: properties.helpUrl || 'help.html'
+                            };
                         }
                     });
                     this.children.show(new HelpView());
                 }
             });
-            this.help.show(new Help({model: new MenuItem({
-                id: 'help',
-                name: 'Help',
-                classes: 'fa fa-question-circle',
-                iconOnly: iconOnly,
-                dropdown: true
-            })}));
-
-            if (this.model.get('showIngest')) {
-                var ingest = new IngestMenu({model: new MenuItem({
-                    id: 'Ingest',
-                    name: 'Ingest',
-                    classes: 'fa fa-upload showModal',
+            this.help.show(new Help({
+                model: new MenuItem({
+                    id: 'help',
+                    name: 'Help',
+                    classes: 'fa fa-question-circle',
                     iconOnly: iconOnly,
-                    dropdown: false
-                })});
+                    dropdown: true
+                })
+            }));
+            if (this.model.get('showIngest')) {
+                var ingest = new IngestMenu({
+                    model: new MenuItem({
+                        id: 'Ingest',
+                        name: 'Ingest',
+                        classes: 'fa fa-upload showModal',
+                        iconOnly: iconOnly,
+                        dropdown: false
+                    })
+                });
                 this.ingest.show(ingest);
             }
-
-            var preferences = new PreferencesMenu({model: new MenuItem({
-                id: 'Preferences',
-                name: 'Preferences',
-                classes: 'fa fa-sliders showModal',
-                iconOnly: iconOnly,
-                dropdown: false,
-                preferences: Application.UserModel.get('user>preferences')
-            })});
-            this.preferences.show(preferences);
-
-            var workspaces = new WorkspaceSelector({
-                model: store.get('workspaces')
+            var preferences = new PreferencesMenu({
+                model: new MenuItem({
+                    id: 'Preferences',
+                    name: 'Preferences',
+                    classes: 'fa fa-sliders showModal',
+                    iconOnly: iconOnly,
+                    dropdown: false,
+                    preferences: Application.UserModel.get('user>preferences')
+                })
             });
+            this.preferences.show(preferences);
+            var workspaces = new WorkspaceSelector({ model: store.get('workspaces') });
             this.workspaces.show(workspaces);
-
             this._turnOnCollapsibleMenu();
         },
-        _turnOnCollapsibleMenu: function(){
+        _turnOnCollapsibleMenu: function () {
             this._resizeHandler();
             $(window).off('resize.menubar').on('resize.menubar', this._resizeHandler);
         },
@@ -651,6 +629,5 @@ define([
             view._resizeHandler();
         }
     });
-
     return Menu;
 });

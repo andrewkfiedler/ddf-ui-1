@@ -16,80 +16,64 @@ define([
     'icanhaz',
     'wreqr',
     'text!templates/filter/facet.item.handlebars'
-],
-    function (_, Backbone,Marionette, ich, wreqr, facetItemTemplate) {
-        "use strict";
-
-
-        ich.addTemplate('facetItemTemplate', facetItemTemplate);
-
-        var FacetItemView = Marionette.ItemView.extend({
-            template: 'facetItemTemplate',
-            tagName: 'div',
-            events: {
-                'click .toggle-facet': 'toggleFacet',
-                'click .any-button':'anyButtonClicked',
-                'click .toggle-button':'toggleState'
-            },
-            initialize: function(){
-                this.stateModel = new Backbone.Model({
-                    state: this.options.isAny ? 'any' : 'specific'
-                });
-                this.listenTo(this.stateModel, 'change', this.render);
-            },
-            templateHelpers: function(){
-                return {
-                    isAny: this.options.isAny,
-                    state: this.stateModel.get('state')
-                };
-            },
-            anyButtonClicked: function(){
-                wreqr.vent.trigger('anyFacetClicked', this.model.get('fieldName'));
-            },
-            toggleState: function(){
-                this.stateModel.set({
-                    state: this.stateModel.get('state') === 'any' ? 'specific' : 'any'
-                });
-            },
-            toggleFacet: function(evt){
-                if (evt.target.checked) {
-                    this.addFacet(evt);
-                } else {
-                    this.removeFacet(evt);
-                }
-            },
-            removeFacet: function(evt){
-                var element = this.$(evt.currentTarget);
-                var valueCount = element.attr('data-value-count');
-                var fieldValue = element.attr('data-field-value');
-                var fieldName = element.attr('data-field-name');
-
-                wreqr.vent.trigger('facetDeSelected', {
-                    valueCount: valueCount,
-                    fieldValue: fieldValue,
-                    fieldName: fieldName
-                });
-
-                return false;
-            },
-            addFacet: function(evt){
-
-                var element = this.$(evt.currentTarget);
-                var valueCount = element.attr('data-value-count');
-                var fieldValue = element.attr('data-field-value');
-                var fieldName = element.attr('data-field-name');
-
-                wreqr.vent.trigger('facetSelected', {
-                    valueCount: valueCount,
-                    fieldValue: fieldValue,
-                    fieldName: fieldName
-                });
-
-                return false;
+], function (_, Backbone, Marionette, ich, wreqr, facetItemTemplate) {
+    'use strict';
+    ich.addTemplate('facetItemTemplate', facetItemTemplate);
+    var FacetItemView = Marionette.ItemView.extend({
+        template: 'facetItemTemplate',
+        tagName: 'div',
+        events: {
+            'click .toggle-facet': 'toggleFacet',
+            'click .any-button': 'anyButtonClicked',
+            'click .toggle-button': 'toggleState'
+        },
+        initialize: function () {
+            this.stateModel = new Backbone.Model({ state: this.options.isAny ? 'any' : 'specific' });
+            this.listenTo(this.stateModel, 'change', this.render);
+        },
+        templateHelpers: function () {
+            return {
+                isAny: this.options.isAny,
+                state: this.stateModel.get('state')
+            };
+        },
+        anyButtonClicked: function () {
+            wreqr.vent.trigger('anyFacetClicked', this.model.get('fieldName'));
+        },
+        toggleState: function () {
+            this.stateModel.set({ state: this.stateModel.get('state') === 'any' ? 'specific' : 'any' });
+        },
+        toggleFacet: function (evt) {
+            if (evt.target.checked) {
+                this.addFacet(evt);
+            } else {
+                this.removeFacet(evt);
             }
-
-        });
-
-        return FacetItemView;
-
+        },
+        removeFacet: function (evt) {
+            var element = this.$(evt.currentTarget);
+            var valueCount = element.attr('data-value-count');
+            var fieldValue = element.attr('data-field-value');
+            var fieldName = element.attr('data-field-name');
+            wreqr.vent.trigger('facetDeSelected', {
+                valueCount: valueCount,
+                fieldValue: fieldValue,
+                fieldName: fieldName
+            });
+            return false;
+        },
+        addFacet: function (evt) {
+            var element = this.$(evt.currentTarget);
+            var valueCount = element.attr('data-value-count');
+            var fieldValue = element.attr('data-field-value');
+            var fieldName = element.attr('data-field-name');
+            wreqr.vent.trigger('facetSelected', {
+                valueCount: valueCount,
+                fieldValue: fieldValue,
+                fieldName: fieldName
+            });
+            return false;
+        }
     });
+    return FacetItemView;
+});

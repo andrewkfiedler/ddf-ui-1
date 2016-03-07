@@ -10,128 +10,110 @@
  *
  **/
 /* global define */
-
-define([ 'backbone', 
-         'icanhaz', 
-         'text!templates/notification/notification.message.handlebars', 
-         'text!templates/notification/notification.title.handlebars', 
-         'underscore',
-         'jquery',
-         'wreqr',
-         'moment',
-         'pnotify'
-       ], 
-         function(Backbone, ich, messageTemplate, titleTemplate, _, $, wreqr, moment) {
-
+define([
+    'backbone',
+    'icanhaz',
+    'text!templates/notification/notification.message.handlebars',
+    'text!templates/notification/notification.title.handlebars',
+    'underscore',
+    'jquery',
+    'wreqr',
+    'moment',
+    'pnotify'
+], function (Backbone, ich, messageTemplate, titleTemplate, _, $, wreqr, moment) {
     // Create object to contain both the NotificationItemView and the NotificationListView in.
     // This is so we can return it below.
     var NotificationView = {};
-
     ich.addTemplate('notificationTemplate', messageTemplate);
-
     ich.addTemplate('titleTemplate', titleTemplate);
-
     var currentTime = moment();
-
     //notificationStack and isNotificationOpen used to display only one popup notification at a time
     var notificationStack = [];
     var isNotificationOpen = false;
-    
     NotificationView.NotificationItemView = Backbone.Marionette.ItemView.extend({
-
-        initialize: function() {
+        initialize: function () {
             this.listenTo(wreqr.vent, 'notification:open', this.openNotification);
         },
-
-        onRender : function() {
-            var notificationTime = moment(this.model.get("timestamp"));
-            if(notificationTime.diff(currentTime) > 0) {
+        onRender: function () {
+            var notificationTime = moment(this.model.get('timestamp'));
+            if (notificationTime.diff(currentTime) > 0) {
                 this.createNotification();
             }
-
             return this;
         },
-
-        createNotification: function() {
-
+        createNotification: function () {
             var notification = $.pnotify({
-                title : ich.titleTemplate(this.model.toJSON()),
-                text : this.constructNotificationText(),
-                icon : "fa fa-exclamation-circle notification-title",
+                title: ich.titleTemplate(this.model.toJSON()),
+                text: this.constructNotificationText(),
+                icon: 'fa fa-exclamation-circle notification-title',
                 nonblock: true,
-                auto_display : false,
-                hide : true,
+                auto_display: false,
+                hide: true,
                 delay: 3000,
                 history: false,
                 after_close: function () {
-                   if (notificationStack.length) {
+                    if (notificationStack.length) {
                         notificationStack.shift().pnotify_display();
-                   } else {
+                    } else {
                         isNotificationOpen = false;
-                   }
+                    }
                 },
-                stack: {"dir1": "up",
-                        "dir2": "left",
-                        "spacing1": 0,
-                        "spacing2": 0,
-                        "firstpos1": 25,
-                        "firstpos2": 25},
+                stack: {
+                    'dir1': 'up',
+                    'dir2': 'left',
+                    'spacing1': 0,
+                    'spacing2': 0,
+                    'firstpos1': 25,
+                    'firstpos2': 25
+                },
                 //need to define custom styling since the default pnotify fontawesome styling makes every notice a warning.
                 styling: {
-                    container: "alert",
-                    notice: "",
-                    notice_icon: "fa fa-exclamation-circle",
-                    info: "alert-info",
-                    info_icon: "fa fa-info",
-                    success: "alert-success",
-                    success_icon: "fa fa-check",
-                    error: "alert-danger",
-                    error_icon: "fa fa-warning",
-                    pin_up: "fa fa-pause",
-                    pin_down: "fa fa-play",
-                    hi_menu: "well",
-                    hi_btn: "btn btn-default",
-                    hi_btnhov: "",
-                    hi_hnd: "fa fa-chevron-down"
+                    container: 'alert',
+                    notice: '',
+                    notice_icon: 'fa fa-exclamation-circle',
+                    info: 'alert-info',
+                    info_icon: 'fa fa-info',
+                    success: 'alert-success',
+                    success_icon: 'fa fa-check',
+                    error: 'alert-danger',
+                    error_icon: 'fa fa-warning',
+                    pin_up: 'fa fa-pause',
+                    pin_down: 'fa fa-play',
+                    hi_menu: 'well',
+                    hi_btn: 'btn btn-default',
+                    hi_btnhov: '',
+                    hi_hnd: 'fa fa-chevron-down'
                 }
             });
-
             if (isNotificationOpen === false) {
-                 this.notification = notification;
-                 this.notification.pnotify_display();
-                 isNotificationOpen = true;
+                this.notification = notification;
+                this.notification.pnotify_display();
+                isNotificationOpen = true;
             } else {
                 notificationStack.push(notification);
             }
         },
-
-        openNotification: function(noti) {
-            if(noti && noti.cid === this.model.cid) {
-                if(!this.notification) {
+        openNotification: function (noti) {
+            if (noti && noti.cid === this.model.cid) {
+                if (!this.notification) {
                     this.createNotification();
                 } else {
                     this.notification.pnotify_display();
                 }
             }
         },
-
-        constructNotificationText : function() {
+        constructNotificationText: function () {
             var text = ich.notificationTemplate(this.model.toJSON()).html();
             return text;
         },
-
-        onDestroy : function() {
-            if(this.notification) {
+        onDestroy: function () {
+            if (this.notification) {
                 this.notification.pnotify_remove();
             }
         }
     });
-
     // This loops through all models in provided collection. Renders each model.
     // Appends results of to collection view's el element. Which corresponds to the region it is placed in.
-    NotificationView.NotificationListView = Backbone.Marionette.CollectionView.extend({
-        childView : NotificationView.NotificationItemView
-    });
-
+    NotificationView.NotificationListView = Backbone.Marionette.CollectionView.extend({ childView: NotificationView.NotificationItemView });
     return NotificationView;
 });

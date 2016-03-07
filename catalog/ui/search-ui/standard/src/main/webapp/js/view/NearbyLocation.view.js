@@ -10,45 +10,31 @@
  *
  **/
 /*global define*/
-
 define([
-        'jquery',
-        'underscore',
-        'marionette',
-        'icanhaz',
-        'text!templates/metacardNearbyLocation.handlebars',
-    ],
-    function ($, _, Marionette, ich, metacardNearbyLocationTemplate) {
-
-        "use strict";
-
-        var NearbyLocationView = {};
-
-        ich.addTemplate('metacardNearbyLocationTemplate', metacardNearbyLocationTemplate);
-
-        NearbyLocationView = Marionette.ItemView.extend({
-
-            template : 'metacardNearbyLocationTemplate',
-
-            modelEvents: {
-                'change': 'onRender'
-            },
-
-            initialize: function() {
-                this.model.fetch();
-            },
-
-            onRender: function() {
-                this.$el.html(this.getNearby());
-            },
-
-            getNearby: function() {
-                if (this.model.get('name') !== "" && this.model.get('distance') !== "" && this.model.get('direction') !== "") {
-                    var float = parseFloat(this.model.get('distance'));
-                    return float.toFixed(3) + " km " + this.model.get('direction') + " of " + this.model.get('name');
-                }
+    'jquery',
+    'underscore',
+    'marionette',
+    'icanhaz',
+    'text!templates/metacardNearbyLocation.handlebars'
+], function ($, _, Marionette, ich, metacardNearbyLocationTemplate) {
+    'use strict';
+    var NearbyLocationView = {};
+    ich.addTemplate('metacardNearbyLocationTemplate', metacardNearbyLocationTemplate);
+    NearbyLocationView = Marionette.ItemView.extend({
+        template: 'metacardNearbyLocationTemplate',
+        modelEvents: { 'change': 'onRender' },
+        initialize: function () {
+            this.model.fetch();
+        },
+        onRender: function () {
+            this.$el.html(this.getNearby());
+        },
+        getNearby: function () {
+            if (this.model.get('name') !== '' && this.model.get('distance') !== '' && this.model.get('direction') !== '') {
+                var float = parseFloat(this.model.get('distance'));
+                return float.toFixed(3) + ' km ' + this.model.get('direction') + ' of ' + this.model.get('name');
             }
-        });
-
+        }
+    });
     return NearbyLocationView;
 });

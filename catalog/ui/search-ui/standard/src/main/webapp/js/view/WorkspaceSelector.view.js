@@ -21,22 +21,16 @@ define([
     'text!templates/workspace/workspaceSelector.handlebars',
     'js/CustomElements'
 ], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements) {
-
     ich.addTemplate('workspaceSelectorTemplate', workspaceSelectorTemplate);
-
     var WorkspaceSelectorView = Marionette.ItemView.extend({
         template: 'workspaceSelectorTemplate',
         tagName: CustomElements.register('workspace-selector'),
-        modelEvents: {
-            'all': 'rerender'
-        },
-        events: {
-            'click': 'openWorkspaces'
-        },
+        modelEvents: { 'all': 'rerender' },
+        events: { 'click': 'openWorkspaces' },
         initialize: function () {
         },
         serializeData: function () {
-            return _.extend(this.model.toJSON(), {currentWorkspace: this.model.getCurrentWorkspaceName()});
+            return _.extend(this.model.toJSON(), { currentWorkspace: this.model.getCurrentWorkspaceName() });
         },
         rerender: function () {
             this.render();
@@ -45,6 +39,5 @@ define([
             window.location.hash = '#workspaces';
         }
     });
-
     return WorkspaceSelectorView;
 });

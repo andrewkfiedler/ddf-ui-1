@@ -14,49 +14,39 @@
  **/
 /* global define */
 define([
-        'marionette',
-        'icanhaz',
-        'text!templates/ingest/ingest.menuItem.handlebars',
-        'js/view/ingest/IngestModal.view',
-        'wreqr'
-    ],
-    function (Marionette, ich, ingestMenuItem, IngestModal, wreqr) {
-
-        if (!ich.ingestMenuItem) {
-            ich.addTemplate('ingestMenuItem', ingestMenuItem);
-        }
-
-        var IngestMenu = Marionette.LayoutView.extend({
-            tagName: 'li',
-            modelEvents: {
-                'change': 'render'
-            },
-            className: 'dropdown',
-            template: 'ingestMenuItem',
-            regions: {
-                modalRegion: '.modal-region'
-            },
-            events: {
-                'click .showModal': 'showModal'
-            },
-            initialize: function() {
-                this.listenTo(wreqr.vent, 'upload:start', this.onUploadStart);
-                this.listenTo(wreqr.vent, 'upload:finish', this.onUploadFinish);
-            },
-            showModal: function() {
-                var keepCurrentModal = this.modal && this.modal.isUnfinished();
-                if (!keepCurrentModal) {
-                    this.modal = new IngestModal();
-                }
-                wreqr.vent.trigger('showModal', this.modal);
-            },
-            onUploadStart: function() {
-                this.model.set('uploading', true);
-            },
-            onUploadFinish: function() {
-                this.model.set('uploading', false);
+    'marionette',
+    'icanhaz',
+    'text!templates/ingest/ingest.menuItem.handlebars',
+    'js/view/ingest/IngestModal.view',
+    'wreqr'
+], function (Marionette, ich, ingestMenuItem, IngestModal, wreqr) {
+    if (!ich.ingestMenuItem) {
+        ich.addTemplate('ingestMenuItem', ingestMenuItem);
+    }
+    var IngestMenu = Marionette.LayoutView.extend({
+        tagName: 'li',
+        modelEvents: { 'change': 'render' },
+        className: 'dropdown',
+        template: 'ingestMenuItem',
+        regions: { modalRegion: '.modal-region' },
+        events: { 'click .showModal': 'showModal' },
+        initialize: function () {
+            this.listenTo(wreqr.vent, 'upload:start', this.onUploadStart);
+            this.listenTo(wreqr.vent, 'upload:finish', this.onUploadFinish);
+        },
+        showModal: function () {
+            var keepCurrentModal = this.modal && this.modal.isUnfinished();
+            if (!keepCurrentModal) {
+                this.modal = new IngestModal();
             }
-        });
-
-        return IngestMenu;
+            wreqr.vent.trigger('showModal', this.modal);
+        },
+        onUploadStart: function () {
+            this.model.set('uploading', true);
+        },
+        onUploadFinish: function () {
+            this.model.set('uploading', false);
+        }
     });
+    return IngestMenu;
+});
