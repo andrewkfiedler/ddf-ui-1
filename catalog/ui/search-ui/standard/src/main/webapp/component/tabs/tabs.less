@@ -1,11 +1,13 @@
 @{customElementNamespace}tabs {
   @tabHeight: 44px;
-  @tabBackground: rgba(255,255,255,.9);
+  @tabBackground: rgba(255, 255, 255, .9);
   @tabColor: contrast(@tabBackground);
 
   .customElement;
 
   .tabs-list {
+    .inlineFix;
+
     height: @tabHeight;
     padding: 0px 50px;
     white-space: nowrap;
@@ -19,7 +21,7 @@
       }
     }
 
-    &.is-open{
+    &.is-open {
       .tabs-dropdown {
         background: @within-background-color;
         color: white;
@@ -43,57 +45,63 @@
       }
     }
 
+    .tabs-expanded {
+      height: 100%;
+    }
+
     .tabs-collapsed {
+      display: none;
       background: @background-color;
       > div {
         display: none;
       }
     }
-  }
 
-  .tabs-collapsed {
-    display: none;
-  }
+    .tabs-title {
 
-  .tabs-title {
+      display: none;
 
-    display: none;
-    
-    &.is-active.is-merged {
-      display: inline;
-    }
-  }
-
-  .tabs-dropdown {
-    display: none;
-
-    &.has-activeTab {
-      background: @tabBackground;
-      color: @tabColor;
-
-      .hint {
-        display: none;
+      &.is-active.is-merged {
+        display: inline;
       }
     }
 
-    .hint {
-      display: inline;
-    }
-  }
-
-  .tabs-tab {
-    padding: 10px 10px;
-    display: inline-block;
-    height: 100%;
-    border: 1px solid @border-color;
-
-    &.is-active {
-      background: @tabBackground;
-      color: @tabColor;
-    }
-
-    &.is-merged {
+    .tabs-dropdown {
       display: none;
+      height: 100%;
+
+      > button {
+        height: 100%;
+        padding: 10px;
+      }
+
+      &.has-activeTab {
+        background: @tabBackground;
+        color: @tabColor;
+
+        .hint {
+          display: none;
+        }
+      }
+
+      .hint {
+        display: inline;
+      }
+    }
+
+    .tabs-tab {
+      padding: 10px 10px;
+      display: inline-block;
+      height: 100%;
+
+      &.is-active {
+        background: @tabBackground;
+        color: @tabColor;
+      }
+
+      &.is-merged {
+        display: none;
+      }
     }
   }
 
