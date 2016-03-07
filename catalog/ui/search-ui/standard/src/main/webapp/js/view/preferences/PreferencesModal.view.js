@@ -15,7 +15,6 @@
 /* global define*/
 define([
     'application',
-    'icanhaz',
     'underscore',
     'marionette',
     'backbone',
@@ -37,15 +36,9 @@ define([
     // load dependencies
     'spectrum',
     'jquerySortable'
-], function (Application, ich, _, Marionette, Backbone, $, properties, OpenLayersController, CesiumLayersController, maptype, Modal, preferencesModalTemplate, colorPrefsTabTemplate, layerPrefsTabTemplate, layerListTemplate, layerPickerTemplate, preferenceButtonsTemplate, User, Cesium, wreqr) {
-    ich.addTemplate('preferencesModalTemplate', preferencesModalTemplate);
-    ich.addTemplate('colorPrefsTabTemplate', colorPrefsTabTemplate);
-    ich.addTemplate('layerPrefsTabTemplate', layerPrefsTabTemplate);
-    ich.addTemplate('layerListTemplate', layerListTemplate);
-    ich.addTemplate('layerPickerTemplate', layerPickerTemplate);
-    ich.addTemplate('preferenceButtonsTemplate', preferenceButtonsTemplate);
+], function (Application, _, Marionette, Backbone, $, properties, OpenLayersController, CesiumLayersController, maptype, Modal, preferencesModalTemplate, colorPrefsTabTemplate, layerPrefsTabTemplate, layerListTemplate, layerPickerTemplate, preferenceButtonsTemplate, User, Cesium, wreqr) {
     var PrefsModalView = Modal.extend({
-        template: 'preferencesModalTemplate',
+        template: preferencesModalTemplate,
         className: 'well well-small prefsModal',
         regions: {
             colorTabRegion: '#colorTab',
@@ -69,7 +62,7 @@ define([
         }
     });
     PrefsModalView.ColorTabView = Marionette.LayoutView.extend({
-        template: 'colorPrefsTabTemplate',
+        template: colorPrefsTabTemplate,
         regions: { colorButtonsRegion: '#colorButtons' },
         initialize: function () {
             this.viewModel = this.model.clone();
@@ -145,7 +138,7 @@ define([
         }
     });
     PrefsModalView.Buttons = Marionette.LayoutView.extend({
-        template: 'preferenceButtonsTemplate',
+        template: preferenceButtonsTemplate,
         events: {
             'click button.save': 'save',
             'click button.reset-defaults': 'resetDefaults'
@@ -163,7 +156,7 @@ define([
         }
     });
     PrefsModalView.LayerTabView = Marionette.LayoutView.extend({
-        template: 'layerPrefsTabTemplate',
+        template: layerPrefsTabTemplate,
         regions: {
             layerPickersRegion: '#layerPickers',
             layerButtonsRegion: '#layerButtons'
@@ -277,7 +270,7 @@ define([
          * using CompositeView because it supports table header in template.
          */
     PrefsModalView.LayerPickerTable = Marionette.CompositeView.extend({
-        template: 'layerListTemplate',
+        template: layerListTemplate,
         childViewContainer: '#pickerList',
         /*
              "reverse" the sort order of the picker rows, so that the lowest layer
@@ -343,7 +336,7 @@ define([
         }
     });
     PrefsModalView.LayerPicker = Marionette.ItemView.extend({
-        template: 'layerPickerTemplate',
+        template: layerPickerTemplate,
         tagName: 'tr',
         className: 'layerPicker-row',
         ui: { range: 'input[type="range"]' },

@@ -15,7 +15,6 @@ define([
     'backbone',
     'marionette',
     'wreqr',
-    'icanhaz',
     'q',
     'underscore',
     'spin',
@@ -23,10 +22,9 @@ define([
     'text!templates/search/progress.handlebars',
     'direction',
     'progressbar'
-], function ($, Backbone, Marionette, wreqr, ich, Q, _, Spinner, spinnerConfig, progressTemplate, dir) {
+], function ($, Backbone, Marionette, wreqr, Q, _, Spinner, spinnerConfig, progressTemplate, dir) {
     'use strict';
     var Progress = {};
-    ich.addTemplate('progressTemplate', progressTemplate);
     Progress.ProgressModel = Backbone.Model.extend({
         defaults: {
             current: 0,
@@ -61,7 +59,7 @@ define([
         }
     });
     Progress.ProgressView = Marionette.ItemView.extend({
-        template: 'progressTemplate',
+        template: progressTemplate,
         className: 'progress-view',
         events: {
             'click #progress-btn': 'merge',

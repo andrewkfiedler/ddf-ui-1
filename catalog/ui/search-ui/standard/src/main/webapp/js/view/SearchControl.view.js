@@ -15,14 +15,12 @@ define([
     'underscore',
     'marionette',
     'backbone',
-    'icanhaz',
     'wreqr',
     'text!templates/search/searchControl.handlebars',
     'direction'
-], function ($, _, Marionette, Backbone, ich, wreqr, searchControlTemplate, dir) {
+], function ($, _, Marionette, Backbone, wreqr, searchControlTemplate, dir) {
     'use strict';
     var SearchControl = {};
-    ich.addTemplate('searchControlTemplate', searchControlTemplate);
     SearchControl.SearchControlModel = Backbone.Model.extend({
         defaults: {
             back: '',
@@ -84,7 +82,7 @@ define([
         }
     });
     SearchControl.SearchControlView = Marionette.ItemView.extend({
-        template: 'searchControlTemplate',
+        template: searchControlTemplate,
         model: new SearchControl.SearchControlModel(),
         events: {
             'click .back': 'action',

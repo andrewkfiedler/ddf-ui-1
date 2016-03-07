@@ -16,13 +16,11 @@
 define([
     'marionette',
     'jquery',
-    'icanhaz',
     'text!templates/ingest/ingestNewFileRow.handlebars',
     'fileupload'
-], function (Marionette, $, ich, ingestNewFileRow) {
-    ich.addTemplate('ingestNewFileRow', ingestNewFileRow);
+], function (Marionette, $, ingestNewFileRow) {
     var UploadItem = Marionette.ItemView.extend({
-        template: 'ingestNewFileRow',
+        template: ingestNewFileRow,
         tagName: 'li',
         className: 'file-list-item',
         events: {

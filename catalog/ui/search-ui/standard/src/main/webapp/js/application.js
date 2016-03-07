@@ -16,11 +16,9 @@ define([
     'underscore',
     'marionette',
     'backbone',
-    'icanhaz',
     'properties',
     'maptype',
     // Templates
-    'text!templates/map.handlebars',
     'text!templates/header.layout.handlebars',
     'text!templates/footer.layout.handlebars',
     'js/controllers/application.controller',
@@ -35,13 +33,9 @@ define([
     'modelbinder',
     'collectionbinder',
     'js/router'
-], function ($, _, Marionette, Backbone, ich, properties, maptype, map, header, footer, ApplicationController, ModalController, SystemUsageController, User) {
+], function ($, _, Marionette, Backbone, properties, maptype, header, footer, ApplicationController, ModalController, SystemUsageController, User) {
     'use strict';
-    var Application = {};
-    // Setup templates
-    ich.addTemplate('map', map);
-    ich.addTemplate('headerLayout', header);
-    ich.addTemplate('footerLayout', footer);
+    var Application = {};    // Setup templates
     Application.App = new Marionette.Application();
     Application.AppModel = new Backbone.Model(properties);
     Application.UserModel = new User.Response();
@@ -65,7 +59,7 @@ define([
     //setup the header
     Application.App.addInitializer(function () {
         Application.App.headerRegion.show(new Marionette.ItemView({
-            template: 'headerLayout',
+            template: header,
             className: 'header-layout',
             model: Application.AppModel
         }));
@@ -73,7 +67,7 @@ define([
     //setup the footer
     Application.App.addInitializer(function () {
         Application.App.footerRegion.show(new Marionette.ItemView({
-            template: 'footerLayout',
+            template: footer,
             className: 'footer-layout',
             model: Application.AppModel
         }));

@@ -13,14 +13,12 @@ define([
     'underscore',
     'backbone',
     'marionette',
-    'icanhaz',
     'wreqr',
     'text!templates/filter/facet.item.handlebars'
-], function (_, Backbone, Marionette, ich, wreqr, facetItemTemplate) {
+], function (_, Backbone, Marionette, wreqr, facetItemTemplate) {
     'use strict';
-    ich.addTemplate('facetItemTemplate', facetItemTemplate);
     var FacetItemView = Marionette.ItemView.extend({
-        template: 'facetItemTemplate',
+        template: facetItemTemplate,
         tagName: 'div',
         events: {
             'click .toggle-facet': 'toggleFacet',

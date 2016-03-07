@@ -16,7 +16,6 @@ define([
     'cesium',
     'marionette',
     'underscore',
-    'icanhaz',
     'properties',
     'js/model/Metacard',
     'js/view/Progress.view',
@@ -26,12 +25,11 @@ define([
     'maptype',
     'js/store',
     'bootstrapselect'
-], function ($, Backbone, Cesium, Marionette, _, ich, properties, MetaCard, Progress, wreqr, searchFormTemplate, dir, maptype, store) {
+], function ($, Backbone, Cesium, Marionette, _, properties, MetaCard, Progress, wreqr, searchFormTemplate, dir, maptype, store) {
     'use strict';
     var Query = {};
-    ich.addTemplate('searchFormTemplate', searchFormTemplate);
     Query.QueryView = Marionette.ItemView.extend({
-        template: 'searchFormTemplate',
+        template: searchFormTemplate,
         className: 'slide-animate',
         events: {
             'click #searchButton': 'search',

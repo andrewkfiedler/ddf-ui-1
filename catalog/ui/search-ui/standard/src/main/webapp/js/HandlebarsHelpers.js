@@ -11,11 +11,10 @@
  **/
 /*global define*/
 define([
-    'icanhaz',
     'underscore',
     'moment',
     'handlebars'
-], function (ich, _, moment, Handlebars) {
+], function (_, moment, Handlebars) {
     'use strict';
     // The module to be exported
     var helper, helpers = {
@@ -335,7 +334,7 @@ define([
     // Export helpers
     for (helper in helpers) {
         if (helpers.hasOwnProperty(helper)) {
-            ich.addHelper(helper, helpers[helper]);
+            Handlebars.registerHelper(helper, helpers[helper]);
         }
     }
 });

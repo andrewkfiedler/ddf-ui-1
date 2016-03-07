@@ -15,19 +15,15 @@
 /*global define*/
 define([
     'marionette',
-    'icanhaz',
     'underscore',
     'jquery',
     'text!./workspace-basic.hbs',
-    'js/CustomElements',
-], function (Marionette, ich, _, $, workspaceBasicTemplate, CustomElements) {
-
-    ich.addTemplate('workspaceBasic', workspaceBasicTemplate);
-
+    'js/CustomElements'
+], function (Marionette, _, $, workspaceBasicTemplate, CustomElements) {
     var editMode = false;
 
     var WorkspaceBasic = Marionette.LayoutView.extend({
-        template: 'workspaceBasic',
+        template: workspaceBasicTemplate,
         tagName: CustomElements.register('workspace-basic'),
         modelEvents: {
             'all': 'render'

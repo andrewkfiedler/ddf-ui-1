@@ -16,15 +16,13 @@ define([
     'backbone',
     'wreqr',
     'text!templates/geocoder.handlebars',
-    'icanhaz',
     'jquery'
-], function (_, Marionette, Backbone, wreqr, geocoderTemplate, ich, $) {
+], function (_, Marionette, Backbone, wreqr, geocoderTemplate, $) {
     var geocoder = {};
-    ich.addTemplate('geocoderTemplate', geocoderTemplate);
     var url = '/services/REST/v1/Locations';
     var geocoderModel = new Backbone.Model();
     geocoder.View = Marionette.ItemView.extend({
-        template: 'geocoderTemplate',
+        template: geocoderTemplate,
         events: {
             'keypress #searchfield': 'searchOnEnter',
             'click #searchbutton': 'search'

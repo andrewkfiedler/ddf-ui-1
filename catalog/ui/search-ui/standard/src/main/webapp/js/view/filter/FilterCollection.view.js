@@ -13,15 +13,13 @@ define([
     'backbone',
     'marionette',
     'properties',
-    'icanhaz',
     'js/model/Filter',
     './FilterItem.view',
     'text!templates/filter/filter.collection.handlebars'
-], function (Backbone, Marionette, Properties, ich, Filter, FilterItemView, filterCollectionTemplate) {
+], function (Backbone, Marionette, Properties, Filter, FilterItemView, filterCollectionTemplate) {
     'use strict';
-    ich.addTemplate('filterCollectionTemplate', filterCollectionTemplate);
     var FilterCollectionView = Marionette.CompositeView.extend({
-        template: 'filterCollectionTemplate',
+        template: filterCollectionTemplate,
         childView: FilterItemView,
         className: 'filter-collection-view',
         childViewContainer: '.filter-items',

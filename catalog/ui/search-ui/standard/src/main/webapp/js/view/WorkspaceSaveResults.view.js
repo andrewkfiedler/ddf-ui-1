@@ -17,16 +17,14 @@ define([
     'js/model/Workspace',
     'backbone',
     'direction',
-    'icanhaz',
     'wreqr',
     'text!templates/workspace/workspaceSaveResults.handlebars',
     // Load non attached libs and plugins
     'perfectscrollbar'
-], function ($, _, Marionette, Workspace, Backbone, dir, ich, wreqr, workspaceSaveResults) {
+], function ($, _, Marionette, Workspace, Backbone, dir, wreqr, workspaceSaveResults) {
     'use strict';
-    ich.addTemplate('workspaceSaveResults', workspaceSaveResults);
     var SaveResults = Marionette.ItemView.extend({
-        template: 'workspaceSaveResults',
+        template: workspaceSaveResults,
         events: {
             'click .submit': 'saveResults',
             'keypress input[name=workspaceName]': 'saveResultsOnEnter',

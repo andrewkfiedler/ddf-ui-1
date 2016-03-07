@@ -12,18 +12,16 @@
 define([
     'underscore',
     'marionette',
-    'icanhaz',
     'wreqr',
     'properties',
     'js/model/Filter',
     './FacetCollection.view',
     './FilterCollection.view',
     'text!templates/filter/filter.layout.handlebars'
-], function (_, Marionette, ich, wreqr, Properties, Filter, FacetCollectionView, FilterCollectionView, filterLayoutTemplate) {
+], function (_, Marionette, wreqr, Properties, Filter, FacetCollectionView, FilterCollectionView, filterLayoutTemplate) {
     'use strict';
-    ich.addTemplate('filterLayoutTemplate', filterLayoutTemplate);
     var FilterView = Marionette.LayoutView.extend({
-        template: 'filterLayoutTemplate',
+        template: filterLayoutTemplate,
         className: 'filter-view',
         events: {
             'click .add-filter': 'addFilterPressed',

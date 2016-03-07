@@ -62,7 +62,6 @@ require.config({
         jquerySortable: 'lib/jquery-ui/ui/minified/jquery.ui.sortable.min',
         // handlebars
         handlebars: 'lib/handlebars/handlebars.min',
-        icanhaz: 'lib/icanhandlebarz/ICanHandlebarz',
         // require plugins
         text: 'lib/requirejs-plugins/lib/text',
         css: 'lib/require-css/css.min',
@@ -114,13 +113,6 @@ require.config({
         },
         underscore: { exports: '_' },
         handlebars: { exports: 'Handlebars' },
-        icanhaz: {
-            deps: [
-                'jquery',
-                'handlebars'
-            ],
-            exports: 'ich'
-        },
         moment: { exports: 'moment' },
         jquerycometd: {
             deps: [
@@ -186,11 +178,11 @@ require([
     'backbone',
     'marionette',
     'application',
-    'icanhaz',
     'properties',
+    'handlebars',
     'js/HandlebarsHelpers',
     'js/ApplicationHelpers'
-], function (_, $, Backbone, Marionette, app, ich, properties) {
+], function (_, $, Backbone, Marionette, app, properties, hbs) {
     'use strict';
     // Make lodash compatible with Backbone
     var lodash = _.noConflict();
@@ -202,11 +194,12 @@ require([
     Backbone.Associations.EVENTS_NC = true;
     var document = window.document;
     //in here we drop in any top level patches, etc.
+    var cache = {};
     Marionette.Renderer.render = function (template, data) {
-        if (!template) {
-            return '';
+        if (cache[template] === undefined) {
+            cache[template] = hbs.compile(template);
         }
-        return ich[template](data);
+        return cache[template](data);
     };
     //TODO: this hack here is to fix the issue of the main div not resizing correctly
     //when the header and footer are in place

@@ -14,19 +14,17 @@ define([
     'underscore',
     'marionette',
     'backbone',
-    'icanhaz',
     'properties',
     'wreqr',
     'js/model/Filter',
     'text!templates/filter/filter.item.handlebars',
     'bootstrapselect'
-], function ($, _, Marionette, Backbone, ich, Properties, wreqr, Filter, filterItemTemplate) {
+], function ($, _, Marionette, Backbone, Properties, wreqr, Filter, filterItemTemplate) {
     'use strict';
-    ich.addTemplate('filterItemTemplate', filterItemTemplate);
     var FilterItemView = Marionette.ItemView.extend({
         className: 'item',
         tagName: 'tr',
-        template: 'filterItemTemplate',
+        template: filterItemTemplate,
         events: {
             'click .remove': 'removePressed',
             'change .hasDatepicker': 'dateChanged',

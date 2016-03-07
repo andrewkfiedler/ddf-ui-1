@@ -13,16 +13,14 @@ define([
     'underscore',
     'marionette',
     'backbone',
-    'icanhaz',
     './FacetItem.view',
     'text!templates/filter/facet.collection.handlebars',
     'properties'
-], function (_, Marionette, Backbone, ich, FacetItemView, facetCollectionTemplate, Properties) {
+], function (_, Marionette, Backbone, FacetItemView, facetCollectionTemplate, Properties) {
     'use strict';
-    ich.addTemplate('facetCollectionTemplate', facetCollectionTemplate);
     var FacetCollectionView = Marionette.CompositeView.extend({
         childView: FacetItemView,
-        template: 'facetCollectionTemplate',
+        template: facetCollectionTemplate,
         childViewOptions: function () {
             // TODO Hopefully later down the road we can make this more generic instead of hard-coding metadata-content-type
             var queryObject = this.model.parents[0];

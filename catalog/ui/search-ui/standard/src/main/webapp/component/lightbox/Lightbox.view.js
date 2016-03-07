@@ -15,17 +15,13 @@
 /*global define, alert*/
 define([
     'marionette',
-    'icanhaz',
     'underscore',
     'jquery',
     'text!./Lightbox.hbs',
     'js/CustomElements'
-], function (Marionette, ich, _, $, LightboxTemplate, CustomElements) {
-
-    ich.addTemplate('Lightbox', LightboxTemplate);
-
+], function (Marionette, _, $, LightboxTemplate, CustomElements) {
     var LightboxView = Marionette.LayoutView.extend({
-        template: 'Lightbox',
+        template: LightboxTemplate,
         tagName: CustomElements.register('lightbox'),
         modelEvents: {
             'all': 'rerender',

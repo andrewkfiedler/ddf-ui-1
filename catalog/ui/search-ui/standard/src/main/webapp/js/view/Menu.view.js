@@ -12,7 +12,6 @@
 /*global define, setTimeout, clearTimeout, document, window, parseInt*/
 define([
     'marionette',
-    'icanhaz',
     'text!templates/menu/menubar.handlebars',
     'text!templates/menu/menubarItem.handlebars',
     'backbone',
@@ -38,23 +37,12 @@ define([
     'perfectscrollbar',
     'backbonecometd',
     'progressbar'
-], function (Marionette, ich, menubarTemplate, menubarItemTemplate, Backbone, notificationMenuTemplate, notificationCategoryTemplate, wreqr, _, loginTemplate, logoutTemplate, taskTemplate, taskCategoryTemplate, helpTemplate, Cometd, $, IngestMenu, PreferencesMenu, Application, properties, CustomElements, WorkspaceSelector, store) {
-    if (!ich.menubarItemTemplate) {
-        ich.addTemplate('menubarItemTemplate', menubarItemTemplate);
-    }
-    ich.addTemplate('menubarTemplate', menubarTemplate);
-    ich.addTemplate('notificationMenuTemplate', notificationMenuTemplate);
-    ich.addTemplate('notificationCategoryTemplate', notificationCategoryTemplate);
-    ich.addTemplate('loginTemplate', loginTemplate);
-    ich.addTemplate('logoutTemplate', logoutTemplate);
-    ich.addTemplate('taskTemplate', taskTemplate);
-    ich.addTemplate('taskCategoryTemplate', taskCategoryTemplate);
-    ich.addTemplate('helpTemplate', helpTemplate);
+], function (Marionette, menubarTemplate, menubarItemTemplate, Backbone, notificationMenuTemplate, notificationCategoryTemplate, wreqr, _, loginTemplate, logoutTemplate, taskTemplate, taskCategoryTemplate, helpTemplate, Cometd, $, IngestMenu, PreferencesMenu, Application, properties, CustomElements, WorkspaceSelector, store) {
     var iconOnly = false;
     var Menu = {};
     var MenuItem = Backbone.Model.extend({});
     Menu.NotificationItem = Marionette.ItemView.extend({
-        template: 'notificationMenuTemplate',
+        template: notificationMenuTemplate,
         tagName: 'li',
         events: {
             'click': 'clickBody',
@@ -97,7 +85,7 @@ define([
         }
     });
     Menu.TaskItem = Marionette.ItemView.extend({
-        template: 'taskTemplate',
+        template: taskTemplate,
         tagName: 'li',
         events: {
             'click a': 'clickLink',
@@ -148,7 +136,7 @@ define([
     });
     Menu.TaskCategory = Marionette.ItemView.extend({
         tagName: 'li',
-        template: 'taskCategoryTemplate',
+        template: taskCategoryTemplate,
         events: {
             'click #closeCategory': 'dismissAll',
             'click #removeAll': 'removeAll',
@@ -184,7 +172,7 @@ define([
     });
     Menu.NotificationCategory = Marionette.ItemView.extend({
         tagName: 'li',
-        template: 'notificationCategoryTemplate',
+        template: notificationCategoryTemplate,
         events: {
             'click #closeCategory': 'dismissAll',
             'click #removeAll': 'removeAll',
@@ -271,12 +259,12 @@ define([
     });
     Menu.Item = Marionette.LayoutView.extend({
         tagName: 'li',
-        template: 'menubarItemTemplate',
+        template: menubarItemTemplate,
         regions: { children: 'ul.dropdown-menu' },
         modelEvents: { 'change': 'render' }
     });
     Menu.LoginForm = Marionette.ItemView.extend({
-        template: 'loginTemplate',
+        template: loginTemplate,
         events: {
             'click .btn-signin': 'logInUser',
             'keypress #username': 'logInEnter',
@@ -320,7 +308,7 @@ define([
         }
     });
     Menu.LogoutForm = Marionette.ItemView.extend({
-        template: 'logoutTemplate',
+        template: logoutTemplate,
         events: { 'click .btn-logout': 'logout' },
         logout: function () {
             //this function is only here to handle clearing basic auth credentials
@@ -337,7 +325,7 @@ define([
         }
     });
     Menu.Bar = Marionette.LayoutView.extend({
-        template: 'menubarTemplate',
+        template: menubarTemplate,
         className: 'navbar',
         tagName: CustomElements.register('menu-bar'),
         regions: {
@@ -538,7 +526,7 @@ define([
                 className: 'dropdown',
                 onRender: function () {
                     var HelpView = Marionette.ItemView.extend({
-                        template: 'helpTemplate',
+                        template: helpTemplate,
                         serializeData: function () {
                             return {
                                 branding: menuBarView.model.get('branding'),

@@ -15,18 +15,14 @@
 /* global define */
 define([
     'marionette',
-    'icanhaz',
     'text!templates/preferences/preferences.menu.handlebars',
     'js/view/preferences/PreferencesModal.view',
     'wreqr'
-], function (Marionette, ich, preferencesMenuItem, Modal, wreqr) {
-    if (!ich.preferencesMenuItem) {
-        ich.addTemplate('preferencesMenuItem', preferencesMenuItem);
-    }
+], function (Marionette, preferencesMenuItem, Modal, wreqr) {
     return Marionette.LayoutView.extend({
         tagName: 'li',
         className: 'dropdown',
-        template: 'preferencesMenuItem',
+        template: preferencesMenuItem,
         regions: { modalRegion: '.modal-region' },
         events: { 'click .showModal': 'showModal' },
         showModal: function () {

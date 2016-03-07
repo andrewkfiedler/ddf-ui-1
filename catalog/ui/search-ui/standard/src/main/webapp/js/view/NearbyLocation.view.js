@@ -14,14 +14,12 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'icanhaz',
     'text!templates/metacardNearbyLocation.handlebars'
-], function ($, _, Marionette, ich, metacardNearbyLocationTemplate) {
+], function ($, _, Marionette, metacardNearbyLocationTemplate) {
     'use strict';
     var NearbyLocationView = {};
-    ich.addTemplate('metacardNearbyLocationTemplate', metacardNearbyLocationTemplate);
     NearbyLocationView = Marionette.ItemView.extend({
-        template: 'metacardNearbyLocationTemplate',
+        template: metacardNearbyLocationTemplate,
         modelEvents: { 'change': 'onRender' },
         initialize: function () {
             this.model.fetch();

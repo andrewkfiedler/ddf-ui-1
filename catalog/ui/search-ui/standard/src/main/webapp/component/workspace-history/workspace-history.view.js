@@ -15,19 +15,15 @@
 /*global define*/
 define([
     'marionette',
-    'icanhaz',
     'underscore',
     'jquery',
     'text!./workspace-history.hbs',
-    'js/CustomElements',
-], function (Marionette, ich, _, $, workspaceHistoryTemplate, CustomElements) {
-
-    ich.addTemplate('workspaceHistory', workspaceHistoryTemplate);
-
+    'js/CustomElements'
+], function (Marionette, _, $, workspaceHistoryTemplate, CustomElements) {
     var selectedVersion;
 
     var WorkspaceHistory = Marionette.LayoutView.extend({
-        template: 'workspaceHistory',
+        template: workspaceHistoryTemplate,
         tagName: CustomElements.register('workspace-history'),
         modelEvents: {
             'all': 'render'

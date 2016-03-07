@@ -15,17 +15,13 @@
 /*global define*/
 define([
     'marionette',
-    'icanhaz',
     'underscore',
     'jquery',
     'text!./workspace-sharing.hbs',
-    'js/CustomElements',
-], function (Marionette, ich, _, $, workspaceSharingTemplate, CustomElements) {
-
-    ich.addTemplate('workspaceSharing', workspaceSharingTemplate);
-
+    'js/CustomElements'
+], function (Marionette, _, $, workspaceSharingTemplate, CustomElements) {
     var WorkspaceSharing = Marionette.LayoutView.extend({
-        template: 'workspaceSharing',
+        template: workspaceSharingTemplate,
         tagName: CustomElements.register('workspace-sharing'),
         modelEvents: {
             'all': 'render'

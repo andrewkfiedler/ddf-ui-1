@@ -14,7 +14,6 @@ define([
     'jquery',
     'underscore',
     'marionette',
-    'icanhaz',
     'direction',
     'maptype',
     'wreqr',
@@ -25,14 +24,12 @@ define([
     'js/view/NearbyLocation.view',
     'js/model/NearbyLocation',
     'js/store'
-], function ($, _, Marionette, ich, dir, maptype, wreqr, Cometd, metacardTemplate, Modal, metacardActionTemplate, NearbyLocationView, NearbyLocation, store) {
+], function ($, _, Marionette, dir, maptype, wreqr, Cometd, metacardTemplate, Modal, metacardActionTemplate, NearbyLocationView, NearbyLocation, store) {
     'use strict';
     var Metacard = {};
     var nearbyChecked = false;
-    ich.addTemplate('metacardTemplate', metacardTemplate);
-    ich.addTemplate('metacardActionTemplate', metacardActionTemplate);
     Metacard.ActionModal = Modal.extend({
-        template: 'metacardActionTemplate',
+        template: metacardActionTemplate,
         initialize: function () {
             // there is no automatic chaining of initialize.
             Modal.prototype.initialize.apply(this, arguments);
@@ -40,7 +37,7 @@ define([
     });
     Metacard.MetacardDetailView = Marionette.LayoutView.extend({
         className: 'slide-animate height-full',
-        template: 'metacardTemplate',
+        template: metacardTemplate,
         regions: { nearby: '#nearby' },
         events: {
             'click .location-link': 'viewLocation',

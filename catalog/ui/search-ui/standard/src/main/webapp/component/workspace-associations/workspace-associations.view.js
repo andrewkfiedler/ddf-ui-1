@@ -15,17 +15,14 @@
 /*global define*/
 define([
     'marionette',
-    'icanhaz',
     'underscore',
     'jquery',
     'text!./workspace-associations.hbs',
     'js/CustomElements',
-], function (Marionette, ich, _, $, workspaceAssociationsTemplate, CustomElements) {
-
-    ich.addTemplate('workspaceAssociations', workspaceAssociationsTemplate);
+], function (Marionette, _, $, workspaceAssociationsTemplate, CustomElements) {
 
     var WorkspaceAssociations = Marionette.LayoutView.extend({
-        template: 'workspaceAssociations',
+        template: workspaceAssociationsTemplate,
         tagName: CustomElements.register('workspace-associations'),
         modelEvents: {
             'all': 'render'

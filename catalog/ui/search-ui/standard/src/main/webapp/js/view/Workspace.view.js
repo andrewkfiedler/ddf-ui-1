@@ -17,7 +17,6 @@ define([
     'js/model/Workspace',
     'backbone',
     'direction',
-    'icanhaz',
     'wreqr',
     'moment',
     'text!templates/workspace/workspacePanel.handlebars',
@@ -41,20 +40,11 @@ define([
     // Load non attached libs and plugins
     'backboneundo',
     'perfectscrollbar'
-], function ($, _, Marionette, Workspace, Backbone, dir, ich, wreqr, moment, workspacePanel, workspaceList, workspaceItem, workspaceAdd, workspace, workspaceQueryItem, workspaceMetacardItem, workspaceVisibility, workspaceContainer, WorkspaceSaveResults, maptype, WorkspaceControl, SlidingRegion, QueryView, QueryModel, MetacardList, MetacardDetail, Search) {
+], function ($, _, Marionette, Workspace, Backbone, dir, wreqr, moment, workspacePanel, workspaceList, workspaceItem, workspaceAdd, workspace, workspaceQueryItem, workspaceMetacardItem, workspaceVisibility, workspaceContainer, WorkspaceSaveResults, maptype, WorkspaceControl, SlidingRegion, QueryView, QueryModel, MetacardList, MetacardDetail, Search) {
     'use strict';
     var WorkspaceView = {};
-    ich.addTemplate('workspacePanel', workspacePanel);
-    ich.addTemplate('workspaceList', workspaceList);
-    ich.addTemplate('workspaceItem', workspaceItem);
-    ich.addTemplate('workspaceAdd', workspaceAdd);
-    ich.addTemplate('workspace', workspace);
-    ich.addTemplate('workspaceQueryItem', workspaceQueryItem);
-    ich.addTemplate('workspaceMetacardItem', workspaceMetacardItem);
-    ich.addTemplate('workspaceVisibility', workspaceVisibility);
-    ich.addTemplate('workspaceContainer', workspaceContainer);
     WorkspaceView.WorkspaceAdd = Marionette.ItemView.extend({
-        template: 'workspaceAdd',
+        template: workspaceAdd,
         events: {
             'click .submit': 'addWorkspace',
             'click #cancel': 'cancel',
@@ -81,7 +71,7 @@ define([
         }
     });
     WorkspaceView.MetacardItem = Marionette.ItemView.extend({
-        template: 'workspaceMetacardItem',
+        template: workspaceMetacardItem,
         tagName: 'tr',
         className: 'workspace-row',
         events: {
@@ -96,7 +86,7 @@ define([
         }
     });
     WorkspaceView.SearchItem = Marionette.ItemView.extend({
-        template: 'workspaceQueryItem',
+        template: workspaceQueryItem,
         tagName: 'tr',
         className: 'workspace-row',
         events: {
@@ -185,7 +175,7 @@ define([
         className: 'table'
     });
     WorkspaceView.Workspace = Marionette.LayoutView.extend({
-        template: 'workspace',
+        template: workspace,
         className: 'search-form',
         initialize: function () {
             this.listenTo(wreqr.vent, 'workspace:edit', this.editMode);
@@ -238,7 +228,7 @@ define([
         }
     });
     WorkspaceView.WorkspaceItem = Marionette.ItemView.extend({
-        template: 'workspaceItem',
+        template: workspaceItem,
         tagName: 'tr',
         className: 'workspace-row',
         events: {
@@ -331,13 +321,13 @@ define([
         }
     });
     WorkspaceView.WorkspaceList = Marionette.CollectionView.extend({
-        template: 'workspaceList',
+        template: workspaceList,
         childView: WorkspaceView.WorkspaceItem,
         tagName: 'table',
         className: 'table workspace-table'
     });
     WorkspaceView.WorkspacesLayoutView = Marionette.LayoutView.extend({
-        template: 'workspaceList',
+        template: workspaceList,
         className: 'height-full',
         regions: {
             workspaceControlRegion: '#workspaceControl',
@@ -503,7 +493,7 @@ define([
         }
     });
     WorkspaceView.WorkspaceLayout = Marionette.LayoutView.extend({
-        template: 'workspacePanel',
+        template: workspacePanel,
         className: 'partialaffix span3 row-fluid nav well well-small search-controls',
         regions: {
             workspacesRegion: '#workspaces',
@@ -523,7 +513,7 @@ define([
         }
     });
     WorkspaceView.WorkspaceVisibility = Marionette.ItemView.extend({
-        template: 'workspaceVisibility',
+        template: workspaceVisibility,
         className: 'panel-collapse',
         events: { 'click .collapse-btn': 'collapseSearchPanel' },
         model: new Backbone.Model(),
@@ -547,7 +537,7 @@ define([
         }
     });
     WorkspaceView.PanelLayout = Marionette.LayoutView.extend({
-        template: 'workspaceContainer',
+        template: workspaceContainer,
         regions: {
             panelRegion: '#workspace-panel',
             visibilityRegion: '#workspace-visibility'

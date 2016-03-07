@@ -15,15 +15,13 @@
 /*global define, window*/
 define([
     'marionette',
-    'icanhaz',
     'underscore',
     'jquery',
     'text!templates/workspace/workspaceSelector.handlebars',
     'js/CustomElements'
-], function (Marionette, ich, _, $, workspaceSelectorTemplate, CustomElements) {
-    ich.addTemplate('workspaceSelectorTemplate', workspaceSelectorTemplate);
+], function (Marionette, _, $, workspaceSelectorTemplate, CustomElements) {
     var WorkspaceSelectorView = Marionette.ItemView.extend({
-        template: 'workspaceSelectorTemplate',
+        template: workspaceSelectorTemplate,
         tagName: CustomElements.register('workspace-selector'),
         modelEvents: { 'all': 'rerender' },
         events: { 'click': 'openWorkspaces' },

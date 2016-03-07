@@ -15,17 +15,14 @@
 /*global define*/
 define([
     'marionette',
-    'icanhaz',
     'underscore',
     'jquery',
     'text!./workspace-advanced.hbs',
     'js/CustomElements',
-], function (Marionette, ich, _, $, workspaceAdvancedTemplate, CustomElements) {
-
-    ich.addTemplate('workspaceAdvanced', workspaceAdvancedTemplate);
+], function (Marionette, _, $, workspaceAdvancedTemplate, CustomElements) {
 
     var WorkspaceAdvanced = Marionette.LayoutView.extend({
-        template: 'workspaceAdvanced',
+        template: workspaceAdvancedTemplate,
         tagName: CustomElements.register('workspace-advanced'),
         modelEvents: {
             'all': 'render'

@@ -14,7 +14,6 @@
  **/
 /* global define */
 define([
-    'icanhaz',
     'underscore',
     'marionette',
     'backbone',
@@ -25,10 +24,9 @@ define([
     'cometdinit',
     'wreqr',
     'bootstrapselect'
-], function (ich, _, Marionette, Backbone, $, Modal, UploadList, ingestModalTemplate, Cometd, wreqr) {
-    ich.addTemplate('ingestModalTemplate', ingestModalTemplate);
+], function (_, Marionette, Backbone, $, Modal, UploadList, ingestModalTemplate, Cometd, wreqr) {
     var IngestModal = Modal.extend({
-        template: 'ingestModalTemplate',
+        template: ingestModalTemplate,
         events: {
             'click .start-upload': 'startUpload',
             'click .cancel-uploads': 'cancelPendingUploads',

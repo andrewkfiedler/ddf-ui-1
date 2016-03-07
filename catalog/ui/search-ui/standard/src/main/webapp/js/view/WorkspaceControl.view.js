@@ -15,14 +15,12 @@ define([
     'underscore',
     'marionette',
     'backbone',
-    'icanhaz',
     'wreqr',
     'text!templates/search/searchControl.handlebars',
     'direction'
-], function ($, _, Marionette, Backbone, ich, wreqr, workspaceControlTemplate, dir) {
+], function ($, _, Marionette, Backbone, wreqr, workspaceControlTemplate, dir) {
     'use strict';
     var WorkspaceControl = {};
-    ich.addTemplate('workspaceControlTemplate', workspaceControlTemplate);
     WorkspaceControl.WorkspaceControlModel = Backbone.Model.extend({
         defaults: {
             back: 'Add',
@@ -133,7 +131,7 @@ define([
         }
     });
     WorkspaceControl.WorkspaceControlView = Marionette.ItemView.extend({
-        template: 'workspaceControlTemplate',
+        template: workspaceControlTemplate,
         events: {
             'click .back': 'action',
             'click .forward': 'action'

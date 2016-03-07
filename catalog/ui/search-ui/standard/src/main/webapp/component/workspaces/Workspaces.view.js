@@ -15,21 +15,17 @@
 /*global define*/
 define([
     'marionette',
-    'icanhaz',
     'underscore',
     'jquery',
     'text!./workspaces.hbs',
     'js/CustomElements',
     'component/tabs/workspace/tabs-workspace',
     'component/tabs/workspace/tabs-workspace.view'
-], function (Marionette, ich, _, $, workspacesTemplate, CustomElements, TabsModel, TabsView) {
-
-    ich.addTemplate('workspaces', workspacesTemplate);
-
+], function (Marionette, _, $, workspacesTemplate, CustomElements, TabsModel, TabsView) {
     var selectedWorkspace;
 
     var Workspaces = Marionette.LayoutView.extend({
-        template: 'workspaces',
+        template: workspacesTemplate,
         tagName: CustomElements.register('workspaces'),
         modelEvents: {
             'all': 'rerender'

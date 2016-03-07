@@ -12,7 +12,7 @@
 /* global define */
 define([
     'backbone',
-    'icanhaz',
+    'handlebars',
     'text!templates/notification/notification.message.handlebars',
     'text!templates/notification/notification.title.handlebars',
     'underscore',
@@ -20,13 +20,15 @@ define([
     'wreqr',
     'moment',
     'pnotify'
-], function (Backbone, ich, messageTemplate, titleTemplate, _, $, wreqr, moment) {
+], function (Backbone, hbs, messageTemplate, titleTemplate, _, $, wreqr, moment) {
     // Create object to contain both the NotificationItemView and the NotificationListView in.
     // This is so we can return it below.
     var NotificationView = {};
-    ich.addTemplate('notificationTemplate', messageTemplate);
-    ich.addTemplate('titleTemplate', titleTemplate);
     var currentTime = moment();
+
+    var message = hbs.compile(messageTemplate)
+    var title = hbs.compile(titleTemplate)
+
     //notificationStack and isNotificationOpen used to display only one popup notification at a time
     var notificationStack = [];
     var isNotificationOpen = false;
@@ -43,7 +45,7 @@ define([
         },
         createNotification: function () {
             var notification = $.pnotify({
-                title: ich.titleTemplate(this.model.toJSON()),
+                title: title(this.model.toJSON()),
                 text: this.constructNotificationText(),
                 icon: 'fa fa-exclamation-circle notification-title',
                 nonblock: true,
@@ -103,8 +105,7 @@ define([
             }
         },
         constructNotificationText: function () {
-            var text = ich.notificationTemplate(this.model.toJSON()).html();
-            return text;
+            return message(this.model.toJSON());
         },
         onDestroy: function () {
             if (this.notification) {

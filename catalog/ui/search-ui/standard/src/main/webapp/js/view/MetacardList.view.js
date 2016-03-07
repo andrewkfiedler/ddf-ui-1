@@ -15,7 +15,6 @@ define([
     'backbone',
     'jquery',
     'underscore',
-    'icanhaz',
     'direction',
     'spin',
     'spinnerConfig',
@@ -30,7 +29,7 @@ define([
     'text!templates/resultlist/status.handlebars',
     'properties',
     'js/store'
-], function (Marionette, Backbone, $, _, ich, dir, Spinner, spinnerConfig, wreqr, FilterLayoutView, resultListItemTemplate, resultListTemplate, metacardTableTemplate, countLowTemplate, countHighTemplate, statusItemTemplate, statusTemplate, properties, store) {
+], function (Marionette, Backbone, $, _, dir, Spinner, spinnerConfig, wreqr, FilterLayoutView, resultListItemTemplate, resultListTemplate, metacardTableTemplate, countLowTemplate, countHighTemplate, statusItemTemplate, statusTemplate, properties, store) {
     'use strict';
     var List = {};
     function throwError(message, name) {
@@ -54,16 +53,9 @@ define([
             });
         }
     }
-    ich.addTemplate('resultListItem', resultListItemTemplate);
-    ich.addTemplate('resultListTemplate', resultListTemplate);
-    ich.addTemplate('metacardTableTemplate', metacardTableTemplate);
-    ich.addTemplate('countLowTemplate', countLowTemplate);
-    ich.addTemplate('countHighTemplate', countHighTemplate);
-    ich.addTemplate('statusItemTemplate', statusItemTemplate);
-    ich.addTemplate('statusTemplate', statusTemplate);
     List.MetacardRow = Marionette.ItemView.extend({
         tagName: 'tr',
-        template: 'resultListItem',
+        template: resultListItemTemplate,
         events: {
             'click .metacard-link': 'viewMetacard',
             'click .select-record-checkbox': 'changeRecordSelection'
@@ -109,7 +101,7 @@ define([
         }
     });
     List.MetacardTable = Marionette.CompositeView.extend({
-        template: 'metacardTableTemplate',
+        template: metacardTableTemplate,
         childView: List.MetacardRow,
         childViewContainer: 'tbody',
         childViewOptions: function (model) {
@@ -180,14 +172,14 @@ define([
     List.StatusRow = Marionette.ItemView.extend({
         events: { 'click .source-toggle': 'toggleSource' },
         tagName: 'tr',
-        template: 'statusItemTemplate',
+        template: statusItemTemplate,
         modelEvents: { 'change': 'render' },
         toggleSource: function (e) {
             toggleSourceCheckbox(e, this.model.get('id'));
         }
     });
     List.StatusTable = Marionette.CompositeView.extend({
-        template: 'statusTemplate',
+        template: statusTemplate,
         childView: List.StatusRow,
         childViewContainer: '.included tbody',
         events: {
@@ -244,9 +236,9 @@ define([
         getTemplate: function () {
             if (!_.isUndefined(this.model.get('hits'))) {
                 if (!this.model.get('results') || this.model.get('results').length === 0 || properties.resultCount > this.model.get('results').length || properties.resultCount >= this.model.get('hits')) {
-                    return 'countLowTemplate';
+                    return countLowTemplate;
                 } else {
-                    return 'countHighTemplate';
+                    return countHighTemplate;
                 }
             } else {
                 return false;
@@ -255,7 +247,7 @@ define([
     });
     List.MetacardListView = Marionette.LayoutView.extend({
         className: 'slide-animate height-full',
-        template: 'resultListTemplate',
+        template: resultListTemplate,
         regions: {
             countRegion: '.result-count',
             listRegion: '#resultList',

@@ -22,7 +22,6 @@ define([
     'js/model/Metacard',
     'backbone',
     'direction',
-    'icanhaz',
     'wreqr',
     'text!templates/search/search.panel.handlebars',
     'js/view/SearchControl.view',
@@ -32,12 +31,11 @@ define([
     'js/store',
     // Load non attached libs and plugins
     'perfectscrollbar'
-], function ($, _, Marionette, SlidingRegion, QueryView, Progress, MetacardList, MetacardDetail, MetacardModel, Backbone, dir, ich, wreqr, searchPanel, SearchControl, QueryModel, WorkspaceSaveResults, FilterController, store) {
+], function ($, _, Marionette, SlidingRegion, QueryView, Progress, MetacardList, MetacardDetail, MetacardModel, Backbone, dir, wreqr, searchPanel, SearchControl, QueryModel, WorkspaceSaveResults, FilterController, store) {
     'use strict';
     var Search = {};
-    ich.addTemplate('searchPanel', searchPanel);
     Search.SearchLayout = Marionette.LayoutView.extend({
-        template: 'searchPanel',
+        template: searchPanel,
         className: 'height-full',
         regions: {
             progressRegion: '#progressRegion',

@@ -15,19 +15,15 @@
 /* global define */
 define([
     'marionette',
-    'icanhaz',
     'text!templates/ingest/ingest.menuItem.handlebars',
     'js/view/ingest/IngestModal.view',
     'wreqr'
-], function (Marionette, ich, ingestMenuItem, IngestModal, wreqr) {
-    if (!ich.ingestMenuItem) {
-        ich.addTemplate('ingestMenuItem', ingestMenuItem);
-    }
+], function (Marionette, ingestMenuItem, IngestModal, wreqr) {
     var IngestMenu = Marionette.LayoutView.extend({
         tagName: 'li',
         modelEvents: { 'change': 'render' },
         className: 'dropdown',
-        template: 'ingestMenuItem',
+        template: ingestMenuItem,
         regions: { modalRegion: '.modal-region' },
         events: { 'click .showModal': 'showModal' },
         initialize: function () {

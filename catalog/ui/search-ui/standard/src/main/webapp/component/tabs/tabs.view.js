@@ -15,25 +15,22 @@
 /*global define, alert*/
 define([
     'marionette',
-    'icanhaz',
     'underscore',
     'jquery',
     'text!./tabs.hbs',
     'js/CustomElements'
-], function (Marionette, ich, _, $, TabsTemplate, CustomElements) {
+], function (Marionette, _, $, TabsTemplate, CustomElements) {
 
     function namespacedEvent(event, view){
         return event + '.' + view.cid;
     }
-
-    ich.addTemplate('Tabs', TabsTemplate);
 
     /** This is an abstract view.  It should not be used directly.  It should be extended,
      *  and determineContent should be overwritten.
      */
 
     var TabsView = Marionette.LayoutView.extend({
-        template: 'Tabs',
+        template: TabsTemplate,
         tagName: CustomElements.register('tabs'),
         modelEvents: {
             'change:activeTab': 'handleTabChange'
