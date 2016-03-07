@@ -9,12 +9,44 @@
     height: @tabHeight;
     padding: 0px 50px;
     white-space: nowrap;
-    overflow: auto;
+    overflow: visible;
     width: 100%;
+    position: relative;
 
     &.is-collapsed {
       .tabs-dropdown {
         display: inline-block;
+      }
+    }
+
+    &.is-open{
+      .tabs-dropdown {
+        background: @within-background-color;
+        color: white;
+      }
+
+      .tabs-collapsed {
+        display: block;
+        width: 100%;
+        text-align: center;
+        border: 1px solid @border-color;
+
+        > div.is-merged {
+          display: block;
+          color: white;
+          width: 100%;
+          padding: 10px;
+        }
+        > div.is-merged.is-active {
+          display: none;
+        }
+      }
+    }
+
+    .tabs-collapsed {
+      background: @background-color;
+      > div {
+        display: none;
       }
     }
   }
@@ -24,24 +56,38 @@
   }
 
   .tabs-title {
+
     display: none;
+    
+    &.is-active.is-merged {
+      display: inline;
+    }
   }
 
   .tabs-dropdown {
     display: none;
+
+    &.has-activeTab {
+      background: @tabBackground;
+      color: @tabColor;
+
+      .hint {
+        display: none;
+      }
+    }
+
+    .hint {
+      display: inline;
+    }
   }
-
-
 
   .tabs-tab {
     padding: 10px 10px;
     display: inline-block;
     height: 100%;
     border: 1px solid @border-color;
-    transition: padding @transitionTime linear;
 
     &.is-active {
-      padding: 10px 20px;
       background: @tabBackground;
       color: @tabColor;
     }

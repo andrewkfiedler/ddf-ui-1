@@ -35,7 +35,8 @@ define([
             'change:activeTab': 'handleTabChange'
         },
         events: {
-            'click .tabs-tab': 'changeTab'
+            'click .tabs-tab': 'changeTab',
+            'click .tabs-collapsed div': 'changeTab'
         },
         regions: {
             'tabsContent': '.tabs-content'
@@ -47,20 +48,25 @@ define([
             });
         },
         onRender: function () {
-            this.showTab();
+            this.showTab(true);
             this.determineContent();
+            this._clickHandler();
         },
         onShow: function () {
             this._resizeHandler();
         },
         handleTabChange: function () {
-            this.showTab();
+            this.showTab(true);
             this.determineContent();
         },
-        showTab: function () {
+        showTab: function (shouldResize) {
             var currentTab = this.model.getActiveTab();
             this.$el.find('.is-active').removeClass('is-active');
             this.$el.find('[data-id=' + currentTab + ']').addClass('is-active');
+            this.showActiveDropdownTab();
+            if (shouldResize){
+                this._resizeHandler();
+            }
         },
         serializeData: function () {
             return _.extend(this.model.toJSON(), {tabTitles: Object.keys(this.model.get('tabs'))});
@@ -68,23 +74,48 @@ define([
         determineContent: function () {
             throw 'You need to override determine content by extending this view.';
         },
+        showActiveDropdownTab: function(){
+            var hasActiveTab = this.$el.find('.tabs-list .tabs-dropdown .tabs-title.is-active.is-merged').length !== 0;
+            if (hasActiveTab) {
+                this.$el.find('.tabs-list .tabs-dropdown').addClass('has-activeTab');
+            } else {
+                this.$el.find('.tabs-list .tabs-dropdown').removeClass('has-activeTab');
+            }
+        },
         changeTab: function (event) {
             var tab = event.currentTarget.getAttribute('data-id');
             this.model.setActiveTab(tab);
+        },
+        _clickHandler: function(){
+            var view = this;
+            var tabList = view.$el.find('.tabs-list');
+            var menu = tabList.find('.tabs-dropdown');
+            menu.off('click').on('click', function () {
+                tabList.toggleClass('is-open');
+                if (tabList.hasClass('is-open')) {
+                    $('body').on('click.menubar', function (e) {
+                        if (e.target !== menu[0] && menu.find(e.target).length === 0) {
+                            $('body').off('click.menubar');
+                            tabList.removeClass('is-open');
+                        }
+                    });
+                } else {
+                    $('body').off('click.menubar');
+                }
+            });
         },
         _widthWhenCollapsed: [],
         _resizeHandler: function () {
             var view = this;
             var menu = view.el.querySelector('.tabs-list');
-            console.log('scrollWidth:'+menu.scrollWidth);
-            console.log('clientWidth:'+menu.clientWidth);
-            if (view._hasMergeableTabs() && menu.scrollWidth > menu.clientWidth) {
-                view._widthWhenCollapsed.push(menu.scrollWidth+1);
+            var expandedList = menu.querySelector('.tabs-expanded');
+            if (view._hasMergeableTabs() && expandedList.scrollWidth > expandedList.clientWidth) {
+                view._widthWhenCollapsed.push(expandedList.scrollWidth);
                 view._mergeTab();
                 view._resizeHandler();
             } else {
                 if (view._widthWhenCollapsed.length !== 0
-                    && menu.clientWidth > view._widthWhenCollapsed[view._widthWhenCollapsed.length - 1]) {
+                    && expandedList.clientWidth > view._widthWhenCollapsed[view._widthWhenCollapsed.length - 1]) {
                     view._widthWhenCollapsed.pop();
                     view._unmergeTab();
                     view._resizeHandler();
@@ -99,17 +130,20 @@ define([
             } else {
                 menu.classList.remove('is-collapsed');
             }
+            view.showTab(false);
         },
-        _hasMergeableTabs: function(){
-            return this.$el.find('.tabs-list .tabs-expanded > .tabs-tab:not(.is-merged)').length !==0;
+        _hasMergeableTabs: function () {
+            return this.$el.find('.tabs-list .tabs-expanded > .tabs-tab:not(.is-merged)').length !== 0;
         },
         _mergeTab: function () {
-            this.$el.find('.tabs-list .tabs-expanded > .tabs-tab:not(.is-merged)')
-                .last().addClass('is-merged');
+            var id = this.$el.find('.tabs-list .tabs-expanded > .tabs-tab:not(.is-merged)')
+                .last().attr('data-id');
+            this.$el.find('.tabs-list [data-id=' + id + ']').addClass('is-merged');
         },
         _unmergeTab: function () {
-            this.$el.find('.tabs-list .tabs-expanded > .tabs-tab.is-merged')
-                .first().removeClass('is-merged');
+            var id = this.$el.find('.tabs-list .tabs-expanded > .tabs-tab.is-merged')
+                .first().attr('data-id');
+            this.$el.find('.tabs-list [data-id=' + id + ']').removeClass('is-merged');
         }
     });
 
