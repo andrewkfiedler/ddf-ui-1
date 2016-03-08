@@ -40,7 +40,11 @@ define([
     // Load non attached libs and plugins
     'backboneundo',
     'perfectscrollbar'
-], function ($, _, Marionette, Workspace, Backbone, dir, wreqr, moment, workspacePanel, workspaceList, workspaceItem, workspaceAdd, workspace, workspaceQueryItem, workspaceMetacardItem, workspaceVisibility, workspaceContainer, WorkspaceSaveResults, maptype, WorkspaceControl, SlidingRegion, QueryView, QueryModel, MetacardList, MetacardDetail, Search) {
+], function ($, _, Marionette, Workspace, Backbone, dir, wreqr, moment, workspacePanel,
+             workspaceList, workspaceItem, workspaceAdd, workspace, workspaceQueryItem,
+             workspaceMetacardItem, workspaceVisibility, workspaceContainer, WorkspaceSaveResults,
+             maptype, WorkspaceControl, SlidingRegion, QueryView, QueryModel, MetacardList,
+             MetacardDetail, Search) {
     'use strict';
     var WorkspaceView = {};
     WorkspaceView.WorkspaceAdd = Marionette.ItemView.extend({

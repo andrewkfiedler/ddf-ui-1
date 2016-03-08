@@ -17,12 +17,12 @@ define([
     'marionette',
     'underscore',
     'jquery',
-    'text!templates/workspace/workspaceSelector.handlebars',
+    'text!templates/workspace/workspaceIndicator.handlebars',
     'js/CustomElements'
-], function (Marionette, _, $, workspaceSelectorTemplate, CustomElements) {
-    var WorkspaceSelectorView = Marionette.ItemView.extend({
-        template: workspaceSelectorTemplate,
-        tagName: CustomElements.register('workspace-selector'),
+], function (Marionette, _, $, workspaceIndicatorTemplate, CustomElements) {
+    var WorkspaceIndicatorView = Marionette.ItemView.extend({
+        template: workspaceIndicatorTemplate,
+        tagName: CustomElements.register('workspace-indicator'),
         modelEvents: { 'all': 'rerender' },
         events: { 'click': 'openWorkspaces' },
         initialize: function () {
@@ -37,5 +37,5 @@ define([
             window.location.hash = '#workspaces';
         }
     });
-    return WorkspaceSelectorView;
+    return WorkspaceIndicatorView;
 });

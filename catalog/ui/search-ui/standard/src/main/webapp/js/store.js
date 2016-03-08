@@ -14,26 +14,41 @@
 define([
     'backbone',
     'poller',
+    'underscore',
     'js/model/Workspace',
     'js/model/Source',
-], function (Backbone, poller, Workspace, Source) {
+    'component/workspaces/workspaces'
+], function (Backbone, poller, _, Workspace, Source, Workspaces) {
 
     // initialize a backbone model and fetch it's state from the server
     var init = function (Model, opts) {
-        opts = opts || {};
+        opts = _.extend({
+            persisted: true,
+            poll: false
+        }, opts);
         var m = new Model();
-        m.fetch();
-        if (opts.poll !== undefined) {
-            poller.get(m, opts.poll).start();
+        if (opts.persisted) {
+            m.fetch();
+            if (opts.poll) {
+                poller.get(m, opts.poll).start();
+            }
         }
         return m;
     };
 
     var Store = Backbone.Model.extend({
-      initialize: function () {
-        this.set('workspaces', init(Workspace.WorkspaceResult));
-        this.set('sources', init(Source, { poll: { delay: 60000 } }));
-      }
+        initialize: function () {
+            this.set('workspaces', init(Workspace.WorkspaceResult));
+            this.set('sources', init(Source, {
+                poll:
+                {
+                    delay: 60000
+                }
+            }));
+            this.set('componentWorkspaces', init(Workspaces, {
+                persisted: false
+            }));
+        }
     });
 
     return new Store();

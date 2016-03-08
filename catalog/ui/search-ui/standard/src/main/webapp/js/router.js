@@ -28,7 +28,7 @@ define([
                 lightboxViewInstance.model.updateTitle('Workspaces');
                 lightboxViewInstance.model.open();
                 lightboxViewInstance.lightboxContent.show(new WorkspacesView({
-                    model: store.get('workspaces')
+                    model: store.get('componentWorkspaces')
                 }));
             },
             openWorkspace: function(workspaceId){

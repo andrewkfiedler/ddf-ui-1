@@ -11,23 +11,16 @@
  *
  **/
  --}}
-<div class="workspaceBasic-inputs">
-
+<div class="input-label">
+    <label for="{{cid}}" class="is-clickable">
+        <span class=""></span>
+        {{label}}
+    </label>
 </div>
-<div class="workspaceBasic-footer">
-    <button class="workspaceBasic-edit is-neutral">
-         <span class="fa fa-pencil">
-             Edit
-         </span>
-    </button>
-    <button class="workspaceBasic-cancel is-negative">
-         <span class="fa fa-times">
-             Cancel
-         </span>
-    </button>
-    <button class="workspaceBasic-save is-positive">
-         <span class="fa fa-floppy-o">
-             Save
-         </span>
-    </button>
+<div class="input-value">
+    <input id="{{cid}}" value="{{value}}">
+    <span></span>
+    <label>
+        {{value}}
+    </label>
 </div>

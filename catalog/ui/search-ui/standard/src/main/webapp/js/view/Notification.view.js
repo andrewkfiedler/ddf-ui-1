@@ -26,8 +26,8 @@ define([
     var NotificationView = {};
     var currentTime = moment();
 
-    var message = hbs.compile(messageTemplate)
-    var title = hbs.compile(titleTemplate)
+    var message = hbs.compile(messageTemplate);
+    var title = hbs.compile(titleTemplate);
 
     //notificationStack and isNotificationOpen used to display only one popup notification at a time
     var notificationStack = [];

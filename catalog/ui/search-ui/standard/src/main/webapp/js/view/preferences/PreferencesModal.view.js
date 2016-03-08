@@ -36,7 +36,10 @@ define([
     // load dependencies
     'spectrum',
     'jquerySortable'
-], function (Application, _, Marionette, Backbone, $, properties, OpenLayersController, CesiumLayersController, maptype, Modal, preferencesModalTemplate, colorPrefsTabTemplate, layerPrefsTabTemplate, layerListTemplate, layerPickerTemplate, preferenceButtonsTemplate, User, Cesium, wreqr) {
+], function (Application, _, Marionette, Backbone, $, properties, OpenLayersController,
+             CesiumLayersController, maptype, Modal, preferencesModalTemplate,
+             colorPrefsTabTemplate, layerPrefsTabTemplate, layerListTemplate,
+             layerPickerTemplate, preferenceButtonsTemplate, User, Cesium, wreqr) {
     var PrefsModalView = Modal.extend({
         template: preferencesModalTemplate,
         className: 'well well-small prefsModal',

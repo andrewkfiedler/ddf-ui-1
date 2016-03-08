@@ -13,3 +13,28 @@ button:active {
 button.is-primary {
   background: @primary-color;
 }
+
+.button-mixin(@buttonColor) {
+  &:hover {
+    background: shade(@buttonColor, 10%);
+    border: 1px solid shade(@buttonColor, 25%);
+  }
+
+  &:focus {
+    background: shade(@buttonColor, 25%);
+    border: 1px solid shade(@buttonColor, 50%);
+  }
+}
+
+button.is-negative {
+  .button-mixin(@negative-color);
+}
+button.is-positive {
+  .button-mixin(@positive-color);
+}
+button.is-neutral {
+  .button-mixin(@neutral-color);
+}
+button.is-primary {
+  .button-mixin(@primary-color);
+}

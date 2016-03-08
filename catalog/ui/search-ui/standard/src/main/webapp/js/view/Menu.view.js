@@ -31,13 +31,16 @@ define([
     'application',
     'properties',
     'js/CustomElements',
-    'js/view/WorkspaceSelector.view',
+    'js/view/WorkspaceIndicator.view',
     'js/store',
     'modelbinder',
     'perfectscrollbar',
     'backbonecometd',
     'progressbar'
-], function (Marionette, menubarTemplate, menubarItemTemplate, Backbone, notificationMenuTemplate, notificationCategoryTemplate, wreqr, _, loginTemplate, logoutTemplate, taskTemplate, taskCategoryTemplate, helpTemplate, Cometd, $, IngestMenu, PreferencesMenu, Application, properties, CustomElements, WorkspaceSelector, store) {
+], function (Marionette, menubarTemplate, menubarItemTemplate, Backbone, notificationMenuTemplate,
+             notificationCategoryTemplate, wreqr, _, loginTemplate, logoutTemplate, taskTemplate,
+             taskCategoryTemplate, helpTemplate, Cometd, $, IngestMenu, PreferencesMenu, Application,
+             properties, CustomElements, WorkspaceIndicator, store) {
     var iconOnly = false;
     var Menu = {};
     var MenuItem = Backbone.Model.extend({});
@@ -48,7 +51,7 @@ define([
             'click': 'clickBody',
             'click a': 'removeNotification'
         },
-        modelEvents: { 'change': 'render' },
+        modelEvents: {'change': 'render'},
         onDestroy: function () {
             clearTimeout(this.timeout);
         },
@@ -68,16 +71,16 @@ define([
                         wreqr.vent.trigger('notification:delete', this.model);
                         Cometd.Comet.publish(this.model.url, {
                             data: [{
-                                    id: this.model.get('id'),
-                                    action: id
-                                }]
+                                id: this.model.get('id'),
+                                action: id
+                            }]
                         });
                     }
                 } else {
                     if (id === 'cancelRemove') {
-                        this.model.set({ closeConfirm: false });
+                        this.model.set({closeConfirm: false});
                     } else {
-                        this.model.set({ closeConfirm: true });
+                        this.model.set({closeConfirm: true});
                     }
                 }
             }
@@ -91,7 +94,7 @@ define([
             'click a': 'clickLink',
             'click': 'clickBody'
         },
-        modelEvents: { 'change': 'render' },
+        modelEvents: {'change': 'render'},
         clickBody: function (e) {
             //stops the menu from closing
             e.stopPropagation();
@@ -102,25 +105,25 @@ define([
                 if (id !== 'close' && id !== 'cancelRemove') {
                     Cometd.Comet.publish(this.model.url, {
                         data: [{
-                                id: this.model.get('id'),
-                                action: id
-                            }]
+                            id: this.model.get('id'),
+                            action: id
+                        }]
                     });
                     if (id === 'remove') {
                         this.model.collection.remove(this.model);
                         wreqr.vent.trigger('task:remove', this.model);
                         Cometd.Comet.publish(this.model.url, {
                             data: [{
-                                    id: this.model.get('id'),
-                                    action: id
-                                }]
+                                id: this.model.get('id'),
+                                action: id
+                            }]
                         });
                     }
                 } else {
                     if (id === 'cancelRemove') {
-                        this.model.set({ closeConfirm: false });
+                        this.model.set({closeConfirm: false});
                     } else {
-                        this.model.set({ closeConfirm: true });
+                        this.model.set({closeConfirm: true});
                     }
                 }
             }
@@ -129,7 +132,7 @@ define([
         onRender: function () {
             if (parseInt(this.model.get('progress'), 10) <= 100) {
                 if (parseInt(this.model.get('progress'), 10) !== -1) {
-                    this.$('.task-progressbar').progressbar({ value: parseInt(this.model.get('progress'), 10) });
+                    this.$('.task-progressbar').progressbar({value: parseInt(this.model.get('progress'), 10)});
                 }
             }
         }
@@ -143,7 +146,7 @@ define([
             'click #cancelRemove': 'cancelRemoveAll',
             'click': 'clickBody'
         },
-        modelEvents: { 'change': 'render' },
+        modelEvents: {'change': 'render'},
         clickBody: function (e) {
             //stops the menu from closing
             e.stopPropagation();
@@ -151,7 +154,7 @@ define([
         removeAll: function (e) {
             var activitiesToDelete = [];
             var currentActivities = [];
-            currentActivities = this.model.get('collection').where({ category: this.model.get('category') });
+            currentActivities = this.model.get('collection').where({category: this.model.get('category')});
             this.model.get('collection').remove(currentActivities);
             wreqr.vent.trigger('task:remove', this.model);
             _.each(currentActivities, function (activity) {
@@ -160,14 +163,14 @@ define([
                     action: 'remove'
                 });
             });
-            Cometd.Comet.publish('/service/action', { data: activitiesToDelete });
+            Cometd.Comet.publish('/service/action', {data: activitiesToDelete});
             this.clickBody(e);
         },
         cancelRemoveAll: function () {
-            this.model.set({ closeConfirm: false });
+            this.model.set({closeConfirm: false});
         },
         dismissAll: function () {
-            this.model.set({ closeConfirm: true });
+            this.model.set({closeConfirm: true});
         }
     });
     Menu.NotificationCategory = Marionette.ItemView.extend({
@@ -179,7 +182,7 @@ define([
             'click #cancelRemove': 'cancelRemoveAll',
             'click': 'clickBody'
         },
-        modelEvents: { 'change': 'render' },
+        modelEvents: {'change': 'render'},
         clickBody: function (e) {
             //stops the menu from closing
             e.stopPropagation();
@@ -187,7 +190,7 @@ define([
         removeAll: function (e) {
             var notificationsInCategory = [];
             var notifications = [];
-            notificationsInCategory = this.model.get('collection').where({ application: this.model.get('category') });
+            notificationsInCategory = this.model.get('collection').where({application: this.model.get('category')});
             this.model.get('collection').remove(notificationsInCategory);
             wreqr.vent.trigger('notification:delete', this.model);
             for (var i = 0; i < notificationsInCategory.length; ++i) {
@@ -196,14 +199,14 @@ define([
                     action: 'remove'
                 });
             }
-            Cometd.Comet.publish('/notification/action', { data: notifications });
+            Cometd.Comet.publish('/notification/action', {data: notifications});
             this.clickBody(e);
         },
         cancelRemoveAll: function () {
-            this.model.set({ closeConfirm: false });
+            this.model.set({closeConfirm: false});
         },
         dismissAll: function () {
-            this.model.set({ closeConfirm: true });
+            this.model.set({closeConfirm: true});
         }
     });
     Menu.NotificationEmpty = Marionette.ItemView.extend({
@@ -260,8 +263,8 @@ define([
     Menu.Item = Marionette.LayoutView.extend({
         tagName: 'li',
         template: menubarItemTemplate,
-        regions: { children: 'ul.dropdown-menu' },
-        modelEvents: { 'change': 'render' }
+        regions: {children: 'ul.dropdown-menu'},
+        modelEvents: {'change': 'render'}
     });
     Menu.LoginForm = Marionette.ItemView.extend({
         template: loginTemplate,
@@ -309,7 +312,7 @@ define([
     });
     Menu.LogoutForm = Marionette.ItemView.extend({
         template: logoutTemplate,
-        events: { 'click .btn-logout': 'logout' },
+        events: {'click .btn-logout': 'logout'},
         logout: function () {
             //this function is only here to handle clearing basic auth credentials
             //if you aren't using basic auth, this shouldn't do anything
@@ -344,15 +347,18 @@ define([
                     className: 'dropdown',
                     initialize: function () {
                         if (this.isNotGuestUser()) {
-                            this.model.set({ name: Application.UserModel.get('user').get('username') });
+                            this.model.set({name: Application.UserModel.get('user').get('username')});
                         } else if (!this.isNotGuestUser() && properties.externalAuthentication) {
-                            this.model.set({ name: typeof Application.UserModel.get('user').get('username') === 'undefined' ? 'ERROR' : Application.UserModel.get('user').get('username').split('@')[0] });
+                            this.model.set({
+                                name: typeof Application.UserModel.get('user').get('username') === 'undefined' ?
+                                    'ERROR' : Application.UserModel.get('user').get('username').split('@')[0]
+                            });
                         }
                         this.listenTo(Application.UserModel, 'change', this.updateUser);
                     },
                     updateUser: function () {
                         if (this.isNotGuestUser()) {
-                            this.model.set({ name: Application.UserModel.get('user').get('username') });
+                            this.model.set({name: Application.UserModel.get('user').get('username')});
                         }
                         this.render();
                     },
@@ -407,9 +413,9 @@ define([
                         }
                         if (this.collection) {
                             if (this.collection.length === 0) {
-                                this.model.set({ countNum: '' });
+                                this.model.set({countNum: ''});
                             } else {
-                                this.model.set({ countNum: this.collection.length });
+                                this.model.set({countNum: this.collection.length});
                             }
                             this.render();
                             this.updateScrollbar();
@@ -466,9 +472,9 @@ define([
                     }
                     if (this.collection) {
                         if (this.collection.length === 0) {
-                            this.model.set({ countNum: '' });
+                            this.model.set({countNum: ''});
                         } else {
-                            this.model.set({ countNum: this.collection.length });
+                            this.model.set({countNum: this.collection.length});
                         }
                         this.updateScrollbar();
                     }
@@ -481,18 +487,18 @@ define([
                         } else {
                             len = '';
                         }
-                        this.model.set({ countNum: len });
+                        this.model.set({countNum: len});
                     }
                 },
                 addNotification: function () {
                     if (!this.collection) {
                         if (wreqr.reqres.hasHandler('notifications')) {
                             this.collection = wreqr.reqres.request('notifications');
-                            this.model.set({ countNum: this.collection.length });
+                            this.model.set({countNum: this.collection.length});
                         }
                         this.render();
                     } else {
-                        this.model.set({ countNum: this.collection.length });
+                        this.model.set({countNum: this.collection.length});
                     }
                 },
                 onRender: function () {
@@ -570,7 +576,7 @@ define([
                 })
             });
             this.preferences.show(preferences);
-            var workspaces = new WorkspaceSelector({ model: store.get('workspaces') });
+            var workspaces = new WorkspaceIndicator({model: store.get('workspaces')});
             this.workspaces.show(workspaces);
             this._turnOnCollapsibleMenu();
         },

@@ -1,0 +1,73 @@
+@{customElementNamespace}input {
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+
+  .inlineFix;
+
+  > div {
+    width: 50%;
+    display: inline-block;
+  }
+
+  .input-label {
+    text-align: right;
+    > label {
+      padding: 10px;
+      height: 100%;
+      width: 100%;
+      margin: 0px;
+    }
+  }
+
+  .input-value {
+    padding-right: 10px;
+    input {
+      width: 100%;
+      padding: 5px 10px;
+      color: black;
+      display: none;
+    }
+    label {
+      margin: 0px;
+      padding: 10px;
+    }
+  }
+
+  &.is-readOnly {
+
+    .input-value {
+      input {
+        display: none;
+      }
+      label {
+        display: block;
+      }
+    }
+  }
+
+  &.is-editing:not(.is-readOnly) {
+    .input-value {
+      input {
+        display: block;
+      }
+      label {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (max-width: @mediumScreenSize) {
+  @{customElementNamespace}input {
+
+    white-space: normal;
+    > div {
+      width: 100%;
+    }
+    .input-label {
+      text-align: left;
+    }
+  }
+
+}

@@ -29,7 +29,9 @@ define([
     'text!templates/resultlist/status.handlebars',
     'properties',
     'js/store'
-], function (Marionette, Backbone, $, _, dir, Spinner, spinnerConfig, wreqr, FilterLayoutView, resultListItemTemplate, resultListTemplate, metacardTableTemplate, countLowTemplate, countHighTemplate, statusItemTemplate, statusTemplate, properties, store) {
+], function (Marionette, Backbone, $, _, dir, Spinner, spinnerConfig, wreqr, FilterLayoutView,
+             resultListItemTemplate, resultListTemplate, metacardTableTemplate, countLowTemplate,
+             countHighTemplate, statusItemTemplate, statusTemplate, properties, store) {
     'use strict';
     var List = {};
     function throwError(message, name) {

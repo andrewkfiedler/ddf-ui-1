@@ -1,0 +1,82 @@
+@{customElementNamespace}workspace-selector {
+
+  .customElement;
+
+  h6 {
+    margin: 0px;
+  }
+
+  .workspaces-list {
+    border: 1px solid @border-color;
+    max-height: ~"calc(100% - 150px)";
+    overflow: auto;
+  }
+
+  button {
+    width: 100%;
+    height: @minimumButtonSize;
+    padding: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .workspace {
+    padding: 10px;
+    transition: padding @transitionTime linear;
+
+    &.is-selected {
+      padding-left: 20px;
+      background: @select-background-color;
+      color: contrast(@select-background-color);
+    }
+
+    > div {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    > .workspace-title {
+      width: 100%;
+    }
+    > .workspace-source {
+      width: 50%;
+      float: left;
+    }
+    > .workspace-shared {
+      width: 50%;
+      float: right;
+    }
+
+    > .workspace-shared {
+      > .workspace-shared-group:not(:first-of-type)::before {
+        content: ',';
+      }
+    }
+  }
+
+  .workspace + .workspace {
+    border-top: 1px solid @border-color;
+  }
+}
+
+@media (max-width: @smallScreenSize) {
+  @{customElementNamespace}workspace-selector {
+
+    .workspaces-list {
+      max-height: ~"calc(100% - 180px)";
+    }
+
+    .workspace {
+      > div {
+        text-align: center;
+      }
+      > .workspace-source {
+        width: 100%;
+      }
+      > .workspace-shared {
+        width: 100%;
+      }
+    }
+  }
+}

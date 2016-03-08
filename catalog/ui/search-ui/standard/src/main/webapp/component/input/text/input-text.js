@@ -1,4 +1,3 @@
-{{!--
 /**
  * Copyright (c) Codice Foundation
  *
@@ -10,24 +9,19 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
- --}}
-<div class="workspaceBasic-inputs">
+/*global define*/
+define([
+    'underscore',
+    '../input',
+], function (_, Input) {
 
-</div>
-<div class="workspaceBasic-footer">
-    <button class="workspaceBasic-edit is-neutral">
-         <span class="fa fa-pencil">
-             Edit
-         </span>
-    </button>
-    <button class="workspaceBasic-cancel is-negative">
-         <span class="fa fa-times">
-             Cancel
-         </span>
-    </button>
-    <button class="workspaceBasic-save is-positive">
-         <span class="fa fa-floppy-o">
-             Save
-         </span>
-    </button>
-</div>
+    var TextInput = Input.extend({
+        defaults: {
+        },
+        getAssociatedWorkspace: function() {
+            return store.get('workspaces').get('workspaces').get(this.get('workspaceId'));
+        }
+    });
+
+    return TextInput;
+});

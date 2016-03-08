@@ -1,4 +1,3 @@
-{{!--
 /**
  * Copyright (c) Codice Foundation
  *
@@ -10,24 +9,17 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
- --}}
-<div class="workspaceBasic-inputs">
+/*global define*/
 
-</div>
-<div class="workspaceBasic-footer">
-    <button class="workspaceBasic-edit is-neutral">
-         <span class="fa fa-pencil">
-             Edit
-         </span>
-    </button>
-    <button class="workspaceBasic-cancel is-negative">
-         <span class="fa fa-times">
-             Cancel
-         </span>
-    </button>
-    <button class="workspaceBasic-save is-positive">
-         <span class="fa fa-floppy-o">
-             Save
-         </span>
-    </button>
-</div>
+define([
+    'backbone'
+], function (Backbone) {
+
+    var Workspaces = Backbone.Model.extend({
+        default: {
+            workspaceId: undefined
+        }
+    });
+
+    return Workspaces;
+});

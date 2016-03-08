@@ -20,62 +20,46 @@ define([
     'text!./workspaces.hbs',
     'js/CustomElements',
     'component/tabs/workspace/tabs-workspace',
-    'component/tabs/workspace/tabs-workspace.view'
-], function (Marionette, _, $, workspacesTemplate, CustomElements, TabsModel, TabsView) {
-    var selectedWorkspace;
+    'component/tabs/workspace/tabs-workspace.view',
+    'component/workspace-selector/workspace-selector.view',
+    'js/store'
+], function (Marionette, _, $, workspacesTemplate, CustomElements, TabsModel, TabsView,
+             WorkspaceSelectorView, store) {
 
     var Workspaces = Marionette.LayoutView.extend({
         template: workspacesTemplate,
         tagName: CustomElements.register('workspaces'),
         modelEvents: {
-            'all': 'rerender'
+            'change:workspaceId': 'changeWorkspace'
         },
         events: {
-            'click .workspaces-list .workspace': 'clickWorkspace',
-            'click .workspaces-add': 'createWorkspace',
-            'dblclick .workspaces-list .workspace': 'openWorkspace'
         },
         ui: {
-            workspaceList: '.workspaces-list'
         },
         regions: {
-            'workspaceDetails': '.workspaces-details'
+            'workspaceDetails': '.workspaces-details',
+            'workspaceSelector': '.workspaces-selector'
         },
         initialize: function(){
         },
-        serializeData: function(){
-            return _.extend(this.model.toJSON(), {currentWorkspace: this.model.getCurrentWorkspaceName()});
-        },
-        rerender: function(){
-            this.render();
-        },
-        clickWorkspace: function(event){
-            var workspace = event.currentTarget;
-            selectedWorkspace = workspace.getAttribute('data-id');
+        onRender: function(){
+            var workspaceSelectorView = new WorkspaceSelectorView({
+                model: store.get('workspaces')
+            });
+            this.workspaceSelector.show(workspaceSelectorView);
             this.changeWorkspace();
         },
-        changeWorkspace: function(event){
-            this.highlightSelectedWorkspace();
-            this.workspaceDetails.show(new TabsView({
-                model: new TabsModel({
-                    workspaceId: selectedWorkspace
-                })
-            }));
-        },
-        highlightSelectedWorkspace: function(){
-            this.$el.find('.workspaces-list .workspace').removeClass('is-selected');
-            this.$el.find('[data-id='+selectedWorkspace+']').addClass('is-selected');
-        },
-        createWorkspace: function(){
-            selectedWorkspace = this.model.createWorkspace();
-            this.scrollToNewWorkspace();
-            this.changeWorkspace();
-        },
-        scrollToNewWorkspace: function(){
-            this.ui.workspaceList[0].scrollTop = 0;
-        },
-        openWorkspace: function(){
-            window.location.hash = '#workspace/'+selectedWorkspace;
+        changeWorkspace: function(){
+            var workspaceId = this.model.get('workspaceId');
+            if (workspaceId === undefined){
+                this.workspaceDetails.empty();
+            } else {
+                this.workspaceDetails.show(new TabsView({
+                    model: new TabsModel({
+                        workspaceId: this.model.get('workspaceId')
+                    })
+                }));
+            }
         }
     });
 
