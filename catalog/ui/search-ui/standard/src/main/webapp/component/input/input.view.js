@@ -61,6 +61,9 @@ define([
             var value = this.$el.find('input').val();
             this.model.save(value);
         },
+        focus: function(){
+            this.$el.find('input').focus().select();
+        },
         _editMode: false
     });
 

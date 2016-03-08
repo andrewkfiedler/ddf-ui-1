@@ -17,7 +17,23 @@ define([
 
     var Workspaces = Backbone.Model.extend({
         default: {
-            workspaceId: undefined
+            workspaceId: undefined,
+            isEditing: false
+        },
+        setWorkspaceId: function(workspaceId){
+            this.set('workspaceId', workspaceId);
+        },
+        getWorkspaceId: function(){
+            return this.get('workspaceId');
+        },
+        isEditing: function(){
+            return this.get('isEditing');
+        },
+        turnOnEditing: function(){
+            this.set('isEditing', true);
+        },
+        turnOffEditing: function(){
+            this.set('isEditing', false);
         }
     });
 

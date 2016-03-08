@@ -63,7 +63,7 @@ define([
             },
             getSelectedQuery: function () {
                 return this.get('searches').find(function (query) {
-                    return query.get('selected')
+                    return query.get('selected');
                 });
             },
             initialize: function() {
@@ -184,7 +184,7 @@ define([
                 return this.getWorkspace(this.get('currentWorkspace'));
             },
             getCurrentWorkspaceName: function(){
-                var currentWorkspace = this.getCurrentWorkspace()
+                var currentWorkspace = this.getCurrentWorkspace();
                 if (currentWorkspace){
                     return currentWorkspace.get('name');
                 }

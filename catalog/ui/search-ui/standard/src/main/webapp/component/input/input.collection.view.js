@@ -42,6 +42,9 @@ define([
             this.children.forEach(function(childView){
                 childView.save();
             });
+        },
+        focus: function(){
+            this.children.first().focus();
         }
     });
 

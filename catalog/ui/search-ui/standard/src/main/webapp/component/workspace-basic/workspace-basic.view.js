@@ -22,10 +22,18 @@ define([
     'component/input/input',
     'component/input/input.view',
     'component/input/input.collection',
-    'component/input/input.collection.view'
+    'component/input/input.collection.view',
+    'js/store'
 ], function (Marionette, _, $, workspaceBasicTemplate, CustomElements, Input, InputView,
-             InputCollection, InputCollectionView) {
+             InputCollection, InputCollectionView, store) {
 
+    function isEditing(){
+        return store.get('componentWorkspaces').isEditing();
+    }
+
+    function turnOffEditing(){
+        store.get('componentWorkspaces').turnOffEditing();
+    }
 
     var WorkspaceBasic = Marionette.LayoutView.extend({
         template: workspaceBasicTemplate,
@@ -78,8 +86,13 @@ define([
                 id: 'lastModifiedDate'
             }
         },
-        onRender: function () {
+        onBeforeShow: function(){
             this.workspaceBasicInputs.show(this._inputCollectionView);
+        },
+        onAttach: function () {
+            if (isEditing()){
+                this.turnOnEdit();
+            }
         },
         addPropertyViews: function(){
             var view = this;
@@ -106,6 +119,7 @@ define([
         turnOnEdit: function(){
             this.$el.addClass('is-editing');
             this._inputCollectionView.turnOnEditing();
+            this._inputCollectionView.focus();
         },
         turnOffEdit: function(){
             this.$el.removeClass('is-editing');

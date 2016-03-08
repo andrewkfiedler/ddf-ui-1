@@ -23,11 +23,19 @@ define([
 ], function (Marionette, _, $, workspaceSelectorTemplate, CustomElements, store) {
 
     function getWorkspaceId(){
-        return store.get('componentWorkspaces').get('workspaceId');
+        return store.get('componentWorkspaces').getWorkspaceId();
     }
 
     function setWorkspaceId(workspaceId){
-        store.get('componentWorkspaces').set('workspaceId', workspaceId);
+        store.get('componentWorkspaces').setWorkspaceId(workspaceId);
+    }
+
+    function turnOnEditing(){
+        store.get('componentWorkspaces').turnOnEditing();
+    }
+
+    function turnOffEditing(){
+        store.get('componentWorkspaces').turnOffEditing();
     }
 
     var WorkspaceSelector = Marionette.LayoutView.extend({
@@ -63,6 +71,7 @@ define([
             this.scrollToSelectedWorkspace();
         },
         clickWorkspace: function(event){
+            turnOffEditing();
             var workspace = event.currentTarget;
             setWorkspaceId(workspace.getAttribute('data-id'));
             this.changeWorkspace();
@@ -75,7 +84,8 @@ define([
             this.$el.find('[data-id='+getWorkspaceId()+']').addClass('is-selected');
         },
         createWorkspace: function(){
-            store.get('componentWorkspaces').set('workspaceId', this.model.createWorkspace());
+            turnOnEditing();
+            setWorkspaceId(this.model.createWorkspace());
             this.scrollToSelectedWorkspace();
             this.changeWorkspace();
         },

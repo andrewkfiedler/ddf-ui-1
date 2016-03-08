@@ -331,7 +331,7 @@ define([
                 return str;
             },
           json: function (obj) {
-            return JSON.stringify(obj)
+            return JSON.stringify(obj);
           }
         };
     // Export helpers
