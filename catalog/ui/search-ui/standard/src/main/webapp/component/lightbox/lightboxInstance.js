@@ -11,7 +11,7 @@
  **/
 /*global define*/
 define([
-    './Lightbox'
+    './lightbox'
 ], function (Lightbox) {
 
     return new Lightbox();

@@ -33,6 +33,8 @@ define([
             'change:workspaceId': 'changeWorkspace'
         },
         events: {
+            'click .workspaces-details': 'shiftRight',
+            'click .workspaces-selector': 'shiftLeft'
         },
         ui: {
         },
@@ -54,12 +56,21 @@ define([
             if (workspaceId === undefined){
                 this.workspaceDetails.empty();
             } else {
+                this.shiftRight();
                 this.workspaceDetails.show(new TabsView({
                     model: new TabsModel({
                         workspaceId: this.model.get('workspaceId')
                     })
                 }));
             }
+        },
+        shiftLeft: function(event){
+            this.$el.addClass('shifted-left');
+            this.$el.removeClass('shifted-right');
+        },
+        shiftRight: function(){
+            this.$el.addClass('shifted-right');
+            this.$el.removeClass('shifted-left');
         }
     });
 

@@ -16,7 +16,7 @@ define([
     'poller',
     'underscore',
     'js/model/Workspace',
-    'js/model/Source',
+    'js/model/source',
     'component/workspaces/workspaces'
 ], function (Backbone, poller, _, Workspace, Source, Workspaces) {
 

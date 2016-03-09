@@ -17,7 +17,7 @@ define([
     'marionette',
     'underscore',
     'jquery',
-    'text!./Input.hbs',
+    'text!./input.hbs',
     'js/CustomElements'
 ], function (Marionette, _, $, InputTemplate, CustomElements) {
 
@@ -62,7 +62,7 @@ define([
             this.model.save(value);
         },
         focus: function(){
-            this.$el.find('input').focus().select();
+            this.$el.find('input').select();
         },
         _editMode: false
     });

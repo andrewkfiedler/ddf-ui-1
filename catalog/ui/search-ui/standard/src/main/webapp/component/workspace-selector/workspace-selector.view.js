@@ -71,6 +71,7 @@ define([
             this.scrollToSelectedWorkspace();
         },
         clickWorkspace: function(event){
+            event.stopPropagation();
             turnOffEditing();
             var workspace = event.currentTarget;
             setWorkspaceId(workspace.getAttribute('data-id'));
