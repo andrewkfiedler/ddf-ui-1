@@ -38,17 +38,15 @@ define([
       switch (selected.get('type')) {
         case 'query':
           this.selectedRegion.show(new QueryEditorView({ model: selected.get('object') }))
-          this.selectedRegion.$el.show()
           break;
         case 'metacard':
-          this.selectedRegion.$el.show()
           break;
         default:
-          this.selectedRegion.$el.hide()
+          this.selectedRegion.empty()
       }
     },
 
-    onRender: function() {
+    onBeforeShow: function() {
       this.workspacesRegion.show(new ExploreView({ model: this.model }))
       this.renderSelected();
     }
