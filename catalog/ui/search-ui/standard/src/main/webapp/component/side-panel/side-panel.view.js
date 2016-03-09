@@ -6,7 +6,7 @@ define([
   'js/store'
 ], function (Marionette, sidePanel, ExploreView, QueryEditorView, store) {
 
-  var state = store.get('side-panel')
+  var selected = store.get('selected')
 
   var SidePanelView = Marionette.LayoutView.extend({
     template : sidePanel,
@@ -15,11 +15,11 @@ define([
     regions : {
       workspacesRegion: '#explore',
       searchRegion: '#saved-items',
-      editQueryRegion: '#edit-query'
+      selectedRegion: '#selected'
     },
 
     modelEvents: {
-        'change': 'render'
+      'change': 'render'
     },
 
     events: {
@@ -30,15 +30,27 @@ define([
       //wreqr.vent.trigger('workspace:tabshown', e.target.hash);
     },
 
-    onRender: function() {
-      var workspace = this.model
-      if (workspace) {
-        this.workspacesRegion.show(new ExploreView({ model: workspace }));
-        var query = workspace.getSelectedQuery()
-        if (query) {
-          this.editQueryRegion.show(new QueryEditorView({ model: query }));
-        }
+    initialize: function () {
+      this.listenTo(selected, 'change', this.renderSelected)
+    },
+
+    renderSelected: function () {
+      switch (selected.get('type')) {
+        case 'query':
+          this.selectedRegion.show(new QueryEditorView({ model: selected.get('object') }))
+          this.selectedRegion.$el.show()
+          break;
+        case 'metacard':
+          this.selectedRegion.$el.show()
+          break;
+        default:
+          this.selectedRegion.$el.hide()
       }
+    },
+
+    onRender: function() {
+      this.workspacesRegion.show(new ExploreView({ model: this.model }))
+      this.renderSelected();
     }
   })
 

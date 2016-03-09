@@ -1,4 +1,3 @@
-{{!--
 /**
  * Copyright (c) Codice Foundation
  *
@@ -10,20 +9,22 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
- --}}
-<div class="tabbable tabs-below panel-content">
-  <div class="tab-content workspace-tabs">
-    <div class="tab-pane active" id="explore"></div>
-    <div class="tab-pane" id="saved-items"></div>
-  </div>
-  <ul class="nav nav-tabs">
-    <li class="active">
-      <a href="#explore" data-toggle="tab">Explore</a>
-    </li>
-    <li>
-      <a href="#saved-items" data-toggle="tab">Saved Items</a>
-    </li>
-  </ul>
-</div>
+/*global define*/
+define([
+    'backbone'
+], function(Backbone) {
 
-<div id="selected" class="panel-content" style="display: none"></div>
+    var Selected = Backbone.Model.extend({
+        defaults: {
+            object: undefined,
+            type: undefined
+        },
+        initialize: function () {
+        },
+        reset: function () {
+          this.set(this.defaults)
+        }
+    });
+
+    return Selected;
+});

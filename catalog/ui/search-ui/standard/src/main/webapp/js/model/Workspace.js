@@ -59,7 +59,7 @@ define([
                 }
             ],
             addQuery: function () {
-                this.get('searches').add({ selected: true });
+                return this.get('searches').add()
             },
             getSelectedQuery: function () {
                 return this.get('searches').find(function (query) {

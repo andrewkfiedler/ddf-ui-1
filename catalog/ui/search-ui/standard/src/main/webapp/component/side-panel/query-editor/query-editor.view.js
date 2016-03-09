@@ -1,9 +1,12 @@
 define([
   'marionette',
   'text!./query-editor.hbs',
-  './basic-editor/basic-editor.view'
+  './basic-editor/basic-editor.view',
+  'js/store'
   //'component/tabs/index'
-], function (Marionette, queryEditor, BasicEditorView) {
+], function (Marionette, queryEditor, BasicEditorView, store) {
+
+  var selected = store.get('selected')
 
   var QueryEditorView = Marionette.LayoutView.extend({
     template : queryEditor,
@@ -22,7 +25,7 @@ define([
     },
 
     closeQuery: function () {
-      this.model.closeQuery()
+      selected.reset()
     },
 
     serializeData: function () {

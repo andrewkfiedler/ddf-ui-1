@@ -16,9 +16,11 @@ define([
     'poller',
     'underscore',
     'js/model/Workspace',
-    'js/model/source',
-    'component/workspaces/workspaces'
-], function (Backbone, poller, _, Workspace, Source, Workspaces) {
+    'js/model/Source',
+    'component/workspaces/workspaces',
+    'js/model/Selected',
+   'component/workspaces/workspaces'
+], function (Backbone, poller, _, Workspace, Source, Workspaces, Selected) {
 
     // initialize a backbone model and fetch it's state from the server
     var init = function (Model, opts) {
@@ -40,14 +42,16 @@ define([
         initialize: function () {
             this.set('workspaces', init(Workspace.WorkspaceResult));
             this.set('sources', init(Source, {
-                poll:
-                {
+                poll: {
                     delay: 60000
                 }
             }));
             this.set('componentWorkspaces', init(Workspaces, {
                 persisted: false
             }));
+            this.set('selected', init(Selected, {
+                persisted: false
+            }))
         }
     });
 
