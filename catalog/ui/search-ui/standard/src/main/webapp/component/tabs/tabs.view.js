@@ -53,7 +53,7 @@ define([
             this.determineContent();
             this._clickHandler();
         },
-        onShow: function () {
+        onAttach: function () {
             this._resizeHandler();
         },
         onBeforeDestroy: function(){
