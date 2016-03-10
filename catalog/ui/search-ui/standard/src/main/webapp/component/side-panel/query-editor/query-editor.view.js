@@ -18,7 +18,7 @@ define([
 
   var QueryEditorView = Marionette.LayoutView.extend({
     template : queryEditor,
-    className: 'query-editor',
+    className: 'panel-content query-editor',
 
     regions : {
       queryTabsRegion: '#query-tabs'

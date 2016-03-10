@@ -9,18 +9,20 @@
   top: 51px;
   bottom: 15px;
   left: 15px;
-  white-space: nowrap;
-  font-size: 0;
+
+  .panel-column,
+  .panel-content {
+    height: 100%;
+  }
+
+  .panel-column {
+    float: left;
+  }
 
   .panel-content {
-    font-size: 12pt;
-    white-space: normal;
-    display: inline-block;
-    vertical-align:top;
     background-color: rgba(36, 36, 36, 0.9);
     border: 1px solid @border-color;
     border-left: none;
-    //height: 100%;
     max-width: 400px;
     width: 30vw;
   }
