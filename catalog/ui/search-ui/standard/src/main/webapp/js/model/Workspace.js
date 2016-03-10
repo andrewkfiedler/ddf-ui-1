@@ -59,7 +59,7 @@ define([
                 }
             ],
             addQuery: function () {
-                return this.get('searches').add()
+                return this.get('searches').add(new Query.Model());
             },
             getSelectedQuery: function () {
                 return this.get('searches').find(function (query) {
@@ -74,6 +74,9 @@ define([
                     this.set({metacards: new Workspace.MetacardList()});
                 }
                 this.addMetacardProperties();
+                this.get('searches').on('add',function(){
+                    this.trigger('change');
+                });
                 this.on('nested-change',function(){
                     var attributesChanged = Object.keys(this.changedAttributes());
                     if (!(attributesChanged.length === 1 && attributesChanged[0] === 'lastModifiedDate' && attributesChanged[0] === 'history')){
@@ -158,6 +161,12 @@ define([
                 }
                 this.on({
                    'all': this.setDefaultCurrentWorkspace
+                });
+                this.on('nested-change',function(){
+                    this.save();
+                });
+                this.on('change',function(){
+                    this.save();
                 });
             },
             parse: function (resp) {

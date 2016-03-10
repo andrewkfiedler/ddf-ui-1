@@ -11,20 +11,25 @@
  **/
 /*global define*/
 define([
+    'underscore',
     'backbone'
-], function(Backbone) {
+], function (_, Backbone) {
 
-    var Selected = Backbone.Model.extend({
+    var Content = Backbone.Model.extend({
         defaults: {
-            object: undefined,
-            type: undefined
+            workspaceId: undefined,
+            queries: undefined,
+            savedItems: undefined
         },
-        initialize: function () {
+        initialize: function(){
         },
-        reset: function () {
-          this.set(this.defaults);
+        setWorkspaceId: function(workspaceId){
+            this.set('workspaceId', workspaceId);
+        },
+        getWorkspaceId: function(){
+            return this.get('workspaceId');
         }
     });
 
-    return Selected;
+    return Content;
 });

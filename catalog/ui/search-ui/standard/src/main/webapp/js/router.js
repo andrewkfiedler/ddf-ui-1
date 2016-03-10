@@ -15,7 +15,7 @@ define([
     'marionette',
     'component/lightbox/lightbox.view.instance',
     'component/workspaces/Workspaces.view',
-    'js/store'
+    'js/store',
 ], function (Marionette, lightboxViewInstance, WorkspacesView, store) {
 
     function closeLightbox(){

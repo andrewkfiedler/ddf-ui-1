@@ -14,7 +14,7 @@
  **/
 /*global define, alert*/
 define([
-    './lightbox.view',
+    './Lightbox.view',
     './lightboxInstance'
 ], function (LightboxView, lightboxInstance) {
 

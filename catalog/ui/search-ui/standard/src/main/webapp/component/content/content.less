@@ -1,0 +1,44 @@
+@{customElementNamespace}content {
+
+  .customElement;
+  .inlineFix;
+  .whiteSpaceFix;
+
+  position: fixed;
+  left: 0%;
+  top: 37px;
+  height: ~"calc(100% - 37px)";
+  z-index: @zIndexContent;
+
+  > div {
+    display: inline-block;
+    width: 33.33%;
+    height: 100%;
+    vertical-align: top;
+    transition: width @transitionTime linear;
+    overflow: hidden;
+  }
+
+  &.hide-panelTwo {
+    > .content-panelTwo {
+      width: 0%;
+    }
+    > .content-panelThree {
+      width: 66.66%;
+    }
+  }
+
+
+}
+
+@media (max-width: @mediumScreenSize) {
+  @{customElementNamespace}content {
+
+  }
+}
+
+@media (max-width: @smallScreenSize) {
+  @{customElementNamespace}content {
+
+  }
+}

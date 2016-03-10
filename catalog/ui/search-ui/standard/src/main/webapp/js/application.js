@@ -78,8 +78,7 @@ define([
             'js/module/Notification.module',
             'js/module/Tasks.module',
             'js/module/Menu.module',
-            'js/module/Map.module',
-            'js/module/Workspace.module'
+            'js/module/Content.module'
         ]);
     });
     //get rid of the loading screen

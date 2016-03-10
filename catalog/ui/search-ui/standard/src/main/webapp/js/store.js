@@ -16,11 +16,12 @@ define([
     'poller',
     'underscore',
     'js/model/Workspace',
-    'js/model/Source',
+    'js/model/source',
     'component/workspaces/workspaces',
     'js/model/Selected',
-   'component/workspaces/workspaces'
-], function (Backbone, poller, _, Workspace, Source, Workspaces, Selected) {
+   'component/workspaces/workspaces',
+    'component/content/content'
+], function (Backbone, poller, _, Workspace, Source, Workspaces, Selected, Content) {
 
     // initialize a backbone model and fetch it's state from the server
     var init = function (Model, opts) {
@@ -40,6 +41,7 @@ define([
 
     var Store = Backbone.Model.extend({
         initialize: function () {
+            var self = this;
             this.set('workspaces', init(Workspace.WorkspaceResult));
             this.set('sources', init(Source, {
                 poll: {
@@ -51,7 +53,16 @@ define([
             }));
             this.set('selected', init(Selected, {
                 persisted: false
-            }))
+            }));
+            this.set('content', init(Content, {
+                persisted: false
+            }));
+            this.get('workspaces').on('change:currentWorkspace',function(){
+                self.updateContentOnWorkspaceChange();
+            });
+        },
+        updateContentOnWorkspaceChange: function(){
+            this.get('content').setWorkspaceId(this.get('workspaces').get('currentWorkspace'));
         }
     });
 

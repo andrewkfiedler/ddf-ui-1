@@ -45,8 +45,7 @@ define([
 ], function ($, _, Marionette, Workspace, Backbone, dir, wreqr, moment, workspacePanel,
              workspaceList, workspaceItem, workspaceAdd, workspace, workspaceQueryItem,
              workspaceMetacardItem, workspaceVisibility, workspaceContainer, WorkspaceSaveResults,
-             maptype, WorkspaceControl, SlidingRegion, QueryView, QueryModel, MetacardList,
-             MetacardDetail, Search, SidePanelView) {
+             maptype, WorkspaceControl, SlidingRegion, QueryView, QueryModel) {
     'use strict';
     var WorkspaceView = {};
 
@@ -432,53 +431,6 @@ define([
                     }
                 }
             }
-        }
-    });
-
-    WorkspaceView.WorkspaceVisibility = Marionette.ItemView.extend({
-        template: workspaceVisibility,
-        className: 'panel-collapse',
-        events: {
-            'click .collapse-btn': 'collapseSearchPanel'
-        },
-        model: new Backbone.Model(),
-        modelEvents: {
-            'change': 'render'
-        },
-
-        collapseSearchPanel: function() {
-            var $el = $('.search-controls');
-
-            var zIndex = $el.css('zIndex');
-
-            if (zIndex !== "-1") {
-                $el.css('zIndex', -1);
-                this.model.set({isCollapsed: true});
-            }
-            else {
-                $el.css('zIndex', 100);
-                this.model.set({isCollapsed: false});
-            }
-         },
-
-        initialize: function () {
-            _.bindAll(this);
-            if (!maptype.isNone()) {
-                this.model.set({isMap: true});
-            }
-        }
-    });
-
-    WorkspaceView.PanelLayout = Marionette.LayoutView.extend({
-        template : workspaceContainer,
-        regions : {
-            panelRegion: "#workspace-panel",
-            visibilityRegion: "#workspace-visibility"
-        },
-
-        onRender : function(){
-            this.panelRegion.show(new SidePanelView({ model: this.model.getCurrentWorkspace() }));
-            this.visibilityRegion.show(new WorkspaceView.WorkspaceVisibility());
         }
     });
 

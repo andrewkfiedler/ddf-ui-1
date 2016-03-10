@@ -12,7 +12,7 @@
     "components-backbone": "1.1.0",
     "components-bootstrap": "3.2.0",
     "components-font-awesome": "4.1.0",
-    "handlebars": "v1.2.1",
+    "handlebars": "v4.0.5",
     "html5shiv": "3.7.2",
     "jquery": "components/jquery#1.11.0",
     "jquery-cookie": "1.4.1",

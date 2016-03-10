@@ -5,11 +5,6 @@ button {
   padding: 0px;
 }
 
-button:active {
-  position: inherit;
-  top: inherit;
-}
-
 button.is-primary {
   background: @primary-color;
 }
@@ -17,12 +12,12 @@ button.is-primary {
 .button-mixin(@buttonColor) {
   &:hover {
     background: shade(@buttonColor, 10%);
-    border: 1px solid shade(@buttonColor, 25%);
+    box-shadow: 0px 0px 2px shade(@buttonColor, 25%);
   }
 
   &:focus {
     background: shade(@buttonColor, 25%);
-    border: 1px solid shade(@buttonColor, 50%);
+    border: 0px 0px 2px shade(@buttonColor, 50%);
   }
 }
 

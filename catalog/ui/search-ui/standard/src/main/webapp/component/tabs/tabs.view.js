@@ -66,7 +66,7 @@ define([
         showTab: function (shouldResize) {
             var currentTab = this.model.getActiveTab();
             this.$el.find('.is-active').removeClass('is-active');
-            this.$el.find('[data-id=' + currentTab + ']').addClass('is-active');
+            this.$el.find('[data-id="' + currentTab + '"]').addClass('is-active');
             this.showActiveDropdownTab();
             if (shouldResize){
                 this._resizeHandler();
@@ -108,19 +108,25 @@ define([
                 }
             });
         },
-        _widthWhenCollapsed: [],
+        _widthWhenCollapsed: function(){
+            var widthWhenCollaspsed = [];
+            this._widthWhenCollapsed = function(){
+                return widthWhenCollaspsed;
+            };
+            return widthWhenCollaspsed;
+        },
         _resizeHandler: function () {
             var view = this;
             var menu = view.el.querySelector('.tabs-list');
             var expandedList = menu.querySelector('.tabs-expanded');
             if (view._hasMergeableTabs() && expandedList.scrollWidth > expandedList.clientWidth) {
-                view._widthWhenCollapsed.push(expandedList.scrollWidth);
+                view._widthWhenCollapsed().push(expandedList.scrollWidth);
                 view._mergeTab();
                 view._resizeHandler();
             } else {
-                if (view._widthWhenCollapsed.length !== 0
-                    && expandedList.clientWidth > view._widthWhenCollapsed[view._widthWhenCollapsed.length - 1]) {
-                    view._widthWhenCollapsed.pop();
+                if (view._widthWhenCollapsed().length !== 0
+                    && expandedList.clientWidth > view._widthWhenCollapsed()[view._widthWhenCollapsed().length - 1]) {
+                    view._widthWhenCollapsed().pop();
                     view._unmergeTab();
                     view._resizeHandler();
                 }
@@ -142,12 +148,12 @@ define([
         _mergeTab: function () {
             var id = this.$el.find('.tabs-list .tabs-expanded > .tabs-tab:not(.is-merged)')
                 .last().attr('data-id');
-            this.$el.find('.tabs-list [data-id=' + id + ']').addClass('is-merged');
+            this.$el.find('.tabs-list [data-id="' + id + '"]').addClass('is-merged');
         },
         _unmergeTab: function () {
             var id = this.$el.find('.tabs-list .tabs-expanded > .tabs-tab.is-merged')
                 .first().attr('data-id');
-            this.$el.find('.tabs-list [data-id=' + id + ']').removeClass('is-merged');
+            this.$el.find('.tabs-list [data-id="' + id + '"]').removeClass('is-merged');
         }
     });
 

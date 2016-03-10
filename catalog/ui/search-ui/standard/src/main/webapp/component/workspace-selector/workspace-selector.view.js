@@ -53,7 +53,6 @@ define([
             workspaceList: '.workspaces-list'
         },
         regions: {
-            'workspaceDetails': '.workspaces-details'
         },
         initialize: function(){
         },
