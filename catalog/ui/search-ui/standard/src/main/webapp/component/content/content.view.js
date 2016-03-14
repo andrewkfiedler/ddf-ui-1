@@ -108,7 +108,7 @@ define([
                 this._mapView = new Map2d();
             }
             this.listenTo(store.get('workspaces'), 'change:currentWorkspace', this.updatePanelOne);
-            this.listenTo(store.get('content'), 'change:queryId', this.updatePanelTwo);
+            this.listenTo(store.get('content'), 'change:query', this.updatePanelTwo);
         },
         onRender: function(){
             this.updatePanelOne();
@@ -121,10 +121,11 @@ define([
             this.panelOne.show(new WorkspaceContentTabsView({
                 model: new WorkspaceContentTabs()
             }));
+            this.hidePanelTwo();
         },
         updatePanelTwo: function(){
-            var queryId = store.get('content').get('queryId');
-            if (queryId === undefined){
+            var queryRef = store.getQuery();
+            if (queryRef === undefined){
                 this.hidePanelTwo();
             } else {
                 this.updatePanelTwoTitle();
@@ -135,7 +136,7 @@ define([
             }
         },
         updatePanelTwoTitle: function(){
-            this.$el.find('.content-panelTwo-title').html(store.getCurrentQuery().get('title'));
+            this.$el.find('.content-panelTwo-title').html(store.getQuery().get('title'));
         },
         hidePanelTwo: function(){
             this.$el.addClass('hide-panelTwo');
@@ -144,7 +145,7 @@ define([
             this.$el.removeClass('hide-panelTwo');
         },
         unselectQueriesAndResults: function(){
-            store.get('content').set('queryId', undefined);
+            store.get('content').set('query', undefined);
         },
         _mapView: undefined
 

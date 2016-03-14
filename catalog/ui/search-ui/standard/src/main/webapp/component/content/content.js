@@ -18,7 +18,9 @@ define([
     var Content = Backbone.Model.extend({
         defaults: {
             queryId: undefined,
-            savedItems: undefined
+            savedItems: undefined,
+            query: undefined,
+            state: undefined
         },
         initialize: function(){
         }

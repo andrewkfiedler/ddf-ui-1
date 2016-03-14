@@ -19,8 +19,9 @@ define([
     'jquery',
     'text!./query-selector.hbs',
     'js/CustomElements',
-    'js/store'
-], function (Marionette, _, $, querySelectorTemplate, CustomElements, store) {
+    'js/store',
+    'js/model/Query'
+], function (Marionette, _, $, querySelectorTemplate, CustomElements, store, Query) {
 
     var QuerySelector = Marionette.LayoutView.extend({
         template: querySelectorTemplate,
@@ -40,13 +41,13 @@ define([
         },
         addQuery: function(){
             if (this.model.canAddQuery()){
-                var queryId = this.model.addQuery();
-                store.get('content').set('queryId', queryId);
+                var newQuery = new Query.Model();
+                store.setQueryByReference(newQuery);
             }
         },
         selectQuery: function(event){
             var queryId = event.currentTarget.getAttribute('data-id');
-            store.get('content').set('queryId', queryId);
+            store.setQueryById(queryId);
         },
         onRender: function(){
             this.handleMaxQueries();

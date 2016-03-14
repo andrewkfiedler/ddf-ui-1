@@ -60,10 +60,15 @@ define([
         getCurrentWorkspace: function(){
            return this.get('workspaces').get('workspaces').get(this.get('workspaces').get('currentWorkspace'));
         },
-        getCurrentQuery: function(){
-            var workspaceId = this.get('workspaces').get('currentWorkspace');
-            var queryId = this.get('content').get('queryId');
-            return this.get('workspaces').get('workspaces').get(workspaceId).get('searches').get(queryId);
+        setQueryById: function(queryId){
+            var queryRef = this.getCurrentWorkspace().get('searches').get(queryId);
+            this.setQueryByReference(queryRef.clone());
+        },
+        setQueryByReference: function(queryRef){
+            this.get('content').set('query', queryRef);
+        },
+        getQuery: function(){
+            return this.get('content').get('query');
         }
     });
 

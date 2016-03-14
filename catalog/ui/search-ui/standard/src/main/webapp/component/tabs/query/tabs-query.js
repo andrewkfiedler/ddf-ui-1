@@ -28,9 +28,7 @@ define([
             }
         },
         getAssociatedQuery: function(){
-            var workspaceId = store.get('workspaces').get('currentWorkspace');
-            var queryId = store.get('content').get('queryId');
-            return store.get('workspaces').get('workspaces').get(workspaceId).get('searches').get(queryId);
+            return store.getQuery();
         }
     });
 
