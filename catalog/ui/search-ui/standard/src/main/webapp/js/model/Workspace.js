@@ -58,8 +58,13 @@ define([
                     relatedModel: Metacard.MetacardResult
                 }
             ],
+            canAddQuery: function(){
+              return this.get('searches').length < 10;
+            },
             addQuery: function () {
-                return this.get('searches').add(new Query.Model());
+                var query = new Query.Model({title: 'New Workspace'});
+                this.get('searches').add(query);
+                return query.get('id');
             },
             getSelectedQuery: function () {
                 return this.get('searches').find(function (query) {
@@ -205,6 +210,7 @@ define([
                 return workspace.get('id');
             },
             setCurrentWorkspace: function(workspaceId){
+                console.log(workspaceId);
                 this.set('currentWorkspace', workspaceId);
             },
             getWorkspace: function(workspaceId){

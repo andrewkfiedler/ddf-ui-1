@@ -14,16 +14,19 @@ define(['application',
         'marionette',
         'backbone',
         'component/content/content.view',
-        'js/store'
+        // Load non attached libs and plugins
+        'datepicker',
+        'datepickerOverride',
+        'datepickerAddon',
+        'multiselect',
+        'multiselectfilter'
     ],
-    function(Application, Marionette, Backbone, ContentView, store) {
+    function(Application, Marionette, Backbone, ContentView) {
 
         Application.App.module('ContentModule', function(ContentModule) {
 
             ContentModule.addInitializer(function(){
-                var contentView = new ContentView({
-                    model: store.get('content')
-                });
+                var contentView = new ContentView();
                 contentView.render();
             });
         });

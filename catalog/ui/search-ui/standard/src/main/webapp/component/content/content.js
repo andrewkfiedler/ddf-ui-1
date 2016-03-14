@@ -17,17 +17,10 @@ define([
 
     var Content = Backbone.Model.extend({
         defaults: {
-            workspaceId: undefined,
-            queries: undefined,
+            queryId: undefined,
             savedItems: undefined
         },
         initialize: function(){
-        },
-        setWorkspaceId: function(workspaceId){
-            this.set('workspaceId', workspaceId);
-        },
-        getWorkspaceId: function(){
-            return this.get('workspaceId');
         }
     });
 

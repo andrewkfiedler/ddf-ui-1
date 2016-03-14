@@ -17,12 +17,17 @@ define([
     'marionette',
     'underscore',
     'jquery',
-    '../tabs.view',
-    'js/store'
-], function (Marionette, _, $, TabsView, store) {
+    '../tabs.view'
+], function (Marionette, _, $, TabsView) {
 
-    var WorkspaceContentTabsView = TabsView.extend({
+    var QueryTabsView = TabsView.extend({
+        determineContent: function(){
+            var activeTab = this.model.getActiveView();
+            this.tabsContent.show(new activeTab({
+                model: this.model.getAssociatedQuery()
+            }));
+        }
     });
 
-    return WorkspaceContentTabsView;
+    return QueryTabsView;
 });

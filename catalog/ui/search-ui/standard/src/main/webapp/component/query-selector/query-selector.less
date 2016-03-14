@@ -1,26 +1,69 @@
 @{customElementNamespace}query-selector {
 
   .customElement;
+  overflow: auto;
 
   .querySelector-query {
 
     .inlineFix;
 
-    .whiteSpaceFix;
-
     > div {
       display: inline-block;
-      width: 33.33%;
+      padding: 5px;
+    }
+
+    > .querySelector-queryActive {
+      width: 50px;
+      text-align: center;
+    }
+
+    > .querySelector-queryDetails {
+      width: ~"calc(100% - 100px)";
+
+      > div {
+        display: inline-block;
+        width: 50%;
+      }
     }
   }
 
   > button {
+    display: none;
     width: 100%;
     padding: 10px;
   }
 
   > h5 {
-    padding: 0px 0px;
+    padding: 10px;
+    margin: 0px;
+  }
+
+  .querySelector-list {
+    max-height: ~"calc(100% - 72px)";
+    overflow: auto;
+
+    > .querySelector-query {
+      .boxShadow;
+
+      > .querySelector-queryActive {
+        padding-top: 13px;
+        padding-bottom: 13px;
+      }
+
+      > .querySelector-queryDetails {
+        padding: 10px 0px;
+      }
+
+    }
+  }
+
+  &.can-addQuery {
+    > button {
+      display: block;
+    }
+    .querySelector-list {
+      max-height: ~"calc(100% - 112px)";
+    }
   }
 }
 

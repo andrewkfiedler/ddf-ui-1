@@ -24,13 +24,14 @@ define([
     'direction',
     'maptype',
     'js/store',
+    'js/CustomElements',
     'bootstrapselect'
-], function ($, Backbone, Cesium, Marionette, _, properties, MetaCard, Progress, wreqr, searchFormTemplate, dir, maptype, store) {
+], function ($, Backbone, Cesium, Marionette, _, properties, MetaCard, Progress, wreqr, searchFormTemplate, dir, maptype, store, CustomElements) {
     'use strict';
     var Query = {};
     Query.QueryView = Marionette.ItemView.extend({
         template: searchFormTemplate,
-        className: 'slide-animate',
+        tagName: CustomElements.register('query-basic'),
         events: {
             'click #searchButton': 'search',
             'click #workspaceSearchButton': 'workspaceSearch',
@@ -215,11 +216,6 @@ define([
             }
         },
         updateScrollbar: function () {
-            var view = this;
-            // defer seems to be necessary for this to update correctly
-            _.defer(function () {
-                view.$el.perfectScrollbar('update');
-            });
         },
         serializeData: function () {
             var allSources, allTypes;

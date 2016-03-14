@@ -1,5 +1,5 @@
 @{customElementNamespace}content {
-
+  @titleBarFontSize: 3rem;
   .customElement;
   .inlineFix;
   .whiteSpaceFix;
@@ -9,6 +9,7 @@
   top: 37px;
   height: ~"calc(100% - 37px)";
   z-index: @zIndexContent;
+  background: @background-color;
 
   > div {
     display: inline-block;
@@ -17,6 +18,7 @@
     vertical-align: top;
     transition: width @transitionTime linear;
     overflow: hidden;
+    .boxShadow;
   }
 
   &.hide-panelTwo {
@@ -25,6 +27,25 @@
     }
     > .content-panelThree {
       width: 66.66%;
+    }
+  }
+
+  > .content-panelTwo {
+    > .content-panelTwo-titleBar {
+      position: relative;
+      font-size: @titleBarFontSize;
+      text-align: center;
+      height: @minimumButtonSize;
+
+      > button {
+        position: absolute;
+        right: 0px;
+      }
+    }
+
+    > .content-panelTwo-content {
+      height: ~"calc(100% - @{minimumButtonSize})";
+      overflow: hidden;
     }
   }
 

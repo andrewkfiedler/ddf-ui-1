@@ -21,24 +21,27 @@ define([
     'js/CustomElements',
     'component/tabs/workspace-content/tabs-workspace-content',
     'component/tabs/workspace-content/tabs-workspace-content.view',
+    'component/tabs/query/tabs-query',
+    'component/tabs/query/tabs-query.view',
     'maptype',
-    'text!templates/map.handlebars'
+    'text!templates/map.handlebars',
+    'js/store'
 ], function (Marionette, _, $, contentTemplate, CustomElements, WorkspaceContentTabs,
-             WorkspaceContentTabsView, maptype, map) {
+             WorkspaceContentTabsView, QueryTabs, QueryTabsView, maptype, map, store) {
 
     var ContentView = Marionette.LayoutView.extend({
         template: contentTemplate,
         tagName: CustomElements.register('content'),
         modelEvents: {
-            'change:workspaceId': 'updatePanelOne'
         },
         events: {
+            'click .content-panelTwo-close': 'unselectQueriesAndResults'
         },
         ui: {
         },
         regions: {
             'panelOne': '.content-panelOne',
-            'panelTwo': '.content-panelTwo',
+            'panelTwo': '.content-panelTwo-content',
             'panelThree': '.content-panelThree'
         },
         initialize: function(){
@@ -104,6 +107,8 @@ define([
                 });
                 this._mapView = new Map2d();
             }
+            this.listenTo(store.get('workspaces'), 'change:currentWorkspace', this.updatePanelOne);
+            this.listenTo(store.get('content'), 'change:queryId', this.updatePanelTwo);
         },
         onRender: function(){
             this.updatePanelOne();
@@ -113,15 +118,33 @@ define([
         onBeforeShow: function(){
         },
         updatePanelOne: function(){
-            var contentView = this;
             this.panelOne.show(new WorkspaceContentTabsView({
-                model: new WorkspaceContentTabs({
-                    'workspaceId': contentView.model.get('workspaceId')
-                })
+                model: new WorkspaceContentTabs()
             }));
+        },
+        updatePanelTwo: function(){
+            var queryId = store.get('content').get('queryId');
+            if (queryId === undefined){
+                this.hidePanelTwo();
+            } else {
+                this.updatePanelTwoTitle();
+                this.showPanelTwo();
+                this.panelTwo.show(new QueryTabsView({
+                    model: new QueryTabs()
+                }));
+            }
+        },
+        updatePanelTwoTitle: function(){
+            this.$el.find('.content-panelTwo-title').html(store.getCurrentQuery().get('title'));
         },
         hidePanelTwo: function(){
             this.$el.addClass('hide-panelTwo');
+        },
+        showPanelTwo: function(){
+            this.$el.removeClass('hide-panelTwo');
+        },
+        unselectQueriesAndResults: function(){
+            store.get('content').set('queryId', undefined);
         },
         _mapView: undefined
 

@@ -18,8 +18,9 @@ define([
     'underscore',
     'jquery',
     'text!./query-selector.hbs',
-    'js/CustomElements'
-], function (Marionette, _, $, querySelectorTemplate, CustomElements) {
+    'js/CustomElements',
+    'js/store'
+], function (Marionette, _, $, querySelectorTemplate, CustomElements, store) {
 
     var QuerySelector = Marionette.LayoutView.extend({
         template: querySelectorTemplate,
@@ -27,20 +28,31 @@ define([
         modelEvents: {
         },
         events: {
-            'click .querySelector-add': 'addQuery'
+            'click .querySelector-add': 'addQuery',
+            'click .querySelector-queryDetails': 'selectQuery'
         },
         ui: {
         },
         regions: {
         },
         initialize: function(){
-            var self = this;
-            this.model.get('searches').on('all',function(){
-                self.render();
-            });
+            this.listenTo(this.model.get('searches'), 'all', this.render);
         },
         addQuery: function(){
-            this.model.addQuery();
+            if (this.model.canAddQuery()){
+                var queryId = this.model.addQuery();
+                store.get('content').set('queryId', queryId);
+            }
+        },
+        selectQuery: function(event){
+            var queryId = event.currentTarget.getAttribute('data-id');
+            store.get('content').set('queryId', queryId);
+        },
+        onRender: function(){
+            this.handleMaxQueries();
+        },
+        handleMaxQueries: function(){
+            this.$el.toggleClass('can-addQuery', this.model.canAddQuery());
         },
         test: function(){
             console.log('test');

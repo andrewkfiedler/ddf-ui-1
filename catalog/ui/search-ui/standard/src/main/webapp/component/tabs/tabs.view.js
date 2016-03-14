@@ -76,7 +76,8 @@ define([
             return _.extend(this.model.toJSON(), {tabTitles: Object.keys(this.model.get('tabs'))});
         },
         determineContent: function () {
-            throw 'You need to override determine content by extending this view.';
+            var activeTab = this.model.getActiveView();
+            this.tabsContent.show(new activeTab());
         },
         showActiveDropdownTab: function(){
             var hasActiveTab = this.$el.find('.tabs-list .tabs-dropdown .tabs-title.is-active.is-merged').length !== 0;

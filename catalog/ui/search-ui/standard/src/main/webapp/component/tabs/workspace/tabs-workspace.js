@@ -31,7 +31,6 @@ workspaceAssociationsView, workspaceSharingView) {
                 'Associations': workspaceAssociationsView,
                 'Sharing': workspaceSharingView
             },
-            activeTab: undefined,
             workspaceId: undefined
         },
         getAssociatedWorkspace: function() {

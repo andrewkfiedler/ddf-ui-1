@@ -13,18 +13,16 @@
  --}}
 <form id="searchForm" class="search-form" method="get">
     <ul class="nav">
-        {{#is isWorkspace true}}
-            <li>
-                <h6>Query Name</h6>
-            </li>
-            <li>
-                <div class="col-lg-10 form-group">
-                    <div class="input-group input-group-sm margin-no">
-                        <input id="queryName" type="text" class="form-control" value="{{name}}" />
-                    </div>
+        <li>
+            <h6>Query Name</h6>
+        </li>
+        <li>
+            <div class="col-lg-10 form-group">
+                <div class="input-group input-group-sm margin-no">
+                    <input name="title" type="text" class="form-control" value="{{title}}" />
                 </div>
-            </li>
-        {{/is}}
+            </div>
+        </li>
 
         <li class="heading-with-help-tip keyword-heading-with-help-tip" style="clear:both">
             <h6>Text</h6>

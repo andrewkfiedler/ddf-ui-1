@@ -11,38 +11,61 @@
  *
  **/
  --}}
-<h5 align="center">Queries for {{name}}</h5>
+<h5 align="center">Queries ({{searches.length}} of 10)</h5>
 
 <div class="querySelector-query">
-    <div class="querySelector-queryFilter">
+    <div class="querySelector-queryActive">
         <span>
-            Filter
+            Active
         </span>
     </div>
-    <div class="querySelector-queryName">
-        <span>
-            Name
-        </span>
-    </div>
-    <div class="querySelector-queryResults">
-        <span>
-            Results
-        </span>
+    <div class="querySelector-queryDetails">
+        <div class="querySelector-queryName">
+            <span>
+                Name
+            </span>
+        </div>
+        <div class="querySelector-queryResults">
+            <span>
+                Results
+            </span>
+        </div>
     </div>
 </div>
 <div class="querySelector-list">
     {{#each searches}}
-        {{title}}
+        <div class="querySelector-query">
+            <div class="querySelector-queryActive is-button" data-id="{{id}}">
+                <span class="fa fa-eye">
+
+                </span>
+            </div>
+            <div class="querySelector-queryDetails is-button" data-id="{{id}}">
+                <div class="querySelector-queryName">
+                    <span>
+                        {{title}}
+                    </span>
+                </div>
+                <div class="querySelector-queryResults">
+                    <span>
+
+                    </span>
+                </div>
+            </div>
+        </div>
     {{/each}}
 </div>
 {{#unless searches}}
     <h6 align="center">
-    You don't have any queries.
-    Click "Add Query" to get Started.
+        You don't have any queries.
+        Click "Add Query" to get Started.
     </h6>
 {{/unless}}
 <button class="querySelector-add is-primary">
     <span class="fa fa-plus">
         Add Query
+    </span>
+    <span class="is-disabled">
+        Max Queries Reached
     </span>
 </button>

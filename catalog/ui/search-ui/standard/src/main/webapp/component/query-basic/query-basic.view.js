@@ -12,17 +12,20 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-/*global define, alert*/
+/*global define*/
 define([
     'marionette',
     'underscore',
     'jquery',
-    '../tabs.view',
-    'js/store'
-], function (Marionette, _, $, TabsView, store) {
+    'text!./query-basic.hbs',
+    'js/CustomElements',
+    'text!templates/search/searchForm.handlebars'
+], function (Marionette, _, $, queryBasicTemplate, CustomElements, searchFormTemplate) {
 
-    var WorkspaceContentTabsView = TabsView.extend({
+    var QueryBasic = Marionette.LayoutView.extend({
+        template: searchFormTemplate,
+        tag: CustomElements.register('query-basic')
     });
 
-    return WorkspaceContentTabsView;
+    return QueryBasic;
 });

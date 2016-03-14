@@ -41,7 +41,6 @@ define([
 
     var Store = Backbone.Model.extend({
         initialize: function () {
-            var self = this;
             this.set('workspaces', init(Workspace.WorkspaceResult));
             this.set('sources', init(Source, {
                 poll: {
@@ -57,12 +56,14 @@ define([
             this.set('content', init(Content, {
                 persisted: false
             }));
-            this.get('workspaces').on('change:currentWorkspace',function(){
-                self.updateContentOnWorkspaceChange();
-            });
         },
-        updateContentOnWorkspaceChange: function(){
-            this.get('content').setWorkspaceId(this.get('workspaces').get('currentWorkspace'));
+        getCurrentWorkspace: function(){
+           return this.get('workspaces').get('workspaces').get(this.get('workspaces').get('currentWorkspace'));
+        },
+        getCurrentQuery: function(){
+            var workspaceId = this.get('workspaces').get('currentWorkspace');
+            var queryId = this.get('content').get('queryId');
+            return this.get('workspaces').get('workspaces').get(workspaceId).get('searches').get(queryId);
         }
     });
 
