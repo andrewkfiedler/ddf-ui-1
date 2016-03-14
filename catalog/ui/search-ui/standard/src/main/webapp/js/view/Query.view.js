@@ -31,7 +31,7 @@ define([
     var Query = {};
     Query.QueryView = Marionette.ItemView.extend({
         template: searchFormTemplate,
-        tagName: CustomElements.register('query-basic'),
+        tagName: CustomElements.register('query-old'),
         events: {
             'click #searchButton': 'search',
             'click #workspaceSearchButton': 'workspaceSearch',

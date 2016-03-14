@@ -20,9 +20,25 @@ define([
             queryId: undefined,
             savedItems: undefined,
             query: undefined,
-            state: undefined
+            state: undefined,
+            editing: true
         },
         initialize: function(){
+        },
+        isEditing: function(){
+            return this.get('editing');
+        },
+        turnOnEditing: function(){
+            this.set('editing', true);
+        },
+        turnOffEditing: function(){
+            this.set('editing', false);
+        },
+        getQuery: function(){
+            return this.get('query');
+        },
+        setQuery: function(queryRef){
+            this.set('query', queryRef);
         }
     });
 

@@ -12,10 +12,11 @@
 /*global define*/
 define([
     'underscore',
-    'backbone'
-], function (_, Backbone) {
+    'backbone',
+    '../input'
+], function (_, Backbone, Input) {
 
-    var Input = Backbone.Model.extend({
+    var QueryTimeInput = Input.extend({
         defaults: {
             value: '',
             label: '',
@@ -57,8 +58,8 @@ define([
             this.set('value', value);
             this.trigger('change:value');
         },
-        type: 'text'
+        type: 'query-time'
     });
 
-    return Input;
+    return QueryTimeInput;
 });

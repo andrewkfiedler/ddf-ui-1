@@ -18,32 +18,40 @@ define([
     'underscore',
     'jquery',
     'js/CustomElements',
-    './input.view'
-], function (Marionette, _, $, CustomElements, InputView) {
+    './input.view',
+    './query-time/input-query-time.view'
+], function (Marionette, _, $, CustomElements, InputView, InputQueryTimeView) {
 
     var InputCollectionView = Marionette.CollectionView.extend({
-        childView: InputView,
-        turnOnEditing: function(){
-            this.children.forEach(function(childView){
+        getChildView: function (item) {
+            switch (item.type) {
+                case 'query-time':
+                    return InputQueryTimeView;
+                case 'text':
+                    return InputView;
+            }
+        },
+        turnOnEditing: function () {
+            this.children.forEach(function (childView) {
                 childView.turnOnEditing();
             });
         },
-        turnOffEditing: function(){
-            this.children.forEach(function(childView){
+        turnOffEditing: function () {
+            this.children.forEach(function (childView) {
                 childView.turnOffEditing();
             });
         },
-        revert: function(){
-            this.children.forEach(function(childView){
+        revert: function () {
+            this.children.forEach(function (childView) {
                 childView.revert();
             });
         },
-        save: function(){
-            this.children.forEach(function(childView){
+        save: function () {
+            this.children.forEach(function (childView) {
                 childView.save();
             });
         },
-        focus: function(){
+        focus: function () {
             this.children.first().focus();
         }
     });

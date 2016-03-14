@@ -60,7 +60,6 @@ define([
         properties: {
             name: {
                 label: 'Name',
-                type: 'String',
                 validation: undefined,
                 description: 'Workspace Name',
                 readOnly: false,
@@ -69,7 +68,6 @@ define([
             },
             createdDate: {
                 label: 'Created Date',
-                type: 'Date',
                 validation: undefined,
                 description: 'The date the workspace was created.',
                 readOnly: true,
@@ -78,7 +76,6 @@ define([
             },
             lastModifiedDate: {
                 label: 'Last Modified Date',
-                type: 'Date',
                 validation: undefined,
                 description: 'The last date the workspace was modified.',
                 readOnly: true,
@@ -99,22 +96,12 @@ define([
             var properties = this.properties;
             for (var property in properties){
                 properties[property].value = this.model.get(property);
-                switch(properties[property].type){
-                    case 'String':
-                        view.addStringProperty(property,properties[property]);
-                        break;
-                    case 'Date':
-                        view.addDateProperty(property, properties[property]);
-                        break;
-                }
+                view.addStringProperty(property,properties[property]);
             }
         },
         addStringProperty: function(property, attributes){
             var propertyModel = new Input(attributes);
             this._inputCollection.add(propertyModel);
-        },
-        addDateProperty: function(property, attributes){
-            this.addStringProperty(property,attributes);
         },
         turnOnEdit: function(){
             this.$el.addClass('is-editing');

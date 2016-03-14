@@ -30,11 +30,24 @@
   display: block;
 }
 
+.inlineBlockDisplay(@thingToInline) {
+
+  > @{thingToInline} {
+    display: inline-block;
+  }
+
+  .inlineFix;
+}
+
 .inlineFix {
   font-size: 0px;
   > * > * {
     font-size: 14px;
   }
+}
+
+.whitespaceNowrap {
+  .whiteSpaceFix;
 }
 
 .whiteSpaceFix {
