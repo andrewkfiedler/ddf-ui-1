@@ -19,7 +19,7 @@ define([
     'jquery',
     '../tabs.view',
     'js/store'
-], function (Marionette, _, $, TabsView, store) {
+], function (Marionette, _, $, TabsView) {
 
     var WorkspaceContentTabsView = TabsView.extend({
     });

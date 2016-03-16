@@ -36,10 +36,24 @@
       font-size: @titleBarFontSize;
       text-align: center;
       height: @minimumButtonSize;
+      line-height: @minimumButtonSize;
+      .resetIconLineHeight;
+
+      > span {
+        display: block;
+        width: ~'calc(100% - @{minimumButtonSize})';
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 0px 10px;
+      }
 
       > button {
         position: absolute;
         right: 0px;
+        top: 0px;
+        width: @minimumButtonSize;
+        height: 100%;
       }
     }
 

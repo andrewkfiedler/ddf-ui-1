@@ -21,13 +21,12 @@ define([
     'js/CustomElements',
     'component/tabs/workspace-content/tabs-workspace-content',
     'component/tabs/workspace-content/tabs-workspace-content.view',
-    'component/tabs/query/tabs-query',
     'component/tabs/query/tabs-query.view',
     'maptype',
     'text!templates/map.handlebars',
     'js/store'
 ], function (Marionette, _, $, contentTemplate, CustomElements, WorkspaceContentTabs,
-             WorkspaceContentTabsView, QueryTabs, QueryTabsView, maptype, map, store) {
+             WorkspaceContentTabsView, QueryTabsView, maptype, map, store) {
 
     var ContentView = Marionette.LayoutView.extend({
         template: contentTemplate,
@@ -130,13 +129,13 @@ define([
             } else {
                 this.updatePanelTwoTitle();
                 this.showPanelTwo();
-                this.panelTwo.show(new QueryTabsView({
-                    model: new QueryTabs()
-                }));
+                this.panelTwo.show(new QueryTabsView());
             }
         },
         updatePanelTwoTitle: function(){
-            this.$el.find('.content-panelTwo-title').html(store.getQuery().get('title'));
+            var queryRef = store.getQuery();
+            var title = queryRef._cloneOf === undefined ? 'New Query' : queryRef.get('cql');
+            this.$el.find('.content-panelTwo-title').html(title);
         },
         hidePanelTwo: function(){
             this.$el.addClass('hide-panelTwo');

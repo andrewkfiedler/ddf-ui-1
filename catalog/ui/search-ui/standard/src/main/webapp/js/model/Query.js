@@ -20,10 +20,9 @@ define([
         'usngs',
         'js/model/Filter',
         'wreqr',
-        'js/Common',
         'backboneassociations'
     ],
-    function (Backbone, _, properties, moment, Metacard, usngs, Filter, wreqr, Common) {
+    function (Backbone, _, properties, moment, Metacard, usngs, Filter, wreqr) {
         "use strict";
         var Query = {};
 
@@ -63,7 +62,6 @@ define([
             drawing: false,
 
             initialize: function () {
-                this.addProperties();
                 _.bindAll(this);
                 this.listenTo(this, 'change:north change:south change:east change:west',this.setBBox);
                 this.listenTo(this, 'change:scheduled change:scheduleValue change:scheduleUnits', this.startScheduledSearch);
@@ -87,11 +85,6 @@ define([
                 }
 
                 this.startScheduledSearch();
-            },
-            addProperties: function(){
-                if (this.get('id')===undefined){
-                    this.set('id', Common.generateUUID());
-                }
             },
 
             notDrawing: function() {
@@ -444,8 +437,8 @@ define([
                 }
             },
 
-            toJSON: function() {
-                var json = _.clone(this.attributes);
+            toJSON: function(options) {
+                var json = Backbone.Model.prototype.toJSON.call(this, options);
 
                 json.cql = this.getCql();
 

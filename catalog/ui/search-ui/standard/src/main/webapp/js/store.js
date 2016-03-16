@@ -19,7 +19,7 @@ define([
     'js/model/source',
     'component/workspaces/workspaces',
     'js/model/Selected',
-   'component/workspaces/workspaces',
+    'component/workspaces/workspaces',
     'component/content/content'
 ], function (Backbone, poller, _, Workspace, Source, Workspaces, Selected, Content) {
 
@@ -57,18 +57,46 @@ define([
                 persisted: false
             }));
         },
-        getCurrentWorkspace: function(){
-           return this.get('workspaces').get('workspaces').get(this.get('workspaces').get('currentWorkspace'));
+        getCurrentWorkspace: function () {
+            return this.get('workspaces').get('workspaces').get(this.get('workspaces').get('currentWorkspace'));
         },
-        setQueryById: function(queryId){
-            var queryRef = this.getCurrentWorkspace().get('searches').get(queryId);
+        getCurrentQueries: function () {
+            return this.getCurrentWorkspace().get('searches');
+        },
+        setQueryById: function (queryId) {
+            var queryRef = this.getCurrentQueries().get(queryId);
             this.setQueryByReference(queryRef.clone());
         },
-        setQueryByReference: function(queryRef){
+        setQueryByReference: function (queryRef) {
             this.get('content').set('query', queryRef);
         },
-        getQuery: function(){
+        getQuery: function () {
             return this.get('content').get('query');
+        },
+        saveQuery: function () {
+            var cloneOf = this.getQuery()._cloneOf;
+            if (cloneOf === undefined){
+                this.addQuery();
+                this.setQueryById(this.getQuery().cid);
+            } else {
+                this.updateQuery();
+                this.setQueryById(cloneOf);
+            }
+        },
+        resetQuery: function(){
+            var cloneOf = this.getQuery()._cloneOf;
+            if (cloneOf === undefined){
+                this.setQueryByReference(undefined);
+            } else {
+                this.setQueryById(cloneOf);
+            }
+        },
+        addQuery: function(){
+            this.getCurrentQueries().add(this.getQuery());
+        },
+        updateQuery: function(){
+            var query = this.getQuery();
+            this.getCurrentQueries().get(query._cloneOf).set(query.attributes);
         }
     });
 

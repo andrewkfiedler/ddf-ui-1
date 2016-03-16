@@ -11,8 +11,6 @@
  *
  **/
  --}}
-<h5 align="center">Queries ({{searches.length}} of 10)</h5>
-
 <div class="querySelector-query">
     <div class="querySelector-queryActive">
         <span>
@@ -33,17 +31,17 @@
     </div>
 </div>
 <div class="querySelector-list">
-    {{#each searches}}
-        <div class="querySelector-query">
-            <div class="querySelector-queryActive is-button" data-id="{{id}}">
+    {{#each this}}
+        <div class="querySelector-query" data-id="{{cid}}">
+            <div class="querySelector-queryActive is-button" data-id="{{cid}}">
                 <span class="fa fa-eye">
 
                 </span>
             </div>
-            <div class="querySelector-queryDetails is-button" data-id="{{id}}">
-                <div class="querySelector-queryName">
+            <div class="querySelector-queryDetails is-button" data-id="{{cid}}">
+                <div class="querySelector-queryName" title="{{generatedName}}">
                     <span>
-                        {{title}}
+                        {{generatedName}}
                     </span>
                 </div>
                 <div class="querySelector-queryResults">
@@ -55,7 +53,7 @@
         </div>
     {{/each}}
 </div>
-{{#unless searches}}
+{{#unless this}}
     <h6 align="center">
         You don't have any queries.
         Click "Add Query" to get Started.

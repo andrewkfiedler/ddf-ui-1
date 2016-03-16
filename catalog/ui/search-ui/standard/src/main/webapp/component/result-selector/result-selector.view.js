@@ -18,10 +18,14 @@ define([
     'underscore',
     'jquery',
     'text!./result-selector.hbs',
-    'js/CustomElements'
-], function (Marionette, _, $, resultSelectorTemplate, CustomElements) {
+    'js/CustomElements',
+    'js/store'
+], function (Marionette, _, $, resultSelectorTemplate, CustomElements, store) {
 
     var ResultSelector = Marionette.LayoutView.extend({
+        setDefaultModel: function(){
+            this.model = store.getCurrentWorkspace();
+        },
         template: resultSelectorTemplate,
         tagName: CustomElements.register('result-selector'),
         modelEvents: {
@@ -32,7 +36,10 @@ define([
         },
         regions: {
         },
-        initialize: function(){
+        initialize: function(options){
+            if (options.model === undefined){
+                this.setDefaultModel();
+            }
         }
     });
 

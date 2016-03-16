@@ -1,5 +1,5 @@
 @{customElementNamespace}lightbox {
-  @lightboxTitleBarFontSize: 2rem;
+  @lightboxTitleBarFontSize: 3rem;
   @paddingVertical: 4px;
   @paddingHorizontal: 7px;
   @borderSize: 1px;
@@ -34,16 +34,18 @@
     border-bottom: 1px solid @border-color;
     text-align: center;
     font-size: @lightboxTitleBarFontSize;
+    min-height: @minimumButtonSize;
+    line-height: @minimumButtonSize;
   }
 
   .lightbox-close {
     position: absolute;
     right: 0px;
-    padding: 4px 7px;
+    height: @minimumButtonSize;
+    width: @minimumButtonSize;
   }
 
   .lightbox-title {
-    padding: 4px 7px;
     display: block;
     white-space: nowrap;
     text-overflow: ellipsis;

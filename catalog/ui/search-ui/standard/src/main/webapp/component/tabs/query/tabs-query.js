@@ -14,19 +14,17 @@ define([
     'underscore',
     '../tabs',
     'js/store',
-    'js/view/Query.view',
-    'component/query-basic/query-basic.view'
-], function (_, Tabs, store, OldQueryView, QueryBasicView) {
+    'component/query-old-basic/query-old-basic.view'
+], function (_, Tabs, store, QueryOldBasicView) {
 
     var WorkspaceContentTabs = Tabs.extend({
         defaults: {
             tabs: {
-                'Old': OldQueryView.QueryView,
-                'Basic': QueryBasicView,
-                'Advanced': OldQueryView.QueryView,
-                'Preview': OldQueryView.QueryView,
-                'Updates': OldQueryView.QueryView,
-                'Status': OldQueryView.QueryView
+                'Basic': QueryOldBasicView,
+                'Advanced': QueryOldBasicView,
+                'Preview': QueryOldBasicView,
+                'Updates': QueryOldBasicView,
+                'Status': QueryOldBasicView
             }
         },
         getAssociatedQuery: function(){

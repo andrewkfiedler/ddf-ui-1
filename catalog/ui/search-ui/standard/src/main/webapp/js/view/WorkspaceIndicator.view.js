@@ -12,14 +12,18 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-/*global define, window*/
+/*global define*/
 define([
     'marionette',
     'underscore',
     'jquery',
     'text!templates/workspace/workspaceIndicator.handlebars',
-    'js/CustomElements'
-], function (Marionette, _, $, workspaceIndicatorTemplate, CustomElements) {
+    'js/CustomElements',
+    'component/lightbox/lightbox.view.instance',
+    'js/store',
+    'component/workspaces/Workspaces.view'
+], function (Marionette, _, $, workspaceIndicatorTemplate, CustomElements, lightboxViewInstance, store,
+            WorkspacesView) {
     var WorkspaceIndicatorView = Marionette.ItemView.extend({
         template: workspaceIndicatorTemplate,
         tagName: CustomElements.register('workspace-indicator'),
@@ -34,7 +38,11 @@ define([
             this.render();
         },
         openWorkspaces: function () {
-            window.location.hash = '#workspaces';
+            lightboxViewInstance.model.updateTitle('Workspaces');
+            lightboxViewInstance.model.open();
+            lightboxViewInstance.lightboxContent.show(new WorkspacesView({
+                model: store.get('componentWorkspaces')
+            }));
         }
     });
     return WorkspaceIndicatorView;

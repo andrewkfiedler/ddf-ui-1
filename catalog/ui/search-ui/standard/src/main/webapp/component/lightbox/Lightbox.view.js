@@ -21,21 +21,6 @@ define([
     'js/CustomElements'
 ], function (Marionette, _, $, LightboxTemplate, CustomElements) {
 
-    function disableTabbingToOutsideElements(view) {
-        $('button').attr('tabindex', -1);
-        $('input').attr('tabindex', -1);
-        $('a').attr('tabindex', -1);
-        view.$el.find('button').attr('tabindex', 0);
-        view.$el.find('input').attr('tabindex', 0);
-        view.$el.find('a').attr('tabindex', 0);
-    }
-
-    function enableTabbingToOutsideElements() {
-        $('button').attr('tabindex', 0);
-        $('input').attr('tabindex', 0);
-        $('a').attr('tabindex', 0);
-    }
-
     var LightboxView = Marionette.LayoutView.extend({
         template: LightboxTemplate,
         tagName: CustomElements.register('lightbox'),
@@ -58,9 +43,6 @@ define([
         },
         handleOpen: function () {
             this.$el.toggleClass('is-open', this.model.isOpen());
-            if (this.model.isOpen()){
-                disableTabbingToOutsideElements(this);
-            }
         },
         handleOutsideClick: function (event) {
             if (event.target === this.el) {
@@ -68,8 +50,7 @@ define([
             }
         },
         close: function () {
-            enableTabbingToOutsideElements();
-            window.location.hash = '#home';
+            this.model.close();
         }
     });
 

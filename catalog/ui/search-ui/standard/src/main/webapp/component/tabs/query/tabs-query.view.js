@@ -17,10 +17,20 @@ define([
     'marionette',
     'underscore',
     'jquery',
-    '../tabs.view'
-], function (Marionette, _, $, TabsView) {
+    '../tabs.view',
+    './tabs-query'
+], function (Marionette, _, $, TabsView, QueryTabsModel) {
 
     var QueryTabsView = TabsView.extend({
+        setDefaultModel: function(){
+            this.model = new QueryTabsModel();
+        },
+        initialize: function(options){
+            if (options.model === undefined){
+                this.setDefaultModel();
+            }
+            TabsView.prototype.initialize.call(this)
+        },
         determineContent: function(){
             var activeTab = this.model.getActiveView();
             this.tabsContent.show(new activeTab({

@@ -13,18 +13,9 @@
 define([
     'underscore',
     '../tabs',
-    'js/store',
     'component/workspace-explore/workspace-explore.view',
     'component/workspace-saved/workspace-saved.view'
-], function (_, Tabs, store, workspaceExploreView, workspaceSavedView) {
-
-    function getCurrentWorkspaceId(){
-        return store.get('workspaces').get('currentWorkspace');
-    }
-    
-    function getCurrentWorkspace(){
-        return store.get('workspaces').get('workspaces').get(getCurrentWorkspaceId());
-    }
+], function (_, Tabs, workspaceExploreView, workspaceSavedView) {
     
     var WorkspaceContentTabs = Tabs.extend({
         defaults: {
@@ -32,9 +23,6 @@ define([
                 'Explore': workspaceExploreView,
                 'Saved Items': workspaceSavedView
             }
-        },
-        getAssociatedWorkspace: function() {
-            return store.get('workspaces').get('workspaces').get(this.get('workspaceId'));
         }
     });
 

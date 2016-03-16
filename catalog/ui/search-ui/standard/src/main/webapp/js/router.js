@@ -18,29 +18,15 @@ define([
     'js/store',
 ], function (Marionette, lightboxViewInstance, WorkspacesView, store) {
 
-    function closeLightbox(){
-        lightboxViewInstance.model.close();
-    }
-
     var Router = Marionette.AppRouter.extend({
         controller: {
-            openWorkspaces: function(){
-                lightboxViewInstance.model.updateTitle('Workspaces');
-                lightboxViewInstance.model.open();
-                lightboxViewInstance.lightboxContent.show(new WorkspacesView({
-                    model: store.get('componentWorkspaces')
-                }));
-            },
             openWorkspace: function(workspaceId){
-                closeLightbox();
                 store.get('workspaces').setCurrentWorkspace(workspaceId);
             },
             home: function(){
-                closeLightbox();
             }
         },
         appRoutes: {
-            'workspaces': 'openWorkspaces',
             'workspace/:id': 'openWorkspace',
             'home': 'home'
         }

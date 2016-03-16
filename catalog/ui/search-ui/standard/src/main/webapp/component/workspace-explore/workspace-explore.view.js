@@ -21,30 +21,40 @@ define([
     'js/CustomElements',
     'component/query-selector/query-selector.view',
     'component/result-selector/result-selector.view',
-    'js/store'
+    'js/store',
+    'component/lightbox/lightbox.view.instance',
+    'component/queries/queries.view'
 ], function (Marionette, _, $, workspaceExploreTemplate, CustomElements, QuerySelectorView,
-             ResultSelectorView, store) {
+             ResultSelectorView, store, lightboxViewInstance, QueriesView) {
 
     var WorkspaceExplore = Marionette.LayoutView.extend({
+        setDefaultModel: function(){
+            this.model = store.getCurrentWorkspace()
+        },
         template: workspaceExploreTemplate,
         tagName: CustomElements.register('workspace-explore'),
         modelEvents: {
         },
         events: {
+            'click .querySelector-modal': 'openQueriesModal'
         },
         regions: {
             workspaceExploreQueries: '.workspaceExplore-queries',
             workspaceExploreResults: '.workspaceExplore-results'
         },
-        initialize: function () {
+        initialize: function (options) {
+            if (options.model === undefined){
+                this.setDefaultModel();
+            }
         },
         onBeforeShow: function(){
-           this.workspaceExploreQueries.show(new QuerySelectorView({
-                model: store.getCurrentWorkspace()
-            }));
-            this.workspaceExploreResults.show(new ResultSelectorView({
-                model: store.getCurrentWorkspace()
-            }));
+           this.workspaceExploreQueries.show(new QuerySelectorView());
+            this.workspaceExploreResults.show(new ResultSelectorView());
+        },
+        openQueriesModal: function(){
+            lightboxViewInstance.model.updateTitle('Queries');
+            lightboxViewInstance.model.open();
+            lightboxViewInstance.lightboxContent.show(new QueriesView());
         }
     });
 

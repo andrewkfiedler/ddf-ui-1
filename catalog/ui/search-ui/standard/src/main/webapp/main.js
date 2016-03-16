@@ -24,12 +24,12 @@ require.config({
         strapdown: 'lib/strapdown/v/0.2',
         spectrum: 'lib/spectrum/spectrum',
         // backbone
-        backbone: 'lib/components-backbone/backbone-min',
-        backboneassociations: 'lib/backbone-associations/backbone-associations-min',
+        backbone: 'lib/components-backbone/backbone',
+        backboneassociations: 'lib/backbone-associations/backbone-associations',
         backbonecometd: 'lib/backbone-cometd/backbone.cometd.extension',
         backboneundo: 'lib/Backbone.Undo.js/Backbone.Undo',
         poller: 'lib/backbone-poller/backbone.poller',
-        underscore: 'lib/lodash/lodash.min',
+        underscore: 'lib/lodash/lodash',
         marionette: 'lib/marionette/lib/backbone.marionette',
         // TODO test combining
         modelbinder: 'lib/backbone.modelbinder/Backbone.ModelBinder.min',
@@ -195,6 +195,26 @@ require([
     var document = window.document;
     //in here we drop in any top level patches, etc.
     var cache = {};
+    var toJSON = Backbone.Model.prototype.toJSON;
+    Backbone.Model.prototype.toJSON = function(options){
+        var originalJSON = toJSON.call(this, options);
+        if (options !== undefined && options.cid === true){
+            originalJSON.cid = this.cid;
+        }
+        return originalJSON;
+    };
+    var clone = Backbone.Model.prototype.clone;
+    Backbone.Model.prototype.clone = function(){
+        var cloneRef = clone.call(this);
+        cloneRef._cloneOf = this.id || this.cid;
+        return cloneRef;
+    };
+    var associationsClone = Backbone.AssociatedModel.prototype.clone;
+    Backbone.AssociatedModel.prototype.clone = function(){
+        var cloneRef = associationsClone.call(this);
+        cloneRef._cloneOf = this.id || this.cid;
+        return cloneRef;
+    };
     Marionette.Renderer.render = function (template, data) {
         if (cache[template] === undefined) {
             cache[template] = hbs.compile(template);

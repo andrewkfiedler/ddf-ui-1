@@ -11,6 +11,14 @@ button.is-primary {
 
 .button-mixin(@buttonColor) {
   background: @buttonColor;
+  font-size: 2rem !important;
+  padding: 0px !important;
+  line-height: 44px;
+  height: 44px;
+  .resetIconLineHeight;
+  span {
+    font-size: 2rem !important;
+  }
 
   &:hover {
     background: shade(@buttonColor, 10%);

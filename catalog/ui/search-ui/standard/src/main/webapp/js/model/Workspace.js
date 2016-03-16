@@ -9,7 +9,7 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-/*global define*/
+/*global define, window*/
 
 define([
         'backbone',
@@ -27,7 +27,10 @@ define([
         });
 
         Workspace.SearchList = Backbone.Collection.extend({
-            model: Query.Model
+            model: Query.Model,
+            canAddQuery: function(){
+                return this.length < 10;
+            }
         });
 
         var fakeUsers = ['Andrew', 'Chris', 'Korben', 'Leon', 'Krauser','Wesker'];
@@ -50,7 +53,7 @@ define([
                 {
                     type: Backbone.Many,
                     key: 'searches',
-                    relatedModel: Query.Model
+                    collectionType: Workspace.SearchList
                 },
                 {
                     type: Backbone.Many,
@@ -217,6 +220,8 @@ define([
                 return this.get('workspaces').get(workspaceId);
             }
         });
+
+        window.Workspace = Workspace;
 
         return Workspace;
 

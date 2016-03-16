@@ -34,6 +34,7 @@
 
   > @{thingToInline} {
     display: inline-block;
+    vertical-align: middle;
   }
 
   .inlineFix;
@@ -54,6 +55,12 @@
   white-space: nowrap;
   > * {
     white-space: normal;
+  }
+}
+
+.resetIconLineHeight {
+  .fa {
+    line-height: inherit;
   }
 }
 

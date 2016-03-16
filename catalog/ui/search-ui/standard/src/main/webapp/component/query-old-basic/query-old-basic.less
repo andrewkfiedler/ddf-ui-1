@@ -1,0 +1,71 @@
+@{customElementNamespace}query-old-basic {
+  .customElement;
+
+  overflow: auto;
+
+  ul > li {
+    padding: 10px;
+
+    &:last-of-type {
+      float: right;
+    }
+  }
+
+  > form {
+    max-height: ~"calc(100% - @{minimumButtonSize})";
+    overflow: auto;
+    display: none;
+  }
+
+  > .buttons > button {
+    height: @minimumButtonSize;
+
+    &.edit {
+      width: 100%;
+    }
+
+    &.cancel {
+      width: 50%;
+      display: none;
+    }
+
+    &.save {
+      width: 50%;
+      display: none;
+    }
+  }
+
+
+  &.is-editing {
+    > form {
+      display: block;
+    }
+
+    > .buttons {
+      .inlineBlockDisplay(button);
+
+      > button {
+        &.edit {
+          display: none;
+        }
+        &.cancel {
+          display: inline-block;
+        }
+        &.save {
+          display: inline-block;
+        }
+      }
+    }
+
+    > .readOnly {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: @smallScreenSize) {
+  @{customElementNamespace}query-old-basic {
+
+
+  }
+}
