@@ -42,7 +42,6 @@ define([
         template: workspaceSelectorTemplate,
         tagName: CustomElements.register('workspace-selector'),
         modelEvents: {
-            'all': 'rerender'
         },
         events: {
             'click .workspaces-list .workspace': 'clickWorkspace',
@@ -55,6 +54,7 @@ define([
         regions: {
         },
         initialize: function(){
+            this.listenTo(this.model.get('workspaces'), 'all', this.rerender);
         },
         serializeData: function(){
             return _.extend(this.model.toJSON(), {currentWorkspace: this.model.getCurrentWorkspaceName()});
