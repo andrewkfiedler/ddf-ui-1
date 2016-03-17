@@ -58,9 +58,9 @@ define([
         },
         highlightQuery: function(){
             var queryRef = store.getQuery();
-            this.$el.find('.querySelector-query').removeClass('is-selected');
+            this.$el.find('.querySelector-queryDetails').removeClass('is-selected');
             if (queryRef !== undefined){
-                this.$el.find('.querySelector-query[data-id="'+queryRef.get('id')+'"]').addClass('is-selected');
+                this.$el.find('.querySelector-queryDetails[data-id="'+queryRef._cloneOf+'"]').addClass('is-selected');
             }
         },
         serializeData: function(){

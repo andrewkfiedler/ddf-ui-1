@@ -32,12 +32,6 @@
         white-space: nowrap;
       }
     }
-
-    &.is-selected {
-      > div {
-        background: @select-background-color;
-      }
-    }
   }
 
   > button {
@@ -50,10 +44,6 @@
   .querySelector-list {
     max-height: ~"calc(100% - @{minimumButtonSize}*1)";
     overflow: auto;
-
-    > .querySelector-query {
-      .boxShadow;
-    }
   }
 
   &.can-addQuery {
