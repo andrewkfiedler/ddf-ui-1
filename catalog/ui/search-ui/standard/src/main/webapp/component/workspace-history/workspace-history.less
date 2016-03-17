@@ -7,18 +7,8 @@
   overflow: hidden;
   padding: 10px 10px;
 
-  .workspaceHistory-row + .workspaceHistory-row {
-    border-top: 1px solid @border-color;
-  }
-
   .workspaceHistory-row {
     transition: padding @transitionTime linear;
-
-    &.is-selected {
-      padding-left: 10px;
-      background: @select-background-color;
-      color: contrast(@select-background-color);
-    }
   }
 
   .workspaceHistory-header {
@@ -29,7 +19,6 @@
     overflow: auto;
     overflow-x: hidden;
     width: 100%;
-    border: 1px solid @border-color;
   }
 
   .workspaceHistory-cell {

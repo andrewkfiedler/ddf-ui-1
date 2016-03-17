@@ -7,7 +7,6 @@
   }
 
   .workspaces-list {
-    border: 1px solid @border-color;
     max-height: ~"calc(100% - 150px)";
     overflow: auto;
   }
@@ -24,12 +23,6 @@
   .workspace {
     padding: 10px;
     transition: padding @transitionTime linear;
-
-    &.is-selected {
-      padding-left: 20px;
-      background: @select-background-color;
-      color: contrast(@select-background-color);
-    }
 
     > div {
       white-space: nowrap;
@@ -53,10 +46,6 @@
         content: ',';
       }
     }
-  }
-
-  .workspace + .workspace {
-    .boxShadow;
   }
 }
 
