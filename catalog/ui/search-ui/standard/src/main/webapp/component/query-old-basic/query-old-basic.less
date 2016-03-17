@@ -14,7 +14,10 @@
   > form {
     max-height: ~"calc(100% - @{minimumButtonSize})";
     overflow: auto;
-    display: none;
+  }
+
+  .readOnly {
+    padding: 10px;
   }
 
   > .buttons > button {
@@ -37,9 +40,6 @@
 
 
   &.is-editing {
-    > form {
-      display: block;
-    }
 
     > .buttons {
       .inlineBlockDisplay(button);

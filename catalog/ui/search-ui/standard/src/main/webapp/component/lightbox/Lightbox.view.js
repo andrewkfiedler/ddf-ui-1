@@ -18,8 +18,9 @@ define([
     'underscore',
     'jquery',
     'text!./Lightbox.hbs',
-    'js/CustomElements'
-], function (Marionette, _, $, LightboxTemplate, CustomElements) {
+    'js/CustomElements',
+    'js/store'
+], function (Marionette, _, $, LightboxTemplate, CustomElements, store) {
 
     var LightboxView = Marionette.LayoutView.extend({
         template: LightboxTemplate,
@@ -37,6 +38,7 @@ define([
         },
         initialize: function () {
             $('body').append(this.el);
+            this.listenTo(store.get('workspaces'),'change:currentWorkspace',this.close);
         },
         rerender: function () {
             this.render();

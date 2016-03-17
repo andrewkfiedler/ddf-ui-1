@@ -366,6 +366,8 @@ define([
             this.updateLocationFields();
             if (this.model._cloneOf === undefined){
                 this.$el.addClass('is-editing');
+            } else {
+                this.readOnly();
             }
         },
         setupPopOver: function (selector, content) {
@@ -534,8 +536,18 @@ define([
         save: function(){
             store.saveQuery();
         },
+        readOnly: function(){
+            this.$el.find('label').attr('disabled', 'disabled');
+            this.$el.find('input').attr('disabled', 'disabled');
+            this.$el.find('select').attr('disabled', 'disabled');
+            this.$el.find('form button').attr('disabled', 'disabled');
+        },
         edit: function(){
             this.$el.addClass('is-editing');
+            this.$el.find('label').removeAttr('disabled');
+            this.$el.find('input').removeAttr('disabled');
+            this.$el.find('select').removeAttr('disabled');
+            this.$el.find('form button').removeAttr('disabled');
         },
         cancel: function(){
             store.resetQuery();

@@ -1,7 +1,6 @@
 @{customElementNamespace}tabs {
   @tabHeight: 44px;
-  @tabBackground: rgba(255, 255, 255, .9);
-  @tabColor: contrast(@tabBackground);
+  @tabColor: lighten(@primary-color, 20%);
 
   .customElement;
   .tabs-list {
@@ -24,7 +23,6 @@
 
     &.is-open {
       .tabs-dropdown {
-        background: @within-background-color;
         color: white;
       }
 
@@ -39,6 +37,11 @@
           color: white;
           width: 100%;
           padding: 10px;
+
+          &:hover {
+            background: @background-color;
+            color: @tabColor;
+          }
         }
         > div.is-merged.is-active {
           display: none;
@@ -73,12 +76,16 @@
       padding: 10px;
 
       &.has-activeTab {
-        background: @tabBackground;
         color: @tabColor;
+        border-bottom: 1px solid @tabColor;
 
         .hint {
           display: none;
         }
+      }
+
+      &:hover {
+        background: none;
       }
 
       .hint {
@@ -88,7 +95,7 @@
 
     .tabs-tab + .tabs-tab,
     .tabs-tab + .tabs-dropdown{
-      border-left: 1px solid @border-color;
+      //border-left: 1px solid @border-color;
     }
 
     .tabs-tab {
@@ -97,7 +104,12 @@
       height: 100%;
 
       &.is-active {
-        background: @tabBackground;
+        color: @tabColor;
+        border-bottom: 1px solid @tabColor;
+      }
+
+      &:hover {
+        background: none;
         color: @tabColor;
       }
 
