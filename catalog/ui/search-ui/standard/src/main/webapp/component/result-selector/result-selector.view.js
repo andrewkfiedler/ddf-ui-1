@@ -40,6 +40,30 @@ define([
             if (options.model === undefined){
                 this.setDefaultModel();
             }
+            //this.listenTo(this.model.get('searches'), 'nested-change', this.handleUpdate);
+            this.listenTo(store.get('content').get('results'), 'all', this.rerender);
+            this.handleUpdate();
+        },
+        handleUpdate: function(){
+            var results = store.get('content').get('results');
+            this.model.get('searches').forEach(function(search){
+                var searchResult = search.get('result');
+                if (searchResult){
+                    var searchResults = searchResult.get('results');
+                    if (searchResults){
+                        searchResults.forEach(function(metacardResult){
+                            var metacard = metacardResult.get('metacard');
+                            results.add(metacard);
+                        });
+                    }
+                }
+            });
+        },
+        rerender: function(){
+            this.render();
+        },
+        serializeData: function(){
+            return store.get('content').get('results').toJSON();
         }
     });
 

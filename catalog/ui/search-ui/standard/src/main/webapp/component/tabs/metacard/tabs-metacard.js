@@ -1,4 +1,3 @@
-{{!--
 /**
  * Copyright (c) Codice Foundation
  *
@@ -10,31 +9,27 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
- --}}
-<div class="workspaceBasic-inputs">
+/*global define*/
+define([
+    'underscore',
+    '../tabs',
+    'js/store'
+], function (_, Tabs, store) {
 
-</div>
-<div class="workspaceBasic-footer">
-    <button class="workspaceBasic-edit is-neutral">
-        <span class="fa fa-pencil">
+    var WorkspaceContentTabs = Tabs.extend({
+        defaults: {
+            tabs: {
+                'Basic': QueryOldBasicView,
+                'Advanced': QueryOldBasicView,
+                'Preview': QueryOldBasicView,
+                'Updates': QueryOldBasicView,
+                'Status': QueryOldBasicView
+            }
+        },
+        getAssociatedQuery: function(){
+            return store.getQuery();
+        }
+    });
 
-        </span>
-        <span>
-            Edit
-        </span>
-    </button>
-    <button class="workspaceBasic-cancel is-negative">
-         <span class="fa fa-times">
-         </span>
-        <span>
-            Cancel
-        </span>
-    </button>
-    <button class="workspaceBasic-save is-positive">
-         <span class="fa fa-floppy-o">
-         </span>
-        <span>
-            Save
-        </span>
-    </button>
-</div>
+    return WorkspaceContentTabs;
+});

@@ -518,6 +518,7 @@ define([
                     result = this.get('result');
                 } else {
                     result = new Metacard.SearchResult();
+                    result.setQueryId(this);
                     this.set({result: result});
                 }
 
@@ -528,7 +529,7 @@ define([
                     localResult.get('results').each(function(searchResult) {
                         searchResult.cleanup();
                     });
-                    localResult.mergeLatest();
+                    //localResult.mergeLatest();
                     localResult = null;
                 };
 
@@ -580,6 +581,9 @@ define([
                         });
                     }
                 }
+            },
+            getId: function(){
+                return this._cloneOf || this.cid;
             }
         });
         return Query;

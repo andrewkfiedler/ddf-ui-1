@@ -12,15 +12,25 @@
 /*global define*/
 define([
     'underscore',
-    'backbone'
-], function (_, Backbone) {
+    'backbone',
+    'js/model/Metacard'
+], function (_, Backbone, Metacard) {
 
-    var Content = Backbone.Model.extend({
+    var Content = Backbone.AssociatedModel.extend({
+        relations: [
+            {
+                type: Backbone.Many,
+                key: 'results',
+                relatedModel: Metacard.Metacard
+            }
+        ],
         defaults: {
             queryId: undefined,
             savedItems: undefined,
             query: undefined,
             state: undefined,
+            results: [],  //list of metacards
+            filter: [],  //list of filtered queries
             editing: true
         },
         initialize: function(){

@@ -15,16 +15,39 @@
 
 <div class="resultSelector-result">
     <div class="resultSelector-resultTitle">
-        Title
+        <span>
+            Title
+        </span>
     </div>
     <div class="resultSelector-resultSource">
-        Source
+        <span>
+            Source
+        </span>
     </div>
     <div class="resultSelector-resultLastModified">
-        Last Modified
+        <span>
+            Last Modified
+        </span>
     </div>
 </div>
-<div class="resultSelector-list">
-    {{#each result}}
+<div class="resultSelector-list is-list">
+    {{#each this}}
+        <div class="resultSelector-result is-button" data-metacardId="{{id}}" data-queryId="{{queryId}}">
+            <div class="resultSelector-resultTitle">
+                <span>
+                    {{properties.title}}
+                </span>
+            </div>
+            <div class="resultSelector-resultSource">
+                <span>
+                    {{properties.source-id}}
+                </span>
+            </div>
+            <div class="resultSelector-resultLastModified">
+                <span>
+                    {{properties.modified}}
+                </span>
+            </div>
+        </div>
     {{/each}}
 </div>

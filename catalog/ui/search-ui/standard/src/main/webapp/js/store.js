@@ -19,7 +19,6 @@ define([
     'js/model/source',
     'component/workspaces/workspaces',
     'js/model/Selected',
-    'component/workspaces/workspaces',
     'component/content/content'
 ], function (Backbone, poller, _, Workspace, Source, Workspaces, Selected, Content) {
 
@@ -56,6 +55,7 @@ define([
             this.set('content', init(Content, {
                 persisted: false
             }));
+            this.listenTo(this.get('workspaces'), 'change:currentWorkspace', this.clearResults);
         },
         getCurrentWorkspace: function () {
             return this.get('workspaces').get('workspaces').get(this.get('workspaces').get('currentWorkspace'));
@@ -97,6 +97,9 @@ define([
         updateQuery: function(){
             var query = this.getQuery();
             this.getCurrentQueries().get(query._cloneOf).set(query.attributes);
+        },
+        clearResults: function(){
+            this.get('content').get('results').reset();
         }
     });
 

@@ -189,6 +189,7 @@ define([
 
             initialize: function () {
                 this.listenTo(wreqr.vent, 'metacard:selected', _.bind(this.onAppContext, this));
+                this.set('id', this.get('properties').id);
             },
 
             onAppContext: function (direction, model) {
@@ -215,17 +216,38 @@ define([
                     key: 'actions',
                     relatedModel: MetaCard.Action
                 }
-            ]
+            ],
+            defaults: {
+                'queryId': undefined
+            },
+            setQueryId: function(metacardResult){
+                this.set('queryId', metacardResult.getQueryId());
+            }
         });
 
         MetaCard.MetacardResult = Backbone.AssociatedModel.extend({
+            defaults: {
+                'queryId': undefined
+            },
             relations: [
                 {
                     type: Backbone.One,
                     key: 'metacard',
                     relatedModel: MetaCard.Metacard
                 }
-            ]
+            ],
+            initialize: function(){
+                this.listenTo(this, 'change:queryId', this.updateChildQueryId);
+            },
+            setQueryId: function(metacardSearchResult){
+                this.set('queryId', metacardSearchResult.getQueryId());
+            },
+            getQueryId: function(){
+                return this.get('queryId');
+            },
+            updateChildQueryId: function(){
+                this.get('metacard').setQueryId(this);
+            }
         });
 
         MetaCard.SourceStatus = Backbone.AssociatedModel.extend({
@@ -233,6 +255,10 @@ define([
         });
 
         MetaCard.SearchResult = Backbone.AssociatedModel.extend({
+            defaults: {
+                'queryId': undefined,
+                'results': []
+            },
             relations: [
                 {
                     type: Backbone.Many,
@@ -246,11 +272,23 @@ define([
                 }
             ],
             url: "/service/query",
+            initialize: function(){
+                var self = this;
+                this.listenTo(this.get('results'), 'add', function(metacardResult){
+                    metacardResult.setQueryId(self);
+                });
+            },
             parse: function (resp) {
                 if (resp.data) {
                     return resp.data;
                 }
                 return resp;
+            },
+            setQueryId: function(query){
+                this.set('queryId', query.getId());
+            },
+            getQueryId: function(){
+                return this.get('queryId');
             },
             cancel: function() {
                 this.unsubscribe();
@@ -271,7 +309,6 @@ define([
                             return result.get('metacard').has('selectedForSave') &&
                                 result.get('metacard').get('selectedForSave') === true;
                         });
-
                         _.forEach(update.results, function (result) {
                             if (_.some(selectedForSave, function (saved) {
                                 return saved.get('metacard').get('properties').get('id') ===

@@ -64,7 +64,9 @@ define([
             }
         },
         serializeData: function(){
-            var json = this.model.toJSON({cid: true});
+            var json = this.model.toJSON({
+                additionalProperties: ['cid']
+            });
             json.forEach(function(search){
                 var cql = search.cql;
                 cql = cql.replace(new RegExp('anyText ILIKE ','g'),'~');

@@ -198,8 +198,11 @@ require([
     var toJSON = Backbone.Model.prototype.toJSON;
     Backbone.Model.prototype.toJSON = function(options){
         var originalJSON = toJSON.call(this, options);
-        if (options !== undefined && options.cid === true){
-            originalJSON.cid = this.cid;
+        if (options && options.additionalProperties !== undefined){
+            var backboneModel = this;
+            options.additionalProperties.forEach(function(property){
+                originalJSON[property] = backboneModel[property];
+            });
         }
         return originalJSON;
     };

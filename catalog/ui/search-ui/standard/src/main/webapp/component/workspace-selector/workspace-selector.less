@@ -1,5 +1,5 @@
 @{customElementNamespace}workspace-selector {
-
+  @buttonMargin: 10px;
   .customElement;
 
   h6 {
@@ -7,14 +7,14 @@
   }
 
   .workspaces-list {
-    max-height: ~"calc(100% - 150px)";
+    max-height: ~"calc(100% - 150px - @{buttonMargin})";
     overflow: auto;
   }
 
   button {
+    margin-top: @buttonMargin;
     width: 100%;
     height: @minimumButtonSize;
-    padding: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -51,9 +51,10 @@
 
 @media (max-width: @smallScreenSize) {
   @{customElementNamespace}workspace-selector {
+    @buttonMargin: 10px;
 
     .workspaces-list {
-      max-height: ~"calc(100% - 180px)";
+      max-height: ~"calc(100% - 180px - @{buttonMargin})";
     }
 
     .workspace {

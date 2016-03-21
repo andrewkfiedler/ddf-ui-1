@@ -419,7 +419,7 @@ define([
             this.zoomOnResults = this.model.get('bbox') || this.model.get('radius') || this.model.get('polygon') ? true : false;
         },
         workspaceSearch: function () {
-            var queryName = this.$('#queryName').val();
+            var queryName = 'need a name';
             if (!queryName) {
                 return;
             }
@@ -535,6 +535,7 @@ define([
         },
         save: function(){
             store.saveQuery();
+            this.workspaceSearch();
         },
         readOnly: function(){
             this.$el.find('label').attr('disabled', 'disabled');

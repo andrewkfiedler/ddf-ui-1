@@ -170,12 +170,12 @@ define([
                 this.on({
                    'all': this.setDefaultCurrentWorkspace
                 });
-                this.on('nested-change',function(){
+                /*this.on('nested-change', function () {
                     this.save();
                 });
-                this.on('change',function(){
+                this.on('change', function () {
                     this.save();
-                });
+                });*/
             },
             parse: function (resp) {
                 if (resp.data) {
