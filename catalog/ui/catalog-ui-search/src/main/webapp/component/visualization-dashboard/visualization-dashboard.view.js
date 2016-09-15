@@ -13,38 +13,20 @@
  *
  **/
 /*global require*/
+var $ = require('jquery');
 var Marionette = require('marionette');
 var MarionetteRegion = require('js/Marionette.Region');
 var VisualizationCollectionView = require('component/visualization/visualization.collection.view');
 var template = require('./visualization-dashboard.hbs');
 var CustomElements = require('js/CustomElements');
 var user = require('component/singletons/user-instance');
+var GoldenLayout = require('golden-layout');
+var CesiumView = require('component/visualization/maps/cesium/cesium.view');
+var InspectorView = require('component/visualization/inspector/inspector.view');
 
 function getVisualizations() {
     return user.get('user').get('preferences').get('visualizations');
 }
-
-var config = {
-    content: [{
-        type: 'row',
-        content: [{
-            type: 'component',
-            componentName: 'testComponent',
-            componentState: { label: 'A' }
-        }, {
-            type: 'column',
-            content: [{
-                type: 'component',
-                componentName: 'testComponent',
-                componentState: { label: 'B' }
-            }, {
-                type: 'component',
-                componentName: 'testComponent',
-                componentState: { label: 'C' }
-            }]
-        }]
-    }]
-};
 
 module.exports = Marionette.LayoutView.extend({
     tagName: CustomElements.register('visualization-dashboard'),
@@ -60,11 +42,51 @@ module.exports = Marionette.LayoutView.extend({
         this.listenTo(getVisualizations(), 'reset add remove update', this.handleEmpty);
     },
     onBeforeShow: function() {
-        this.visualizations.show(new VisualizationCollectionView({
-            selectionInterface: this.options.selectionInterface
-        }), {
-            replaceElement: true
+        var config = {
+            settings: {
+                showPopoutIcon: false
+            },
+            content: [{
+                type: 'row',
+                content: [{
+                    type: 'component',
+                    componentName: 'cesium',
+                    componentState: {}
+                }, {
+                    type: 'column',
+                    content: [{
+                        type: 'component',
+                        componentName: 'inspector',
+                        componentState: {}
+                    }]
+                }]
+            }]
+        };
+        var myLayout = new GoldenLayout(config, this.$el.find('.dashboard-container'));
+        var selectionInterface = this.options.selectionInterface;
+        myLayout.registerComponent('cesium', function(container, componentState) {
+            var cesiumView = new CesiumView({
+                selectionInterface: selectionInterface
+            });
+            cesiumView.render();
+            $(container.getElement()).append(cesiumView.$el);
         });
+        myLayout.registerComponent('inspector', function(container, componentState) {
+            var cesiumView = new InspectorView({
+                selectionInterface: selectionInterface
+            });
+            cesiumView.render();
+            $(container.getElement()).append(cesiumView.$el);
+            setTimeout(function() {
+                myLayout.updateSize();
+            }, 0);
+            other = container;
+        });
+        myLayout.init();
+        $(window).on('resize', function() {
+            myLayout.updateSize();
+        });
+        test = myLayout;
     },
     addVisualization: function() {
         getVisualizations().add({});

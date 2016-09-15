@@ -4,10 +4,11 @@
 
   position: relative;
 
-  > @{customElementNamespace}visualization-collection {
+  > @{customElementNamespace}visualization-collection,
+  > .dashboard-container {
     height: ~'calc(100% - @{minimumButtonSize})';
     width: 100%;
-    overflow: auto;
+    overflow: hidden;
     transition: height @coreTransitionTime linear;
   }
 
