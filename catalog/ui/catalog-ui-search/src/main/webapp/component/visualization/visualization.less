@@ -1,12 +1,49 @@
 @{customElementNamespace}visualization {
-  .customElement;
+  display: inline-block;
   background: inherit;
-
   position: relative;
+  border: 1px solid @medium-lighten-inherited-background-color;
+  transition: height @coreTransitionTime linear;
+  overflow: hidden;
 
-  > .visualization-container {
-    .customElement;
+  > .visualization-container, > .visualization-selector {
     background: inherit;
+    height: ~'calc(100% - @{minimumLineSize})';
+    width: 100%;
+    position: relative;
   }
 
+  > .visualization-selector {
+    display: none;
+  }
+
+  > .visualization-title {
+    background: @lighten-inherited-background-color;
+    border-bottom: 1px solid @medium-lighten-inherited-background-color;
+    height: @minimumLineSize;
+    line-height: @minimumLineSize;
+    white-space: nowrap;
+    padding: 0px 10px;
+    > .title-type {
+      float: left;
+    }
+    > .title-right {
+      float: right;
+      button {
+        height: @minimumLineSize;
+        line-height: @minimumLineSize;
+        padding: 0px 10px;
+      }
+    }
+  }
+
+}
+
+@{customElementNamespace}visualization.is-empty {
+  > .visualization-container {
+    display: none;
+  }
+  > .visualization-selector {
+    display: block;
+  }
 }

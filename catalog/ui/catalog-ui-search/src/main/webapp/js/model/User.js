@@ -19,8 +19,9 @@ define([
     'properties',
     './Alert',
     'js/Common',
+    'component/visualization/visualization.collection',
     'backboneassociations'
-], function (_, wreqr, Backbone, properties, Alert, Common) {
+], function (_, wreqr, Backbone, properties, Alert, Common, VisualizationCollection) {
     'use strict';
 
     var User = {};
@@ -136,6 +137,7 @@ define([
                 alertExpiration: 86400000, // 1 day
                 resultBlacklist: [],
                 visualization: 'map',
+                visualizations: [],
                 columnHide: [],
                 columnOrder: ['title', 'created', 'modified', 'thumbnail']
             };
@@ -156,6 +158,11 @@ define([
                 type: Backbone.Many,
                 key: 'alerts',
                 relatedModel: Alert
+            },
+            {
+                type: Backbone.Many,
+                key: 'visualizations',
+                collectionType: VisualizationCollection
             }
         ],
         initialize: function(){
@@ -171,6 +178,7 @@ define([
             this.listenTo(wreqr.vent, 'alerts:add', this.addAlert);
             this.listenTo(this.get('alerts'), 'remove', this.handleRemove);
             this.listenTo(this, 'change:visualization', this.savePreferences);
+            this.listenTo(this.get('visualizations'), 'all', this.savePreferences);
         },
         handleRemove: function(){
             this.savePreferences();

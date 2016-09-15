@@ -31,11 +31,11 @@ define([
     'js/Common',
     'component/metacard-title/metacard-title.view',
     'component/router/router',
-    'component/visualization/visualization.view',
+    'component/visualization-dashboard/visualization-dashboard.view',
     'component/query-title/query-title.view'
 ], function (wreqr, Marionette, _, $, contentTemplate, CustomElements, MenuView, properties,
              WorkspaceContentTabs, WorkspaceContentTabsView, QueryTabsView, store,
-             MetacardTabsView, MetacardsTabsView, Common, MetacardTitleView, router, VisualizationView,
+             MetacardTabsView, MetacardsTabsView, Common, MetacardTitleView, router, VisualizationDashboardView,
             QueryTitleView) {
 
     var debounceTime = 25;
@@ -58,7 +58,7 @@ define([
             'panelThree': '.content-panelThree'
         },
         initialize: function(){
-            this._mapView = new VisualizationView({
+            this._mapView = new VisualizationDashboardView({
                 selectionInterface: store.get('content')
             });
             this.listenTo(router, 'change', this.handleRoute);
@@ -104,7 +104,7 @@ define([
             if (queryRef === undefined && selectedResults.length === 0){
                 this.hidePanelTwo();
             } else if (selectedResults.length === 1) {
-                this.showPanelTwo();
+               // this.showPanelTwo();
                 if (!this.panelTwo.currentView || this.panelTwo.currentView.constructor !== MetacardTabsView) {
                     this.panelTwo.show(new MetacardTabsView());
                 }
@@ -112,7 +112,7 @@ define([
                     model: selectedResults
                 }));
             } else if (selectedResults.length > 1) {
-                this.showPanelTwo();
+                //this.showPanelTwo();
                 if (!this.panelTwo.currentView || this.panelTwo.currentView.constructor !== MetacardsTabsView) {
                     this.panelTwo.show(new MetacardsTabsView());
                 }
