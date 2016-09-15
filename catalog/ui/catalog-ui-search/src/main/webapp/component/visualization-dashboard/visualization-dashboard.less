@@ -1,0 +1,42 @@
+@{customElementNamespace}visualization-dashboard {
+  .customElement;
+  background: inherit;
+
+  position: relative;
+
+  > @{customElementNamespace}visualization-collection {
+    height: ~'calc(100% - @{minimumButtonSize})';
+    width: 100%;
+    overflow: auto;
+    transition: height @coreTransitionTime linear;
+  }
+
+  > .dashboard-footer {
+    height: @minimumButtonSize;
+    width: 100%;
+    transition: height @coreTransitionTime linear;
+    button {
+      width: 100%;
+      height: 100%;
+    }
+    opacity: 1;
+  }
+
+}
+
+@{customElementNamespace}visualization-dashboard.is-empty {
+
+    > @{customElementNamespace}visualization-collection {
+        height: 0%;
+    }
+
+  > .dashboard-footer {
+    height: 100%;
+
+    button {
+      height: 100%;
+      text-align: center;
+    }
+  }
+
+}

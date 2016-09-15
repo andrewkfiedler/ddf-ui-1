@@ -1,0 +1,36 @@
+@{customElementNamespace}inspector {
+  .customElement;
+
+  .inspector-empty {
+    display: none;
+  }
+
+  > .inspector-container {
+    .customElement;
+  }
+
+  > .inspector-container > .container-title {
+    font-size: 2rem;
+    line-height: @minimumButtonSize;
+    height: @minimumButtonSize;
+    text-align: center;
+    padding-left: 2*@minimumButtonSize;
+  }
+
+  > .inspector-container > .container-tabs {
+    height: ~'calc(100% - @{minimumButtonSize})';
+  }
+
+}
+
+@{customElementNamespace}inspector.is-empty {
+
+  .inspector-empty {
+    display: block;
+  }
+
+  .inspector-container {
+    display: none;
+  }
+
+}
