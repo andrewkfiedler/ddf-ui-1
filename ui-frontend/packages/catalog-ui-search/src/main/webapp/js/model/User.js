@@ -258,6 +258,7 @@ User.Preferences = Backbone.AssociatedModel.extend({
   },
   savePreferences() {
     const currentPrefs = this.toJSON()
+    console.log(currentPrefs.goldenLayout.content)
     if (_.isEqual(Common.duplicate(currentPrefs), this.lastSaved)) {
       return
     }

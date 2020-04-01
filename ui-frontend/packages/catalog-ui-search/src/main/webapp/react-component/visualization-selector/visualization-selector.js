@@ -51,18 +51,36 @@ const VisualizationText = styled.div`
   vertical-align: middle;
 `
 
-const configs = ExtensionPoints.visualizations.reduce((cfg, viz) => {
-  const { id, title, icon } = viz
-
-  cfg[id] = {
-    title,
+const configs = {
+  ...ExtensionPoints.visualizations.reduce((cfg, viz) => {
+    const { id, title, icon } = viz
+  
+    cfg[id] = {
+      title,
+      type: 'component',
+      componentName: id,
+      icon,
+      componentState: {},
+    }
+    return cfg
+  }, {}),
+  unknownComponent: {
+    title: 'My Visual',
     type: 'component',
-    componentName: id,
-    icon,
-    componentState: {},
+    componentName: 'unknownComponent',
+    icon: 'fa fa-bar-chart',
+    componentState: {}
+  },
+  unknownReactComponent: {
+    title: 'My React Visual',
+    type: 'react-component',
+    componentName: 'unknownReactComponent',
+    component: 'unknownReactComponent',
+    icon: 'fa fa-bar-chart',
+    componentState: {}
   }
-  return cfg
-}, {})
+}
+
 
 const unMaximize = contentItem => {
   if (contentItem.isMaximised) {
@@ -86,6 +104,8 @@ class VisualizationSelector extends React.Component {
     this.inspector = React.createRef()
     this.histogram = React.createRef()
     this.table = React.createRef()
+    this.unknownComponent = React.createRef()
+    this.unknownReactComponent = React.createRef()
   }
   render() {
     return (

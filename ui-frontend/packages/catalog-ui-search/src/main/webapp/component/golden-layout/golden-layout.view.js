@@ -21,7 +21,8 @@ const wreqr = require('../../js/wreqr.js')
 const template = require('./golden-layout.hbs')
 const Marionette = require('marionette')
 const CustomElements = require('../../js/CustomElements.js')
-const GoldenLayout = require('golden-layout')
+const GoldenLayout = require('../../../../../../../../../../external/golden-layout/dist/js/goldenlayout')
+  .default
 const properties = require('../../js/properties.js')
 const Common = require('../../js/Common.js')
 const store = require('../../js/store.js')
@@ -30,7 +31,11 @@ const VisualizationDropdown = require('../dropdown/visualization-selector/dropdo
 const DropdownModel = require('../dropdown/dropdown.js')
 const sanitize = require('sanitize-html')
 import ExtensionPoints from '../../extension-points'
-
+import { UnknownComponent, UnknownReactComponent } from '../visualization/unknown/unknown'
+import * as React from 'react'
+import * as ReactDOM from 'react-dom'
+window.React = React;
+window.ReactDOM = ReactDOM;
 const treeMap = (obj, fn, path = []) => {
   if (Array.isArray(obj)) {
     return obj.map((v, i) => treeMap(v, fn, path.concat(i)))
@@ -171,6 +176,9 @@ function removeActiveTabInformation(config) {
   if (config.activeItemIndex !== undefined) {
     config.activeItemIndex = 0
   }
+  if (config.componentState !== undefined) {
+    delete config['componentState']
+  }
   if (config.content === undefined || config.content.length === 0) {
     return
   } else {
@@ -226,12 +234,49 @@ module.exports = Marionette.LayoutView.extend({
       })
     )
   },
+  registerUnknownComponents() {
+    this.goldenLayout.registerComponentFunction(({config}) => {
+      if (this.goldenLayout.isReactConfig(config)) {
+        return UnknownReactComponent
+      } else {
+        return (container, componentState) => {
+          container.on('open', () => {
+            setTimeout(() => {
+              const componentView = new UnknownComponent(
+                _.extend({}, componentState, {
+                  container,
+                })
+              )
+              container.getElement().append(componentView.el)
+              componentView.render()
+              container.on('destroy', () => {
+                componentView.destroy()
+              })
+            }, 0)
+          })
+          container.on('tab', tab => {
+            tab.closeElement.off('click').on('click', event => {
+              if (
+                tab.header.parent.isMaximised &&
+                tab.header.parent.contentItems.length === 1
+              ) {
+                tab.header.parent.toggleMaximise()
+              }
+              tab._onCloseClickFn(event)
+            })
+          })
+        }
+      }
+    })
+
+  },
   showGoldenLayout() {
     this.goldenLayout = new GoldenLayout(
       this.getGoldenLayoutConfig(),
       this.el.querySelector('.golden-layout-container')
     )
     this.registerGoldenLayoutComponents()
+    this.registerUnknownComponents()
     this.goldenLayout.on(
       'stateChanged',
       _.debounce(this.handleGoldenLayoutStateChange.bind(this), 200)
@@ -241,7 +286,11 @@ module.exports = Marionette.LayoutView.extend({
       'initialised',
       this.handleGoldenLayoutInitialised.bind(this)
     )
+    // try {
     this.goldenLayout.init()
+    // } catch (err) {
+    //   console.log(err)
+    // }
   },
   getGoldenLayoutConfig() {
     let currentConfig = user

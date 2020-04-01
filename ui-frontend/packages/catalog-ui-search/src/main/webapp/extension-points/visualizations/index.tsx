@@ -14,7 +14,7 @@
  **/
 const HistogramView = require('../../component/visualization/histogram/histogram.view.js')
 const TableView = require('../../component/visualization/table/table-viz.view.js')
-const InspectorView = require('../../component/visualization/inspector/inspector.view.js')
+// const InspectorView = require('../../component/visualization/inspector/inspector.view.js')
 const LowBandwidthMapView = require('../../component/visualization/low-bandwidth-map/low-bandwidth-map.view.js')
 
 export default [
@@ -27,15 +27,15 @@ export default [
       desiredContainer: 'openlayers',
     },
   },
-  {
-    id: 'cesium',
-    title: '3D Map',
-    view: LowBandwidthMapView,
-    icon: 'fa fa-globe',
-    options: {
-      desiredContainer: 'cesium',
-    },
-  },
+  // {
+  //   id: 'cesium',
+  //   title: '3D Map',
+  //   view: LowBandwidthMapView,
+  //   icon: 'fa fa-globe',
+  //   options: {
+  //     desiredContainer: 'cesium',
+  //   },
+  // },
   {
     id: 'histogram',
     title: 'Histogram',
@@ -48,10 +48,10 @@ export default [
     icon: 'fa fa-table',
     view: TableView,
   },
-  {
-    id: 'inspector',
-    title: 'Inspector',
-    icon: 'fa fa-info',
-    view: InspectorView,
-  },
+  // {
+  //   id: 'inspector',
+  //   title: 'Inspector',
+  //   icon: 'fa fa-info',
+  //   view: InspectorView,
+  // },
 ]

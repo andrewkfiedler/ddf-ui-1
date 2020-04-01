@@ -11328,10 +11328,10 @@ glslify@^7.0.0:
     through2 "^2.0.1"
     xtend "^4.0.0"
 
-golden-layout@1.5.8:
-  version "1.5.8"
-  resolved "https://registry.yarnpkg.com/golden-layout/-/golden-layout-1.5.8.tgz#320963eabdefec4fe143e2b769af918c7791c83c"
-  integrity sha1-Mglj6r3v7E/hQ+K3aa+RjHeRyDw=
+golden-layout@1.5.9:
+  version "1.5.9"
+  resolved "https://registry.yarnpkg.com/golden-layout/-/golden-layout-1.5.9.tgz#a39bc1f6a67e6f886b797c016dd924e9426ba77f"
+  integrity sha1-o5vB9qZ+b4hreXwBbdkk6UJrp38=
   dependencies:
     jquery "*"
 
@@ -22364,7 +22364,7 @@ usng.js@0.4.3:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/usng.js/-/usng.js-0.4.3.tgz#4e1a6b0f16ce88f3b8d05efcb83d0947d50e16ff"
   integrity sha512-J0lTDEraGCYXIOTMpTS/BWqFOMdD4tMSjMV8J92GKw7RrR2/eNWqvcdXbPBIBGiPvP6Ef8BRWKm4Cvx+QlhpCQ==
-  
+
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
