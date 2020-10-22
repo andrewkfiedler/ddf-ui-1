@@ -1,176 +1,58 @@
 import * as React from 'react'
-import { useState, useRef } from 'react'
-import {
-  DatePicker,
-  IDateInputProps,
-  IDatePickerProps,
-} from '@blueprintjs/datetime'
-import { DateHelpers } from './date-helpers'
-import { MuiOutlinedInputBorderClasses } from '../theme/theme'
+import { IDateInputProps } from '@blueprintjs/datetime'
 import TextField, { TextFieldProps } from '@material-ui/core/TextField'
-import InputAdornment from '@material-ui/core/InputAdornment'
-import IconButton from '@material-ui/core/IconButton'
-import CalendarIcon from '@material-ui/icons/Event'
-import Popover from '@material-ui/core/Popover'
-import useTimePrefs from './useTimePrefs'
+import { DateField } from './date'
+import { hot } from 'react-hot-loader'
 
 type DateFieldProps = {
   value: string
   onChange: (value: string) => void
-  disabled?: TextFieldProps['disabled']
-  variant?: TextFieldProps['variant']
-  error?: TextFieldProps['error']
-  helperText?: TextFieldProps['helperText']
-  label?: TextFieldProps['label']
-  disableShortcuts?: boolean
-  margin?: TextFieldProps['margin']
-  style?: React.CSSProperties
+  TextFieldProps?: Partial<TextFieldProps>
   /**
    * Override if you absolutely must
    */
-  BPDateProps?: IDatePickerProps
-}
-
-const validateShape = ({ value, onChange }: DateFieldProps) => {
-  if (DateHelpers.Blueprint.commonProps.parseDate(value) === null) {
-    onChange(new Date().toISOString())
-  }
-}
-
-const formatInputValue = (value: string) => {
-  if (value) {
-    const date = DateHelpers.Blueprint.commonProps.parseDate(value)
-    return DateHelpers.Blueprint.commonProps.formatDate(date!)
-  } else {
-    return '' // This allows us to display an empty state without label overlap
-  }
+  BPDateProps?: Partial<IDateInputProps>
 }
 
 /**
  * DateTimePicker that combines Mui TextField with BlueprintJs DatePicker
- * @displayValue - the display text that is shown by the TextField. Anytime a valid date is input into the TextField, the value is updated
- * @value - the value that holds the date. Often converted into a "TimeShiftedIso" to deal with the fact that Dates don't hold timezone data
- * @isInternalChange - determines whether the updated value came from inside or outside the component
+ *
+ * For now it's meant to work with an outlined text field, but we can add support for other styles if we want.
+ *
+ * By changing the inputComponent, we avoid weird focusing issues, while still allowing use of all the other niceties (helperText) of TextField
  */
 const DateTimePicker = ({
   value,
   onChange,
-  disabled,
-  variant,
-  error,
-  helperText,
-  label,
-  disableShortcuts,
-  margin,
-  style,
+  TextFieldProps,
   BPDateProps,
 }: DateFieldProps) => {
-  useTimePrefs()
-  const [displayValue, setDisplayValue] = useState(formatInputValue(value))
-  const [isInternalChange, setIsInternalChange] = useState(false)
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
-  const dateIconRef = useRef<HTMLButtonElement | null>(null)
-
-  React.useEffect(() => {
-    validateShape({ onChange, value })
-  }, [])
-
-  React.useEffect(() => {
-    if (isInternalChange) {
-      setIsInternalChange(false)
-    } else {
-      // If the value is updated externally (i.e. a new value is passed into the component),
-      // then we need to update the display value.
-      // This allows us to keep the displayValue and value separate
-      // and type in the TextField without being hijacked
-      setDisplayValue(formatInputValue(value))
+  /**
+   * We want to avoid causing the TextField below to percieve a change to inputComponent when possible, because that mucks with focus.
+   *
+   * We stringify the BPDateProps to make life easier for devs, since they will likely pass a plain object.  If they do and their component rerenders,
+   * this memo would trigger even though they think they didn't change BPDateProps (the object is different though!).  So we stringify to make sure we
+   * only pick up real changes.
+   */
+  const inputComponent = React.useMemo(() => {
+    return (props: any) => {
+      return <DateField {...props} BPDateProps={BPDateProps} />
     }
-  }, [value])
-
-  const generateOnChange = (onChange: (value: string) => void) => {
-    return ((selectedDate, isUserChange) => {
-      if (onChange && selectedDate && isUserChange) {
-        setIsInternalChange(true)
-        setDisplayValue(
-          DateHelpers.Blueprint.commonProps.formatDate(selectedDate)
-        )
-        onChange(
-          DateHelpers.Blueprint.converters.TimeshiftedDateToISO(selectedDate)
-        )
-      }
-    }) as IDateInputProps['onChange']
-  }
-
-  const dateIsValid = (value: string) => {
-    const generatedDate = DateHelpers.Blueprint.DateProps.generateValue(value)
-    return DateHelpers.Blueprint.commonProps.isValid(generatedDate)
-  }
+  }, [JSON.stringify(BPDateProps)])
 
   return (
-    <>
-      <TextField
-        onChange={(e) => {
-          setDisplayValue(e.target.value)
-          if (dateIsValid(e.target.value)) {
-            onChange(e.target.value)
-            setIsInternalChange(true)
-          }
-        }}
-        onClick={() => setAnchorEl(dateIconRef.current)}
-        disabled={disabled}
-        label={label || 'Date'}
-        margin={margin}
-        value={displayValue}
-        variant={variant}
-        style={style}
-        error={error}
-        helperText={helperText}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                ref={dateIconRef}
-                disabled={disabled}
-                onClick={() => setAnchorEl(dateIconRef.current)}
-              >
-                <CalendarIcon />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-      <Popover
-        open={!!anchorEl}
-        anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-        disableAutoFocus={true}
-        disableEnforceFocus={true}
-      >
-        <DatePicker
-          key="picker"
-          className={MuiOutlinedInputBorderClasses}
-          onChange={generateOnChange(onChange)}
-          shortcuts={!disableShortcuts}
-          timePrecision="minute"
-          // @ts-ignore this allows an empty picker
-          value={
-            value === undefined
-              ? value
-              : DateHelpers.Blueprint.DateProps.generateValue(value)
-          }
-          {...BPDateProps}
-        />
-      </Popover>
-    </>
+    <TextField
+      fullWidth
+      variant="outlined"
+      InputLabelProps={{ shrink: true }}
+      value={value}
+      onChange={onChange as any}
+      InputProps={{
+        inputComponent: inputComponent,
+      }}
+      {...TextFieldProps}
+    />
   )
 }
 
-export default DateTimePicker
+export default hot(module)(DateTimePicker)

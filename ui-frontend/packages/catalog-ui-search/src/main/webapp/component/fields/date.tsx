@@ -27,7 +27,7 @@ type DateFieldProps = {
   /**
    * Override if you absolutely must
    */
-  BPDateProps?: IDateInputProps
+  BPDateProps?: Partial<IDateInputProps>
 }
 
 const validateShape = ({ value, onChange }: DateFieldProps) => {

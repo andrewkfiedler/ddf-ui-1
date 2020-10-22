@@ -185,16 +185,18 @@ export const Editor = ({
                     case 'DATE':
                       return (
                         <DateTimePicker
-                          disabled={mode === Mode.Normal}
                           value={val}
                           onChange={(value) => {
                             values[index] = value
                             setValues([...values])
                           }}
-                          style={{
-                            minWidth: '500px',
+                          TextFieldProps={{
+                            disabled: mode !== Mode.Normal,
+                            label: label,
                           }}
-                          label={label}
+                          BPDateProps={{
+                            disabled: mode !== Mode.Normal,
+                          }}
                         />
                       )
 
@@ -657,6 +659,7 @@ const Summary = ({ selectionInterface }: Props) => {
                     elevation: Elevations.panels,
                   },
                   open: true,
+                  disableEnforceFocus: true, // otherwise we can't click inside 3rd party libraries using portals (like date picker from blueprint)
                   children: (
                     <div
                       style={{
