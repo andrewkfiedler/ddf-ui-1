@@ -34,14 +34,20 @@ import TableChartIcon from '@material-ui/icons/TableChart'
 import TransferList from '../tabs/metacard/transfer-list'
 import { useDialog } from '../dialog'
 import { TypedUserInstance } from '../singletons/TypedUser'
+import { getResultsVisualState, ResultsVisualContainer } from './results-visual'
 
 type Props = {
   selectionInterface: any
   mode: any
   setMode: any
+  container: ResultsVisualContainer
 }
 
-export const ResultsCommonControls = () => {
+export const ResultsCommonControls = ({
+  container,
+}: {
+  container: ResultsVisualContainer
+}) => {
   const dialogContext = useDialog()
   return (
     <>
@@ -65,14 +71,14 @@ export const ResultsCommonControls = () => {
                   }}
                 >
                   <TransferList
-                    startingLeft={TypedUserInstance.getResultsAttributesShown()}
+                    startingLeft={
+                      getResultsVisualState(container).attributesShown
+                    }
                     startingRight={TypedUserInstance.getResultsAttributesPossible()}
                     onSave={(active) => {
-                      user
-                        .get('user')
-                        .get('preferences')
-                        .set('results-attributesShown', active)
-                      user.savePreferences()
+                      container.extendState({
+                        attributesShown: active,
+                      })
                     }}
                   />
                 </div>
@@ -88,7 +94,12 @@ export const ResultsCommonControls = () => {
   )
 }
 
-const TableVisual = ({ selectionInterface, mode, setMode }: Props) => {
+const TableVisual = ({
+  selectionInterface,
+  mode,
+  setMode,
+  container,
+}: Props) => {
   const lazyResults = useLazyResultsFromSelectionInterface({
     selectionInterface,
   })
@@ -128,7 +139,7 @@ const TableVisual = ({ selectionInterface, mode, setMode }: Props) => {
           direction="row"
           alignItems="center"
         >
-          <ResultsCommonControls />
+          <ResultsCommonControls container={container} />
           <Grid item className="pr-2">
             <Button
               data-id="list-button"

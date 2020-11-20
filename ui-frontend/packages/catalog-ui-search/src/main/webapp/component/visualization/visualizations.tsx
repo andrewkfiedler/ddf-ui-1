@@ -25,7 +25,10 @@ const ResultsViewWrapper = Marionette.LayoutView.extend({
   template() {
     return (
       <>
-        <ResultsView selectionInterface={this.options.selectionInterface} />
+        <ResultsView
+          selectionInterface={this.options.selectionInterface}
+          container={this.options.container}
+        />
       </>
     )
   },

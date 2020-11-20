@@ -451,7 +451,7 @@ export default Marionette.LayoutView.extend({
     }
     if (this.lastConfig === undefined) {
       // this triggers on init of golden layout
-      this.lastConfig = this.getInstanceConfig()
+      this.lastConfig = JSON.parse(JSON.stringify(this.getInstanceConfig()))
       return
     }
     wreqr.vent.trigger('resize') // do we need this?
@@ -463,7 +463,7 @@ export default Marionette.LayoutView.extend({
     ) {
       return
     }
-    this.lastConfig = this.getInstanceConfig()
+    this.lastConfig = JSON.parse(JSON.stringify(this.getInstanceConfig()))
 
     /**
      * If we have this option, then we're editing a layout in the layout editor.

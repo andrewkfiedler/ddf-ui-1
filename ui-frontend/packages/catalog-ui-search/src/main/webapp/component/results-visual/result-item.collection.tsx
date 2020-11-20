@@ -30,14 +30,21 @@ import TableChartIcon from '@material-ui/icons/TableChart'
 import { HeaderCheckbox } from './table-header'
 import { DarkDivider } from '../dark-divider/dark-divider'
 import { ResultsCommonControls } from './table'
+import { ResultsVisualContainer } from './results-visual'
 
 type Props = {
   mode: any
   setMode: any
   selectionInterface: any
+  container: ResultsVisualContainer
 }
 
-const ResultCards = ({ mode, setMode, selectionInterface }: Props) => {
+const ResultCards = ({
+  mode,
+  setMode,
+  selectionInterface,
+  container,
+}: Props) => {
   const lazyResults = useLazyResultsFromSelectionInterface({
     selectionInterface,
   })
@@ -80,7 +87,7 @@ const ResultCards = ({ mode, setMode, selectionInterface }: Props) => {
               }}
             />
           </Grid>
-          <ResultsCommonControls />
+          <ResultsCommonControls container={container} />
           <Grid item className="pr-2">
             <Button
               data-id="list-button"
