@@ -214,12 +214,18 @@ export const HomePage = () => {
       urlBasedQuery = new Query.Model(
         JSON.parse(decodeURIComponent(urlBasedQuery))
       )
-      ;(urlBasedQuery as any).startSearchFromFirstPage()
     } catch (err) {
       console.log(err)
       urlBasedQuery = ''
     }
   }
+  React.useEffect(() => {
+    try {
+      ;(urlBasedQuery as any).startSearchFromFirstPage()
+    } catch (err) {
+      console.log('something went wrong')
+    }
+  }, [])
   // @ts-ignore ts-migrate(6133) FIXME: 'setQueryModel' is declared but its value is never... Remove this comment to see the full error message
   const [queryModel, setQueryModel] = React.useState(
     urlBasedQuery || new Query.Model()
@@ -234,8 +240,12 @@ export const HomePage = () => {
   React.useEffect(() => {
     // this is fairly expensive, so keep it heavily debounced
     const debouncedUpdate = _.debounce(() => {
+      // do not let me commit this, it's only for verifying we go from cql to filter tree correctly
+      queryModel.updateCqlBasedOnFilterTree()
+      const queryModelJSON = queryModel.toJSON()
+      delete queryModelJSON['filterTree']
       const encodedQueryModel = encodeURIComponent(
-        JSON.stringify(queryModel.toJSON())
+        JSON.stringify(queryModelJSON)
       )
       history.replace({
         pathname: '/home',

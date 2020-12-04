@@ -17,11 +17,43 @@
  * See license.txt in the OpenLayers distribution or repository for the
  * full text of the license. */
 // jshint ignore: start
-import { serialize } from '../../webapp/component/filter-builder/filter.structure'
+import {
+  CQLStandardFilterBuilderClass,
+  FilterBuilderClass,
+  FilterClass,
+  isFilterBuilderClass,
+  serialize,
+} from '../component/filter-builder/filter.structure'
 
 const moment = require('moment')
 
 const ANYTEXT_WILDCARD = '"anyText" ILIKE \'%\''
+type PrecendenceType = 'RPAREN' | 'LOGICAL' | 'COMPARISON'
+type FilterFunctionNames = 'proximity' | 'pi'
+type PatternReturnType = RegExp | ((text: string) => string[] | null)
+
+type PatternNamesType =
+  | 'PROPERTY'
+  | 'COMPARISON'
+  | 'IS_NULL'
+  | 'COMMA'
+  | 'LOGICAL'
+  | 'VALUE'
+  | 'FILTER_FUNCTION'
+  | 'BOOLEAN'
+  | 'LPAREN'
+  | 'RPAREN'
+  | 'SPATIAL'
+  | 'UNITS'
+  | 'NOT'
+  | 'BETWEEN'
+  | 'BEFORE'
+  | 'AFTER'
+  | 'DURING'
+  | 'RELATIVE'
+  | 'TIME'
+  | 'TIME_PERIOD'
+  | 'GEOMETRY'
 
 const timePattern = /((([0-9]{4})(-([0-9]{2})(-([0-9]{2})(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?)|^'')/i,
   patterns = {
@@ -48,7 +80,7 @@ const timePattern = /((([0-9]{4})(-([0-9]{2})(-([0-9]{2})(T([0-9]{2}):([0-9]{2})
     TIME_PERIOD: new RegExp(
       '^' + timePattern.source + '/' + timePattern.source
     ),
-    GEOMETRY(text) {
+    GEOMETRY(text: string) {
       const type = /^(POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)/.exec(
         text
       )
@@ -73,9 +105,10 @@ const timePattern = /((([0-9]{4})(-([0-9]{2})(-([0-9]{2})(T([0-9]{2}):([0-9]{2})
         }
         return [text.substr(0, idx + 1)]
       }
+      return null
     },
     END: /^$/,
-  },
+  } as Record<PatternNamesType | 'END', PatternReturnType>,
   follows = {
     ROOT_NODE: [
       'NOT',
@@ -130,20 +163,24 @@ const timePattern = /((([0-9]{4})(-([0-9]{2})(-([0-9]{2})(T([0-9]{2}):([0-9]{2})
     TIME_PERIOD: ['LOGICAL', 'RPAREN', 'END'],
     RELATIVE: ['RPAREN', 'END'],
     FILTER_FUNCTION: ['LPAREN', 'PROPERTY', 'VALUE', 'RPAREN'],
-  },
+    END: [],
+  } as Record<
+    PatternNamesType | 'ROOT_NODE' | 'END',
+    Array<PatternNamesType | 'END'>
+  >,
   precedence = {
     RPAREN: 3,
     LOGICAL: 2,
     COMPARISON: 1,
-  },
+  } as Record<PrecendenceType, number>,
   // as an improvement, these could be figured out while building the syntax tree
   filterFunctionParamCount = {
     proximity: 3,
     pi: 0,
-  },
+  } as Record<FilterFunctionNames, number>,
   dateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 
-function tryToken(text, pattern) {
+function tryToken(text: string, pattern: PatternReturnType) {
   if (pattern instanceof RegExp) {
     return pattern.exec(text)
   } else {
@@ -151,7 +188,7 @@ function tryToken(text, pattern) {
   }
 }
 
-function nextToken(text, tokens) {
+function nextToken(text: string, tokens: Array<PatternNamesType | 'END'>) {
   let i,
     token,
     len = tokens.length
@@ -179,10 +216,16 @@ function nextToken(text, tokens) {
   throw new Error(msg)
 }
 
-function tokenize(text) {
+type TokenType = {
+  type: PatternNamesType | 'END'
+  text: string
+  remainder: string
+}
+
+function tokenize(text: string): Array<TokenType> {
   const results = []
-  let token,
-    expect = follows['ROOT_NODE']
+  let token = undefined as undefined | TokenType
+  let expect = follows['ROOT_NODE']
 
   do {
     token = nextToken(text, expect)
@@ -193,9 +236,10 @@ function tokenize(text) {
     }
     results.push(token)
   } while (token.type !== 'END')
-
   return results
 }
+
+type SpecialCQLCharacters = '%' | '_'
 
 // Mapping of Intrigue's query language syntax to CQL syntax
 const userqlToCql = {
@@ -205,29 +249,187 @@ const userqlToCql = {
   _: '\\_',
 }
 
-const translateUserqlToCql = (str) =>
+const translateUserqlToCql = (str: string): string =>
   str.replace(
     /([^*?%_])?([*?%_])/g,
-    (_, a = '', b) => a + (a === '\\' ? b : userqlToCql[b])
+    (_, a = '', b) =>
+      a + (a === '\\' ? b : userqlToCql[b as SpecialCQLCharacters])
   )
 
 //Mapping of CQL syntax to Intrigue's query language syntax
 const cqlToUserql = {
   '%': '*',
   _: '?',
-}
+} as Record<SpecialCQLCharacters, string>
 
-const translateCqlToUserql = (str) =>
+const translateCqlToUserql = (str: string): string =>
   str.replace(/([^%_])?([%_])/g, (_, a = '', b) =>
-    a === '\\' ? b : a + cqlToUserql[b]
+    a === '\\' ? b : a + cqlToUserql[b as SpecialCQLCharacters]
   )
 
-function buildAst(tokens) {
-  const operatorStack = [],
-    postfix = []
+function buildTree(postfix: Array<TokenType>): any {
+  let value,
+    property,
+    tok = postfix.pop() as TokenType
+  switch (tok.type) {
+    case 'LOGICAL':
+      const rhs = buildTree(postfix),
+        lhs = buildTree(postfix)
+      return {
+        filters: [lhs, rhs],
+        type: tok.text.toUpperCase(),
+      }
+    case 'NOT':
+      const operand = buildTree(postfix)
+      return {
+        filters: [operand],
+        type: tok.type,
+        negated: true,
+      }
+    case 'BETWEEN':
+      let min, max
+      postfix.pop() // unneeded AND token here
+      max = buildTree(postfix)
+      min = buildTree(postfix)
+      property = buildTree(postfix)
+      return {
+        property,
+        lowerBoundary: min,
+        upperBoundary: max,
+        type: tok.type,
+      }
+    case 'BEFORE':
+    case 'AFTER':
+      value = buildTree(postfix)
+      property = buildTree(postfix)
+      return {
+        property,
+        value: moment(value).toISOString(),
+        type: tok.text.toUpperCase(),
+      }
+    case 'DURING':
+      const dates = buildTree(postfix).split('/')
+      property = buildTree(postfix)
+      return {
+        property,
+        from: dates[0],
+        to: dates[1],
+        type: tok.text.toUpperCase(),
+      }
+    case 'COMPARISON':
+      value = buildTree(postfix)
+      property = buildTree(postfix)
+      return {
+        property,
+        value,
+        type: tok.text.toUpperCase(),
+      }
+    case 'IS_NULL':
+      property = buildTree(postfix)
+      return {
+        property,
+        type: tok.text.toUpperCase(),
+      }
+    case 'VALUE':
+      const match = tok.text.match(/^'(.*)'$/)
+      if (match) {
+        return translateCqlToUserql(match[1].replace(/''/g, "'"))
+      } else {
+        return Number(tok.text)
+      }
+    case 'BOOLEAN':
+      switch (tok.text.toUpperCase()) {
+        case 'TRUE':
+          return true
+        default:
+          return false
+      }
+    case 'SPATIAL':
+      switch (tok.text.toUpperCase()) {
+        case 'BBOX':
+          const maxy = buildTree(postfix),
+            maxx = buildTree(postfix),
+            miny = buildTree(postfix),
+            minx = buildTree(postfix),
+            prop = buildTree(postfix)
+
+          return {
+            type: tok.text.toUpperCase(),
+            property: prop,
+            value: [minx, miny, maxx, maxy],
+          }
+        case 'INTERSECTS':
+          value = buildTree(postfix)
+          property = buildTree(postfix)
+          return {
+            type: tok.text.toUpperCase(),
+            property,
+            value,
+          }
+        case 'WITHIN':
+          value = buildTree(postfix)
+          property = buildTree(postfix)
+          return {
+            type: tok.text.toUpperCase(),
+            property,
+            value,
+          }
+        case 'CONTAINS':
+          value = buildTree(postfix)
+          property = buildTree(postfix)
+          return {
+            type: tok.text.toUpperCase(),
+            property,
+            value,
+          }
+        case 'DWITHIN':
+          const distance = buildTree(postfix)
+          value = buildTree(postfix)
+          property = buildTree(postfix)
+          return {
+            type: tok.text.toUpperCase(),
+            value,
+            property,
+            distance: Number(distance),
+          }
+      }
+      break
+    case 'GEOMETRY':
+      return {
+        type: tok.type,
+        value: tok.text,
+      }
+    case 'RELATIVE':
+      return tok.text.substring(1, tok.text.length - 1)
+    case 'FILTER_FUNCTION':
+      const filterFunctionName = tok.text.slice(0, -1) // remove trailing '('
+      const paramCount =
+        filterFunctionParamCount[filterFunctionName as FilterFunctionNames]
+      if (paramCount === undefined) {
+        throw new Error('Unsupported filter function: ' + filterFunctionName)
+      }
+
+      const params = Array.apply(null, Array(paramCount))
+        .map(() => buildTree(postfix))
+        .reverse()
+
+      return {
+        type: tok.type,
+        filterFunctionName,
+        params,
+      }
+
+    default:
+      return tok.text
+  }
+}
+
+function buildAst(tokens: TokenType[]) {
+  const operatorStack = [] as Array<TokenType>,
+    postfix = [] as Array<TokenType>
 
   while (tokens.length) {
-    const tok = tokens.shift()
+    const tok = tokens.shift() as TokenType
     switch (tok.type) {
       case 'PROPERTY':
         // Remove single and double quotes if they exist in property name
@@ -248,13 +450,15 @@ function buildAst(tokens) {
       case 'BEFORE':
       case 'AFTER':
       case 'DURING':
-        const p = precedence[tok.type]
+        const p = precedence[tok.type as PrecendenceType]
 
         while (
           operatorStack.length > 0 &&
-          precedence[operatorStack[operatorStack.length - 1].type] <= p
+          precedence[
+            operatorStack[operatorStack.length - 1].type as PrecendenceType
+          ] <= p
         ) {
-          postfix.push(operatorStack.pop())
+          postfix.push(operatorStack.pop() as TokenType)
         }
 
         operatorStack.push(tok)
@@ -267,14 +471,14 @@ function buildAst(tokens) {
       case 'FILTER_FUNCTION':
         operatorStack.push(tok)
         // insert a '(' manually because we lost the original LPAREN matching the FILTER_FUNCTION regex
-        operatorStack.push({ type: 'LPAREN' })
+        operatorStack.push({ type: 'LPAREN' } as TokenType)
         break
       case 'RPAREN':
         while (
           operatorStack.length > 0 &&
           operatorStack[operatorStack.length - 1].type !== 'LPAREN'
         ) {
-          postfix.push(operatorStack.pop())
+          postfix.push(operatorStack.pop() as TokenType)
         }
         operatorStack.pop() // toss out the LPAREN
 
@@ -287,7 +491,7 @@ function buildAst(tokens) {
           lastOperatorType === 'SPATIAL' ||
           lastOperatorType === 'FILTER_FUNCTION'
         ) {
-          postfix.push(operatorStack.pop())
+          postfix.push(operatorStack.pop() as TokenType)
         }
         break
       case 'COMMA':
@@ -300,166 +504,10 @@ function buildAst(tokens) {
   }
 
   while (operatorStack.length > 0) {
-    postfix.push(operatorStack.pop())
+    postfix.push(operatorStack.pop() as TokenType)
   }
 
-  function buildTree() {
-    let value,
-      property,
-      tok = postfix.pop()
-    switch (tok.type) {
-      case 'LOGICAL':
-        const rhs = buildTree(),
-          lhs = buildTree()
-        return {
-          filters: [lhs, rhs],
-          type: tok.text.toUpperCase(),
-        }
-      case 'NOT':
-        const operand = buildTree()
-        return {
-          filters: [operand],
-          type: tok.type,
-          negated: true,
-        }
-      case 'BETWEEN':
-        let min, max
-        postfix.pop() // unneeded AND token here
-        max = buildTree()
-        min = buildTree()
-        property = buildTree()
-        return {
-          property,
-          lowerBoundary: min,
-          upperBoundary: max,
-          type: tok.type,
-        }
-      case 'BEFORE':
-      case 'AFTER':
-        value = buildTree()
-        property = buildTree()
-        return {
-          property,
-          value: moment(value).toISOString(),
-          type: tok.text.toUpperCase(),
-        }
-      case 'DURING':
-        const dates = buildTree().split('/')
-        property = buildTree()
-        return {
-          property,
-          from: dates[0],
-          to: dates[1],
-          type: tok.text.toUpperCase(),
-        }
-      case 'COMPARISON':
-        value = buildTree()
-        property = buildTree()
-        return {
-          property,
-          value,
-          type: tok.text.toUpperCase(),
-        }
-      case 'IS_NULL':
-        property = buildTree()
-        return {
-          property,
-          type: tok.text.toUpperCase(),
-        }
-      case 'VALUE':
-        const match = tok.text.match(/^'(.*)'$/)
-        if (match) {
-          return translateCqlToUserql(match[1].replace(/''/g, "'"))
-        } else {
-          return Number(tok.text)
-        }
-      case 'BOOLEAN':
-        switch (tok.text.toUpperCase()) {
-          case 'TRUE':
-            return true
-          default:
-            return false
-        }
-      case 'SPATIAL':
-        switch (tok.text.toUpperCase()) {
-          case 'BBOX':
-            const maxy = buildTree(),
-              maxx = buildTree(),
-              miny = buildTree(),
-              minx = buildTree(),
-              prop = buildTree()
-
-            return {
-              type: tok.text.toUpperCase(),
-              property: prop,
-              value: [minx, miny, maxx, maxy],
-            }
-          case 'INTERSECTS':
-            value = buildTree()
-            property = buildTree()
-            return {
-              type: tok.text.toUpperCase(),
-              property,
-              value,
-            }
-          case 'WITHIN':
-            value = buildTree()
-            property = buildTree()
-            return {
-              type: tok.text.toUpperCase(),
-              property,
-              value,
-            }
-          case 'CONTAINS':
-            value = buildTree()
-            property = buildTree()
-            return {
-              type: tok.text.toUpperCase(),
-              property,
-              value,
-            }
-          case 'DWITHIN':
-            const distance = buildTree()
-            value = buildTree()
-            property = buildTree()
-            return {
-              type: tok.text.toUpperCase(),
-              value,
-              property,
-              distance: Number(distance),
-            }
-        }
-        break
-      case 'GEOMETRY':
-        return {
-          type: tok.type,
-          value: tok.text,
-        }
-      case 'RELATIVE':
-        return tok.text.substring(1, tok.text.length - 1)
-      case 'FILTER_FUNCTION':
-        const filterFunctionName = tok.text.slice(0, -1) // remove trailing '('
-        const paramCount = filterFunctionParamCount[filterFunctionName]
-        if (paramCount === undefined) {
-          throw new Error('Unsupported filter function: ' + filterFunctionName)
-        }
-
-        const params = Array.apply(null, Array(paramCount))
-          .map(() => buildTree())
-          .reverse()
-
-        return {
-          type: tok.type,
-          filterFunctionName,
-          params,
-        }
-
-      default:
-        return tok.text
-    }
-  }
-
-  const result = buildTree()
+  const result = buildTree(postfix)
   if (postfix.length > 0) {
     let msg = 'Remaining tokens after building AST: \n'
     for (let i = postfix.length - 1; i >= 0; i--) {
@@ -471,7 +519,7 @@ function buildAst(tokens) {
   return result
 }
 
-function wrap(property) {
+function wrap(property: string): string {
   let wrapped = property
   if (!wrapped.startsWith('"')) {
     wrapped = '"' + wrapped
@@ -482,7 +530,8 @@ function wrap(property) {
   return wrapped
 }
 
-function write(filter) {
+// really could use some refactoring to enable better typing, right now it's recursive and calls itself with so many different types / return types
+function write(filter: any): any {
   switch (filter.type) {
     // spatialClass
     case 'BBOX':
@@ -612,10 +661,13 @@ function write(filter) {
   }
 }
 
-function simplifyFilters(cqlAst) {
+function simplifyFilters(cqlAst: FilterBuilderClass) {
   for (let i = 0; i < cqlAst.filters.length; i++) {
     if (simplifyAst(cqlAst.filters[i], cqlAst)) {
-      const filtersToMerge = cqlAst.filters.splice(i, 1)[0]
+      const filtersToMerge = cqlAst.filters.splice(
+        i,
+        1
+      )[0] as FilterBuilderClass
       filtersToMerge.filters.forEach((filter) => {
         cqlAst.filters.push(filter)
       })
@@ -623,16 +675,19 @@ function simplifyFilters(cqlAst) {
   }
 }
 
-function simplifyAst(cqlAst, parentNode) {
-  if (!cqlAst.filters && parentNode) {
+function simplifyAst(
+  cqlAst: FilterBuilderClass | FilterClass,
+  parentNode?: FilterBuilderClass
+) {
+  if (!isFilterBuilderClass(cqlAst) && parentNode) {
     return false
   } else if (!parentNode) {
-    if (cqlAst.filters) {
+    if (isFilterBuilderClass(cqlAst)) {
       simplifyFilters(cqlAst)
     }
     return cqlAst
   } else {
-    simplifyFilters(cqlAst)
+    simplifyFilters(cqlAst as FilterBuilderClass)
     if (cqlAst.type === parentNode.type) {
       return true
     } else {
@@ -641,10 +696,10 @@ function simplifyAst(cqlAst, parentNode) {
   }
 }
 
-function collapseNOTs(cqlAst, parentNode) {
+function collapseNOTs({ cqlAst }: { cqlAst: any }) {
   if (cqlAst.filters) {
-    cqlAst.filters.forEach((filter) => {
-      collapseNOTs(filter, cqlAst)
+    cqlAst.filters.forEach((filter: any) => {
+      collapseNOTs({ cqlAst: filter })
     })
     if (cqlAst.type === 'NOT') {
       cqlAst.type = cqlAst.filters[0].filters ? cqlAst.filters[0].type : 'AND'
@@ -654,38 +709,55 @@ function collapseNOTs(cqlAst, parentNode) {
   }
 }
 
-function uncollapseNOTs(cqlAst, parentNode) {
-  if (cqlAst.filters) {
-    cqlAst.filters.forEach((filter) => {
-      uncollapseNOTs(filter, cqlAst)
-    })
-    if (cqlAst.negated && cqlAst.type === 'OR') {
-      cqlAst.type = 'NOT'
-      cqlAst.filters = [
-        {
-          type: 'OR',
-          filters: cqlAst.filters,
-        },
-      ]
-    } else if (cqlAst.negated && cqlAst.type === 'AND') {
-      cqlAst.type = 'NOT'
-      cqlAst.filters = [
-        {
-          type: 'AND',
-          filters: cqlAst.filters,
-        },
-      ]
+function uncollapseNOTs({
+  cqlAst,
+}: {
+  cqlAst: FilterBuilderClass | FilterClass
+}): CQLStandardFilterBuilderClass | FilterClass {
+  if (isFilterBuilderClass(cqlAst)) {
+    if (cqlAst.negated) {
+      return new CQLStandardFilterBuilderClass({
+        type: 'NOT',
+        filters: [
+          new CQLStandardFilterBuilderClass({
+            type: cqlAst.type,
+            filters: cqlAst.filters.map((filter) =>
+              uncollapseNOTs({ cqlAst: filter })
+            ),
+          }),
+        ],
+      })
+    } else {
+      return new CQLStandardFilterBuilderClass({
+        type: cqlAst.type,
+        filters: [
+          new CQLStandardFilterBuilderClass({
+            type: cqlAst.type,
+            filters: cqlAst.filters.map((filter) =>
+              uncollapseNOTs({ cqlAst: filter })
+            ),
+          }),
+        ],
+      })
     }
   } else {
     if (cqlAst.negated) {
       const clonedFieldFilter = JSON.parse(JSON.stringify(cqlAst))
-      cqlAst.type = 'NOT'
-      cqlAst.filters = [
-        {
-          type: 'AND',
-          filters: [clonedFieldFilter],
-        },
-      ]
+      return new CQLStandardFilterBuilderClass({
+        type: 'NOT',
+        filters: [
+          new CQLStandardFilterBuilderClass({
+            type: 'AND',
+            filters: [
+              new FilterClass({
+                ...clonedFieldFilter,
+              }),
+            ],
+          }),
+        ],
+      })
+    } else {
+      return cqlAst
     }
   }
 }
@@ -696,12 +768,14 @@ function uncollapseNOTs(cqlAst, parentNode) {
  *
  * This will only ever happen with a specific structure, so we don't need to recurse or anything.
  */
-function removeInvalidFilters(cqlAst) {
+function removeInvalidFilters(cqlAst: FilterBuilderClass): FilterBuilderClass {
   if (cqlAst.filters) {
     for (let i = 0; i < cqlAst.filters.length; i++) {
       const currentFilter = cqlAst.filters[i]
       if (
+        isFilterBuilderClass(currentFilter) &&
         currentFilter.filters &&
+        !isFilterBuilderClass(currentFilter.filters[0]) &&
         currentFilter.filters[0].property === 'anyDate'
       ) {
         cqlAst.filters.splice(i, 1)
@@ -712,7 +786,7 @@ function removeInvalidFilters(cqlAst) {
   return cqlAst
 }
 
-function iterativelySimplify(cqlAst) {
+function iterativelySimplify(cqlAst: FilterBuilderClass) {
   let prevAst = JSON.parse(JSON.stringify(cqlAst))
   simplifyAst(cqlAst)
   while (JSON.stringify(prevAst) !== JSON.stringify(cqlAst)) {
@@ -721,34 +795,38 @@ function iterativelySimplify(cqlAst) {
   }
 }
 
-module.exports = {
-  read(cql) {
+export default {
+  read(cql?: string): FilterBuilderClass {
     if (cql === undefined || cql.length === 0) {
-      return {
-        type: 'AND',
-        filters: [],
-      }
-    }
-    return buildAst(tokenize(cql))
-  },
-  write(filter) {
-    try {
-      const duplicatedFilter = JSON.parse(JSON.stringify(filter))
-      uncollapseNOTs(duplicatedFilter)
-      removeInvalidFilters(duplicatedFilter)
-      return write(duplicatedFilter)
-    } catch (err) {
-      console.log(err)
-      return write({
+      return new FilterBuilderClass({
         type: 'AND',
         filters: [],
       })
     }
+    return buildAst(tokenize(cql))
+  },
+  write(filter: FilterBuilderClass): string {
+    try {
+      // const duplicatedFilter = JSON.parse(JSON.stringify(filter))
+      const standardCqlAst = uncollapseNOTs({
+        cqlAst: filter,
+      }) as FilterBuilderClass
+      removeInvalidFilters(standardCqlAst)
+      return write(standardCqlAst)
+    } catch (err) {
+      console.log(err)
+      return write(
+        new FilterBuilderClass({
+          type: 'AND',
+          filters: [],
+        })
+      )
+    }
   },
   removeInvalidFilters,
-  simplify(cqlAst) {
+  simplify(cqlAst: FilterBuilderClass): FilterBuilderClass {
     iterativelySimplify(cqlAst)
-    collapseNOTs(cqlAst)
+    collapseNOTs({ cqlAst })
     iterativelySimplify(cqlAst)
     return cqlAst
   },

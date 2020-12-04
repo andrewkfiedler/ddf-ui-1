@@ -14,7 +14,7 @@
  **/
 /*jshint bitwise: false*/
 const $ = require('jquery')
-// const cql = require('./cql.js')
+// import cql from './cql'
 const DistanceUtils = require('./DistanceUtils.js')
 
 function sanitizeForCql(text) {

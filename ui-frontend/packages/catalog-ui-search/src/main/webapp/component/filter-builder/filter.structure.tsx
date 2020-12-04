@@ -84,9 +84,9 @@ export const serialize = {
   },
 }
 
-export class FilterBuilderClass extends SpreadOperatorProtectedClass {
-  readonly type: 'AND' | 'OR' | 'NOT OR' | 'NOT AND'
-  readonly filters: (FilterBuilderClass | FilterClass)[]
+class BaseFilterBuilderClass extends SpreadOperatorProtectedClass {
+  readonly type: string
+  readonly filters: Array<any>
   readonly negated: boolean
   readonly id: string
   constructor({
@@ -95,9 +95,9 @@ export class FilterBuilderClass extends SpreadOperatorProtectedClass {
     negated = false,
     id = Math.random().toString(),
   }: {
-    type?: FilterBuilderClass['type']
-    filters?: FilterBuilderClass['filters']
-    negated?: FilterBuilderClass['negated']
+    type?: BaseFilterBuilderClass['type']
+    filters?: BaseFilterBuilderClass['filters']
+    negated?: BaseFilterBuilderClass['negated']
     id?: string
   } = {}) {
     super()
@@ -121,6 +121,43 @@ export class FilterBuilderClass extends SpreadOperatorProtectedClass {
     })
     this.negated = negated
     this.id = id
+  }
+}
+export class FilterBuilderClass extends BaseFilterBuilderClass {
+  readonly type: 'AND' | 'OR'
+  readonly filters: Array<FilterBuilderClass | FilterClass>
+  constructor({
+    type = 'AND',
+    filters = [new FilterClass()],
+    negated = false,
+    id = Math.random().toString(),
+  }: {
+    type?: FilterBuilderClass['type']
+    filters?: FilterBuilderClass['filters']
+    negated?: FilterBuilderClass['negated']
+    id?: string
+  } = {}) {
+    super({ type, filters, negated, id })
+  }
+}
+
+export class CQLStandardFilterBuilderClass extends BaseFilterBuilderClass {
+  readonly type: 'AND' | 'OR' | 'NOT'
+  readonly filters: Array<
+    FilterClass | CQLStandardFilterBuilderClass | FilterBuilderClass
+  >
+  constructor({
+    type = 'AND',
+    filters = [new FilterClass()],
+    negated = false,
+    id = Math.random().toString(),
+  }: {
+    type?: CQLStandardFilterBuilderClass['type']
+    filters?: CQLStandardFilterBuilderClass['filters']
+    negated?: CQLStandardFilterBuilderClass['negated']
+    id?: string
+  } = {}) {
+    super({ type, filters, negated, id })
   }
 }
 
@@ -240,8 +277,10 @@ export const isFilterBuilderClass = (
   filter:
     | FilterBuilderClass
     | FilterClass
+    | CQLStandardFilterBuilderClass
     | Partial<FilterBuilderClass>
     | Partial<FilterClass>
+    | Partial<CQLStandardFilterBuilderClass>
 ): filter is FilterBuilderClass => {
   return filter.constructor === FilterBuilderClass
 }
