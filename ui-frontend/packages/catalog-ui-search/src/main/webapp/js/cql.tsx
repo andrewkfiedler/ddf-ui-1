@@ -19,10 +19,13 @@
 // jshint ignore: start
 import {
   CQLStandardFilterBuilderClass,
+  deserialize,
   FilterBuilderClass,
   FilterClass,
   isFilterBuilderClass,
   serialize,
+  shouldBeFilterBuilderClass,
+  ValueTypes,
 } from '../component/filter-builder/filter.structure'
 
 const moment = require('moment')
@@ -267,69 +270,99 @@ const translateCqlToUserql = (str: string): string =>
     a === '\\' ? b : a + cqlToUserql[b as SpecialCQLCharacters]
   )
 
+const getNextToken = (postfix: Array<TokenType>): TokenType => {
+  if (
+    postfix[postfix.length - 3] &&
+    postfix[postfix.length - 3].type === 'FILTER_FUNCTION'
+  ) {
+    // first two are useless
+    postfix.pop()
+    postfix.pop()
+    return postfix.pop() as TokenType
+  }
+  if (
+    postfix[postfix.length - 2] &&
+    postfix[postfix.length - 2].type === 'RELATIVE'
+  ) {
+    // first one is useless
+    postfix.pop()
+    return postfix.pop() as TokenType
+  }
+  return postfix.pop() as TokenType
+}
+
 function buildTree(postfix: Array<TokenType>): any {
   let value,
     property,
-    tok = postfix.pop() as TokenType
-  switch (tok.type) {
+    tok = getNextToken(postfix)
+  const tokenType = tok.type
+  switch (tokenType) {
     case 'LOGICAL':
       const rhs = buildTree(postfix),
         lhs = buildTree(postfix)
-      return {
+      return new FilterBuilderClass({
         filters: [lhs, rhs],
-        type: tok.text.toUpperCase(),
-      }
+        type: tok.text.toUpperCase() as FilterBuilderClass['type'],
+      })
     case 'NOT':
       const operand = buildTree(postfix)
+      if (isFilterBuilderClass(operand)) {
+      } else {
+      }
+      debugger
       return {
         filters: [operand],
-        type: tok.type,
+        type: tokenType,
         negated: true,
       }
-    case 'BETWEEN':
+    case 'BETWEEN': // works
       let min, max
       postfix.pop() // unneeded AND token here
       max = buildTree(postfix)
       min = buildTree(postfix)
       property = buildTree(postfix)
-      return {
+      return new FilterClass({
         property,
-        lowerBoundary: min,
-        upperBoundary: max,
-        type: tok.type,
-      }
-    case 'BEFORE':
-    case 'AFTER':
+        value: {
+          start: min,
+          end: max,
+        } as ValueTypes['between'],
+        type: tokenType as FilterClass['type'],
+      })
+    case 'BEFORE': // works
+    case 'AFTER': // works
       value = buildTree(postfix)
       property = buildTree(postfix)
-      return {
+      return new FilterClass({
         property,
-        value: moment(value).toISOString(),
-        type: tok.text.toUpperCase(),
-      }
-    case 'DURING':
+        value: value as ValueTypes['date'],
+        type: tok.text.toUpperCase() as FilterClass['type'],
+      })
+    case 'DURING': // technically between for dates
       const dates = buildTree(postfix).split('/')
       property = buildTree(postfix)
-      return {
+      return new FilterClass({
         property,
-        from: dates[0],
-        to: dates[1],
-        type: tok.text.toUpperCase(),
-      }
-    case 'COMPARISON':
-      value = buildTree(postfix)
+        value: {
+          start: dates[0],
+          end: dates[1],
+        } as ValueTypes['during'],
+        type: tok.text.toUpperCase() as FilterClass['type'],
+      })
+    case 'COMPARISON': // works
+      value = buildTree(postfix) as ValueTypes['integer']
       property = buildTree(postfix)
-      return {
+      return new FilterClass({
         property,
         value,
-        type: tok.text.toUpperCase(),
-      }
-    case 'IS_NULL':
+        type: tok.text.toUpperCase() as FilterClass['type'],
+      })
+    case 'IS_NULL': // works
       property = buildTree(postfix)
-      return {
+      return new FilterClass({
         property,
-        type: tok.text.toUpperCase(),
-      }
+        type: tok.text.toUpperCase() as FilterClass['type'],
+      })
     case 'VALUE':
       const match = tok.text.match(/^'(.*)'$/)
       if (match) {
@@ -345,6 +378,7 @@ function buildTree(postfix: Array<TokenType>): any {
           return false
       }
     case 'SPATIAL':
+      // needs to be updated to transform to something location old understands
       switch (tok.text.toUpperCase()) {
         case 'BBOX':
           const maxy = buildTree(postfix),
@@ -353,11 +387,11 @@ function buildTree(postfix: Array<TokenType>): any {
             minx = buildTree(postfix),
             prop = buildTree(postfix)
 
-          return {
-            type: tok.text.toUpperCase(),
+          return new FilterClass({
+            type: tok.text.toUpperCase() as FilterClass['type'],
             property: prop,
             value: [minx, miny, maxx, maxy],
-          }
+          })
         case 'INTERSECTS':
           value = buildTree(postfix)
           property = buildTree(postfix)
@@ -396,29 +430,42 @@ function buildTree(postfix: Array<TokenType>): any {
       break
     case 'GEOMETRY':
       return {
-        type: tok.type,
+        type: tokenType,
         value: tok.text,
       }
     case 'RELATIVE':
-      return tok.text.substring(1, tok.text.length - 1)
-    case 'FILTER_FUNCTION':
+      return new FilterClass({
+        type: 'RELATIVE',
+        value: deserialize.dateRelative(tok.text),
+        property: (postfix.pop() as TokenType).text,
+      })
+    case 'FILTER_FUNCTION': // working
       const filterFunctionName = tok.text.slice(0, -1) // remove trailing '('
       const paramCount =
         filterFunctionParamCount[filterFunctionName as FilterFunctionNames]
       if (paramCount === undefined) {
         throw new Error('Unsupported filter function: ' + filterFunctionName)
       }
-
       const params = Array.apply(null, Array(paramCount))
         .map(() => buildTree(postfix))
         .reverse()
-
-      return {
-        type: tok.type,
-        filterFunctionName,
-        params,
+      switch (filterFunctionName) {
+        case 'proximity':
+          const proximityStrings = params[2] as string
+          return new FilterClass({
+            type: 'FILTER FUNCTION proximity',
+            property: params[0],
+            value: {
+              first: proximityStrings.split(' ')[0],
+              second: proximityStrings.split(' ')[1],
+              distance: params[1],
+            } as ValueTypes['proximity'],
+          })
+        default:
+          throw new Error('Unknown filter function')
       }
-
+    case 'TIME_PERIOD':
+      return tok.text
     default:
       return tok.text
   }
@@ -803,7 +850,18 @@ export default {
         filters: [],
       })
     }
-    return buildAst(tokenize(cql))
+    const reconstructedFilter = buildAst(tokenize(cql))
+    if (
+      isFilterBuilderClass(reconstructedFilter) ||
+      shouldBeFilterBuilderClass(reconstructedFilter)
+    ) {
+      return new FilterBuilderClass(reconstructedFilter)
+    } else {
+      return new FilterBuilderClass({
+        type: 'AND',
+        filters: [reconstructedFilter as FilterClass],
+      })
+    }
   },
   write(filter: FilterBuilderClass): string {
     try {

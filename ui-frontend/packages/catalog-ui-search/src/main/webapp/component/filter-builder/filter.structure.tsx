@@ -41,6 +41,44 @@ const comparatorToCQL = {
   RANGE: 'BETWEEN',
 }
 
+export const deserialize = {
+  /**
+   * example inputs:  // ' are part of input
+   * 'RELATIVE(PT1S)' // last 1 seconds
+   * 'RELATIVE(PT1M)' // last 1 minutes
+   * 'RELATIVE(PT1H)' // last 1 hours
+   * 'RELATIVE(P1D)' // last 1 days
+   * 'RELATIVE(P7D)' // last 1 weeks (notice we get mod of 7 days)
+   * 'RELATIVE(P1M)' // last 1 month
+   * 'RELATIVE(P1Y)' // last 1 year
+   **/
+  dateRelative: (val: string): ValueTypes['relative'] => {
+    let last = ''
+    const guts = val.split('(')[1].split(')')[0].substring(1) // get the thing between the parens, notice we don't care about P either
+    let unit = guts.charAt(guts.length - 1) // notice that we still need to know if it's minutes or months, the unit is the same between them!
+    if (guts.charAt(0) === 'T') {
+      last = guts.substring(1, guts.length - 1)
+      unit = unit.toLowerCase()
+    } else {
+      last = guts.substring(0, guts.length - 1)
+      if (unit !== 'M') {
+        unit = unit.toLowerCase() // only M differs given the conflict between minutes / months
+      }
+      if (unit === 'd') {
+        if (Number(last) % 7 === 0) {
+          // manually convert to weeks since it's not "really" a cql supported unit for relative
+          last = (Number(last) / 7).toString()
+          unit = 'w'
+        }
+      }
+    }
+    return {
+      last,
+      unit,
+    } as ValueTypes['relative']
+  },
+}
+
 export const serialize = {
   dateRelative: ({ last, unit }: ValueTypes['relative']) => {
     if (unit === undefined || !parseFloat(last)) {
@@ -167,6 +205,7 @@ export type ValueTypes = {
     second: string
     distance: number
   }
+  date: string
   boolean: boolean
   text: string
   float: number
