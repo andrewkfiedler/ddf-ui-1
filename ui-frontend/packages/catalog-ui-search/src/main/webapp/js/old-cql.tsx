@@ -367,11 +367,6 @@ function buildTree(postfix: Array<TokenType>): any {
         } as ValueTypes['during'],
         type: tok.text.toUpperCase() as FilterClass['type'],
       })
-    case 'PROPERTY':
-      property = tok.text
-      return new FilterClass({
-        property,
-      })
     case 'COMPARISON': // works
       value = buildTree(postfix) as ValueTypes['integer']
       property = buildTree(postfix)
@@ -520,17 +515,95 @@ function buildTree(postfix: Array<TokenType>): any {
 }
 
 function buildAst(tokens: TokenType[]) {
-  const result = buildTree(tokens)
-  try {
-    if (tokens.length > 0) {
-      let msg = 'Remaining tokens after building AST: \n'
-      for (let i = tokens.length - 1; i >= 0; i--) {
-        msg += tokens[i].type + ': ' + tokens[i].text + '\n'
-      }
-      throw new Error(msg)
+  const operatorStack = [] as Array<TokenType>,
+    postfix = [] as Array<TokenType>
+
+  while (tokens.length) {
+    const tok = tokens.shift() as TokenType
+    switch (tok.type) {
+      case 'PROPERTY':
+        // Remove single and double quotes if they exist in property name
+        tok.text = tok.text.replace(/^'|'$/g, '')
+        tok.text = tok.text.replace(/^"|"$/g, '')
+      case 'GEOMETRY':
+      case 'VALUE':
+      case 'TIME':
+      case 'TIME_PERIOD':
+      case 'RELATIVE':
+      case 'BOOLEAN':
+        postfix.push(tok)
+        break
+      case 'COMPARISON':
+      case 'BETWEEN':
+      case 'IS_NULL':
+      case 'LOGICAL':
+      case 'BEFORE':
+      case 'AFTER':
+      case 'DURING':
+        const p = precedence[tok.type as PrecendenceType]
+
+        while (
+          operatorStack.length > 0 &&
+          precedence[
+            operatorStack[operatorStack.length - 1].type as PrecendenceType
+          ] <= p
+        ) {
+          postfix.push(operatorStack.pop() as TokenType)
+        }
+
+        operatorStack.push(tok)
+        break
+      case 'SPATIAL':
+      case 'NOT':
+      case 'LPAREN':
+        operatorStack.push(tok)
+        break
+      case 'FILTER_FUNCTION':
+        operatorStack.push(tok)
+        // insert a '(' manually because we lost the original LPAREN matching the FILTER_FUNCTION regex
+        operatorStack.push({ type: 'LPAREN' } as TokenType)
+        break
+      case 'RPAREN':
+        while (
+          operatorStack.length > 0 &&
+          operatorStack[operatorStack.length - 1].type !== 'LPAREN'
+        ) {
+          postfix.push(operatorStack.pop() as TokenType)
+        }
+        operatorStack.pop() // toss out the LPAREN
+
+        // if this right parenthesis ends a function argument list (it's not for a logical grouping),
+        // it's now time to add that function to the postfix-ordered list
+        const lastOperatorType =
+          operatorStack.length > 0 &&
+          operatorStack[operatorStack.length - 1].type
+        if (
+          lastOperatorType === 'SPATIAL' ||
+          lastOperatorType === 'FILTER_FUNCTION'
+        ) {
+          postfix.push(operatorStack.pop() as TokenType)
+        }
+        break
+      case 'COMMA':
+      case 'END':
+      case 'UNITS':
+        break
+      default:
+        throw new Error('Unknown token type ' + tok.type)
     }
-  } catch (err) {
-    return new FilterBuilderClass()
+  }
+
+  while (operatorStack.length > 0) {
+    postfix.push(operatorStack.pop() as TokenType)
+  }
+
+  const result = buildTree(postfix)
+  if (postfix.length > 0) {
+    let msg = 'Remaining tokens after building AST: \n'
+    for (let i = postfix.length - 1; i >= 0; i--) {
+      msg += postfix[i].type + ': ' + postfix[i].text + '\n'
+    }
+    throw new Error(msg)
   }
 
   return result
@@ -660,9 +733,9 @@ function write(filter: any, firstCall?: boolean): any {
     // filterFunctionClass
     case 'FILTER FUNCTION proximity':
       // not sure why we need the = true part but without it the backend fails to parse
-      return `(proximity(${write(filter.property)},${write(
+      return `proximity(${write(filter.property)},${write(
         filter.value.distance
-      )},${write(`${filter.value.first} ${filter.value.second}`)}) = true)`
+      )},${write(`${filter.value.first} ${filter.value.second}`)}) = true`
       break
     case undefined:
       if (typeof filter === 'string') {
@@ -848,7 +921,7 @@ export default {
         filters: [],
       })
     }
-    const reconstructedFilter = buildAst(tokenize(cql).reverse())
+    const reconstructedFilter = buildAst(tokenize(cql))
     if (
       isFilterBuilderClass(reconstructedFilter) ||
       shouldBeFilterBuilderClass(reconstructedFilter)
