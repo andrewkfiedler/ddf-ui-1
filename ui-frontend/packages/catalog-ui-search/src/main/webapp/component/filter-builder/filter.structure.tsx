@@ -231,25 +231,30 @@ export type ValueTypes = {
     start: number
     end: number
   }
-  location:
-    | any //POLYGON
+  location: // this is all we technically need to reconstruct (lo fidelity)
+  | {
+        type: 'LINE'
+        mode: 'line'
+        lineWidth?: string
+        line: Array<Array<number>>
+      }
     | {
         type: 'POLYGON'
-        polygonBufferWidth: number
-        polygonBufferUnits: 'meters'
+        polygonBufferWidth?: number | string
+        polygonBufferUnits?: 'meters'
         polygon: Array<Array<number>>
-        locationType: 'dd'
-        polyType: 'polygon'
+        locationType?: 'dd'
+        polyType?: 'polygon'
         mode: 'poly'
       } //POINTRADIUS
     | {
         type: 'POINTRADIUS'
-        radius: number
-        radiusUnits: 'meters'
+        radius: number | string
+        radiusUnits?: 'meters'
         mode: 'circle'
         lat: number
         lon: number
-        locationType: 'dd'
+        locationType?: 'dd'
       }
 }
 

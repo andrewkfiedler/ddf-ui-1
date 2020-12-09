@@ -24,7 +24,10 @@ import SearchIcon from '@material-ui/icons/SearchTwoTone'
 import { useBackbone } from '../selection-checkbox/useBackbone.hook'
 import { useHistory, useLocation } from 'react-router-dom'
 import _ from 'lodash'
-
+import FilterBranch from '../filter-builder/filter-branch'
+import { FilterBuilderClass } from '../filter-builder/filter.structure'
+import CQL from '../../js/cql'
+window.CQL = CQL
 const LeftTop = ({ selectionInterface }: { selectionInterface: any }) => {
   const { closed, setClosed, lastLength, setLength } = useResizableGridContext()
 
@@ -206,6 +209,36 @@ const LeftBottom = ({ selectionInterface }: { selectionInterface: any }) => {
   )
 }
 
+const useFilterTreeFromLocation = () => {
+  const [filterTree, setFilterTree] = React.useState(new FilterBuilderClass())
+  const [cql, setCql] = React.useState('')
+  const location = useLocation()
+
+  React.useEffect(() => {
+    let urlBasedQuery = location.search.split('?defaultQuery=')[1]
+    if (urlBasedQuery) {
+      const queryJSON = JSON.parse(decodeURIComponent(urlBasedQuery))
+      setFilterTree(CQL.simplify(CQL.read(queryJSON.cql)))
+      setCql(queryJSON.cql)
+    }
+  }, [location])
+  return {
+    filterTree,
+    cql: cql,
+  }
+}
+
+const Translation = () => {
+  const { filterTree, cql } = useFilterTreeFromLocation()
+  return (
+    <div className="flex flex-col">
+      <FilterBranch filter={filterTree} setFilter={() => {}} />
+      <div>Original: {cql}</div>
+      <div>Redone: {CQL.write(filterTree)}</div>
+    </div>
+  )
+}
+
 export const HomePage = () => {
   const location = useLocation()
   let urlBasedQuery = location.search.split('?defaultQuery=')[1]
@@ -243,7 +276,7 @@ export const HomePage = () => {
       // do not let me commit this, it's only for verifying we go from cql to filter tree correctly
       queryModel.updateCqlBasedOnFilterTree()
       const queryModelJSON = queryModel.toJSON()
-      delete queryModelJSON['filterTree']
+      // delete queryModelJSON['filterTree']
       const encodedQueryModel = encodeURIComponent(
         JSON.stringify(queryModelJSON)
       )
@@ -268,7 +301,8 @@ export const HomePage = () => {
           </Paper>
         </div>
         <div className="w-full h-full">
-          <GoldenLayout selectionInterface={selectionInterface} />
+          <Translation />
+          {/* <GoldenLayout selectionInterface={selectionInterface} /> */}
         </div>
       </SplitPane>
     </div>

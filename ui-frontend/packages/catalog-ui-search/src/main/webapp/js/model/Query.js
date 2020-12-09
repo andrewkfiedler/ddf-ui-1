@@ -189,7 +189,7 @@ Query.Model = Backbone.AssociatedModel.extend({
       filterTree.id === undefined ||
       filterTree.id === 'default'
     ) {
-      this.set('filterTree', cql.read(this.get('cql'))) // reconstruct
+      this.set('filterTree', cql.simplify(cql.read(this.get('cql')))) // reconstruct
       console.log(this.get('filterTree'))
     } else {
       this.set('filterTree', new FilterBuilderClass(filterTree)) // instantiate the class if everything is a-okay

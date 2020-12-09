@@ -27,9 +27,19 @@ import {
   shouldBeFilterBuilderClass,
   ValueTypes,
 } from '../component/filter-builder/filter.structure'
-
+const CQLUtils = require('./CQLUtils')
 const moment = require('moment')
 
+const arrayFromLinestringWkt = (wkt: string): Array<[number, number]> => {
+  return wkt
+    .substring(11, wkt.length - 1)
+    .split(',')
+    .map(function (coordinate) {
+      return coordinate.split(' ').map(function (value) {
+        return Number(value)
+      }) as [number, number]
+    })
+}
 const ANYTEXT_WILDCARD = '"anyText" ILIKE \'%\''
 type PrecendenceType = 'RPAREN' | 'LOGICAL' | 'COMPARISON'
 type FilterFunctionNames = 'proximity' | 'pi'
@@ -305,15 +315,23 @@ function buildTree(postfix: Array<TokenType>): any {
         type: tok.text.toUpperCase() as FilterBuilderClass['type'],
       })
     case 'NOT':
-      const operand = buildTree(postfix)
-      if (isFilterBuilderClass(operand)) {
+      const peekToken = postfix[postfix.length - 1] as TokenType
+      if (peekToken.type === 'LOGICAL') {
+        return new FilterBuilderClass({
+          ...buildTree(postfix),
+          negated: true,
+        })
+      } else if (peekToken.type === 'NOT') {
+        return new FilterBuilderClass({
+          filters: [buildTree(postfix)],
+          type: 'AND',
+          negated: true,
+        })
       } else {
-      }
-      debugger
-      return {
-        filters: [operand],
-        type: tokenType,
-        negated: true,
+        return new FilterClass({
+          ...buildTree(postfix),
+          negated: true,
+        })
       }
     case 'BETWEEN': // works
       let min, max
@@ -338,7 +356,7 @@ function buildTree(postfix: Array<TokenType>): any {
         value: value as ValueTypes['date'],
         type: tok.text.toUpperCase() as FilterClass['type'],
       })
-    case 'DURING': // technically between for dates
+    case 'DURING': // technically between for dates, works
       const dates = buildTree(postfix).split('/')
       property = buildTree(postfix)
       return new FilterClass({
@@ -363,71 +381,96 @@ function buildTree(postfix: Array<TokenType>): any {
         property,
         type: tok.text.toUpperCase() as FilterClass['type'],
       })
-    case 'VALUE':
+    case 'VALUE': //works
       const match = tok.text.match(/^'(.*)'$/)
       if (match) {
         return translateCqlToUserql(match[1].replace(/''/g, "'"))
       } else {
         return Number(tok.text)
       }
-    case 'BOOLEAN':
+    case 'BOOLEAN': // works
       switch (tok.text.toUpperCase()) {
         case 'TRUE':
           return true
         default:
           return false
       }
-    case 'SPATIAL':
-      // needs to be updated to transform to something location old understands
-      switch (tok.text.toUpperCase()) {
-        case 'BBOX':
-          const maxy = buildTree(postfix),
-            maxx = buildTree(postfix),
-            miny = buildTree(postfix),
-            minx = buildTree(postfix),
-            prop = buildTree(postfix)
-
+    case 'SPATIAL': // working
+      // next token tells us whether this is DWITHIN or INTERSECTS
+      switch (tok.text) {
+        case 'INTERSECTS': {
+          // things without buffers, could be poly or line
+          const valueToken = postfix.pop() as TokenType
+          const propertyToken = postfix.pop() as TokenType
+          if (valueToken.text.startsWith('LINESTRING')) {
+            return new FilterClass({
+              type: 'GEOMETRY',
+              value: {
+                mode: 'line',
+                type: 'LINE',
+                line: arrayFromLinestringWkt(valueToken.text),
+              } as ValueTypes['location'],
+              property: propertyToken.text,
+            })
+          }
           return new FilterClass({
-            type: tok.text.toUpperCase() as FilterClass['type'],
-            property: prop,
-            value: [minx, miny, maxx, maxy],
+            type: 'GEOMETRY',
+            value: {
+              mode: 'poly',
+              type: 'POLYGON',
+              polygon: CQLUtils.arrayFromPolygonWkt(valueToken.text),
+            } as ValueTypes['location'],
+            property: propertyToken.text,
           })
-        case 'INTERSECTS':
-          value = buildTree(postfix)
-          property = buildTree(postfix)
-          return {
-            type: tok.text.toUpperCase(),
-            property,
-            value,
+        }
+        case 'DWITHIN': {
+          // things with buffers, could be poly, line or point
+          const bufferToken = postfix.pop() as TokenType
+          const valueToken = postfix.pop() as TokenType
+          const propertyToken = postfix.pop() as TokenType
+          if (valueToken.text.startsWith('LINESTRING')) {
+            return new FilterClass({
+              type: 'GEOMETRY',
+              value: {
+                mode: 'line',
+                type: 'LINE',
+                lineWidth: bufferToken.text,
+                line: arrayFromLinestringWkt(valueToken.text),
+              } as ValueTypes['location'],
+              property: propertyToken.text,
+            })
+          } else if (valueToken.text.startsWith('POLYGON')) {
+            return new FilterClass({
+              type: 'GEOMETRY',
+              value: {
+                mode: 'poly',
+                type: 'POLYGON',
+                polygonBufferWidth: bufferToken.text,
+                polygon: CQLUtils.arrayFromPolygonWkt(valueToken.text),
+              } as ValueTypes['location'],
+              property: propertyToken.text,
+            })
           }
-        case 'WITHIN':
-          value = buildTree(postfix)
-          property = buildTree(postfix)
-          return {
-            type: tok.text.toUpperCase(),
-            property,
-            value,
-          }
-        case 'CONTAINS':
-          value = buildTree(postfix)
-          property = buildTree(postfix)
-          return {
-            type: tok.text.toUpperCase(),
-            property,
-            value,
-          }
-        case 'DWITHIN':
-          const distance = buildTree(postfix)
-          value = buildTree(postfix)
-          property = buildTree(postfix)
-          return {
-            type: tok.text.toUpperCase(),
-            value,
-            property,
-            distance: Number(distance),
-          }
+          return new FilterClass({
+            type: 'GEOMETRY',
+            value: {
+              mode: 'circle',
+              type: 'POINTRADIUS',
+              radius: bufferToken.text,
+              lat: Number(
+                valueToken.text
+                  .substring(6, valueToken.text.length - 1)
+                  .split(' ')[1]
+              ),
+              lon: Number(valueToken.text.substring(6).split(' ')[0]),
+            } as ValueTypes['location'],
+            property: propertyToken.text,
+          })
+          break
+        }
+        default:
+          throw new Error('Unknown spatial type encountered')
       }
-      break
     case 'GEOMETRY':
       return {
         type: tokenType,
@@ -711,17 +754,24 @@ function write(filter: any): any {
 function simplifyFilters(cqlAst: FilterBuilderClass) {
   for (let i = 0; i < cqlAst.filters.length; i++) {
     if (simplifyAst(cqlAst.filters[i], cqlAst)) {
-      const filtersToMerge = cqlAst.filters.splice(
-        i,
-        1
-      )[0] as FilterBuilderClass
-      filtersToMerge.filters.forEach((filter) => {
-        cqlAst.filters.push(filter)
-      })
+      cqlAst.filters.splice.apply(
+        cqlAst.filters,
+        ([i, 1] as any[]).concat(
+          (cqlAst.filters[i] as FilterBuilderClass).filters
+        )
+      )
     }
   }
+  return cqlAst
 }
 
+/**
+ * The current read function for cql produces an unoptimized tree.  While it's possible we could
+ * fix the output there, I'm not sure of how.  It ends up producing very nested filter trees from
+ * relatively simple cql.
+ * @param cqlAst
+ * @param parentNode
+ */
 function simplifyAst(
   cqlAst: FilterBuilderClass | FilterClass,
   parentNode?: FilterBuilderClass
@@ -735,23 +785,13 @@ function simplifyAst(
     return cqlAst
   } else {
     simplifyFilters(cqlAst as FilterBuilderClass)
-    if (cqlAst.type === parentNode.type) {
+    if (
+      cqlAst.type === parentNode.type &&
+      cqlAst.negated === parentNode.negated
+    ) {
       return true
     } else {
       return false
-    }
-  }
-}
-
-function collapseNOTs({ cqlAst }: { cqlAst: any }) {
-  if (cqlAst.filters) {
-    cqlAst.filters.forEach((filter: any) => {
-      collapseNOTs({ cqlAst: filter })
-    })
-    if (cqlAst.type === 'NOT') {
-      cqlAst.type = cqlAst.filters[0].filters ? cqlAst.filters[0].type : 'AND'
-      cqlAst.negated = true
-      cqlAst.filters = cqlAst.filters[0].filters || cqlAst.filters
     }
   }
 }
@@ -777,14 +817,9 @@ function uncollapseNOTs({
     } else {
       return new CQLStandardFilterBuilderClass({
         type: cqlAst.type,
-        filters: [
-          new CQLStandardFilterBuilderClass({
-            type: cqlAst.type,
-            filters: cqlAst.filters.map((filter) =>
-              uncollapseNOTs({ cqlAst: filter })
-            ),
-          }),
-        ],
+        filters: cqlAst.filters.map((filter) =>
+          uncollapseNOTs({ cqlAst: filter })
+        ),
       })
     }
   } else {
@@ -840,6 +875,7 @@ function iterativelySimplify(cqlAst: FilterBuilderClass) {
     prevAst = JSON.parse(JSON.stringify(cqlAst))
     simplifyAst(cqlAst)
   }
+  return cqlAst
 }
 
 export default {
@@ -883,10 +919,7 @@ export default {
   },
   removeInvalidFilters,
   simplify(cqlAst: FilterBuilderClass): FilterBuilderClass {
-    iterativelySimplify(cqlAst)
-    collapseNOTs({ cqlAst })
-    iterativelySimplify(cqlAst)
-    return cqlAst
+    return iterativelySimplify(cqlAst)
   },
   translateCqlToUserql,
   translateUserqlToCql,
