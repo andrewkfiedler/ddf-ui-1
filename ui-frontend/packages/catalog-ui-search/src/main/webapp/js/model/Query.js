@@ -94,20 +94,6 @@ function limitToHistoric(cqlFilterTree) {
   }
 }
 
-const handleTieredSearchLocalFinish = function (ids) {
-  const results = this.get('result').get('results').toJSON()
-
-  const status = this.get('result').get('status').toJSON()
-
-  const resultIds = results.map((result) => result.metacard.id)
-  const missingResult = ids.some((id) => !resultIds.includes(id))
-  if (!missingResult) {
-    return
-  }
-  this.set('federation', 'enterprise')
-  this.startSearch({ results, status })
-}
-
 Query.Model = Backbone.AssociatedModel.extend({
   relations: [
     {
@@ -117,6 +103,10 @@ Query.Model = Backbone.AssociatedModel.extend({
       isTransient: true,
     },
   ],
+  constructor(attributes, options) {
+    this.options = { useUserDefaults: false, ephemeralFilter: true, ephemeralSort: true, ...options }
+    return Backbone.AssociatedModel.apply(this, arguments)
+  },
   set(data) {
     if (
       typeof data === 'object' &&
@@ -151,13 +141,13 @@ Query.Model = Backbone.AssociatedModel.extend({
         excludeUnnecessaryAttributes: true,
         count: properties.resultCount,
         start: 1,
-        federation: 'enterprise',
         sorts: [
           {
             attribute: 'modified',
             direction: 'descending',
           },
         ],
+        sources: ['all'],
         result: undefined,
         type: 'text',
         isLocal: false,
@@ -166,7 +156,7 @@ Query.Model = Backbone.AssociatedModel.extend({
         spellcheck: false,
         phonetics: false,
       },
-      user.getQuerySettings().toJSON()
+      this.options.useUserDefaults ? user.getQuerySettings().toJSON() : {}
     )
   },
   resetToDefaults(overridenDefaults) {
@@ -175,7 +165,7 @@ Query.Model = Backbone.AssociatedModel.extend({
     this.trigger('resetToDefaults')
   },
   applyDefaults() {
-    this.set(_.pick(this.defaults(), ['sorts', 'federation', 'sources']))
+    this.set(_.pick(this.defaults(), ['sorts', 'sources']))
   },
   revert() {
     this.trigger('revert')
@@ -183,8 +173,14 @@ Query.Model = Backbone.AssociatedModel.extend({
   isLocal() {
     return this.get('isLocal')
   },
-  initialize(_attrs, options) {
-    this.options = { ephemeralFilter: true, ephemeralSort: true, ...options }
+  _handleDeprecatedFederation(attributes) {
+    if (attributes && attributes.federation) {
+      console.error(
+        'Attempt to set federation on a search.  This attribute is deprecated.  Did you mean to set sources?'
+      )
+    }
+  },
+  initialize(attributes) {
     _.bindAll.apply(_, [this].concat(_.functions(this))) // underscore bindAll does not take array arg
     const filterTree = this.get('filterTree')
     if (filterTree && typeof filterTree === 'string') {
@@ -201,6 +197,7 @@ Query.Model = Backbone.AssociatedModel.extend({
     } else {
       this.set('filterTree', new FilterBuilderClass(filterTree)) // instantiate the class if everything is a-okay
     }
+    this._handleDeprecatedFederation(attributes)
     this.listenTo(
       this,
       'change:cql change:filterTree change:sources change:sorts change:spellcheck change:phonetics',
@@ -290,11 +287,6 @@ Query.Model = Backbone.AssociatedModel.extend({
   isOutdated() {
     return this.get('isOutdated')
   },
-  startTieredSearchIfOutdated(ids) {
-    if (this.isOutdated()) {
-      this.startTieredSearch(ids)
-    }
-  },
   startSearchIfOutdated() {
     if (this.isOutdated()) {
       this.startSearch()
@@ -332,23 +324,6 @@ Query.Model = Backbone.AssociatedModel.extend({
     this.updateCqlBasedOnFilterTree()
     this.resetCurrentIndexForSourceGroup()
     this.startSearch(options, done)
-  },
-  startTieredSearch(ids) {
-    this.set('federation', 'local')
-    this.startSearch(undefined, (searches) => {
-      $.when(...searches).then(() => {
-        const queryResponse = this.get('result')
-        if (queryResponse && queryResponse.isUnmerged()) {
-          this.listenToOnce(
-            queryResponse,
-            'change:merged',
-            handleTieredSearchLocalFinish.bind(this, ids)
-          )
-        } else {
-          handleTieredSearchLocalFinish.call(this, ids)
-        }
-      })
-    })
   },
   startSearch(options, done) {
     this.trigger('panToShapesExtent')
