@@ -235,6 +235,7 @@ function getLayout(plot?: any) {
 
 type Props = {
   selectionInterface: any
+  Plotly: any
 }
 
 const getPropertyView = ({

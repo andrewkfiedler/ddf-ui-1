@@ -13,7 +13,7 @@
  *
  **/
 
-const Cesium = require('cesium')
+const Cesium = require('cesium/Build/Cesium/Cesium.js')
 const _ = require('underscore')
 const Turf = require('@turf/turf')
 const DistanceUtils = require('../DistanceUtils.js')

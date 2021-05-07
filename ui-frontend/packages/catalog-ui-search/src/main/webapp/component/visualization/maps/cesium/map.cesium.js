@@ -26,7 +26,7 @@ const DrawPolygon = require('../../../../js/widgets/cesium.polygon.js')
 const DrawLine = require('../../../../js/widgets/cesium.line.js')
 
 const properties = require('../../../../js/properties.js')
-const Cesium = require('cesium')
+const Cesium = require('cesium/Build/Cesium/Cesium.js')
 const Turf = require('@turf/turf')
 const DrawHelper = require('cesium-drawhelper/DrawHelper')
 import CesiumLayerCollectionController from '../../../../js/controllers/cesium.layerCollection.controller'

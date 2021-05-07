@@ -170,7 +170,7 @@ module.exports = new (Backbone.Model.extend({
       -1
     ) {
       this.getEnumForMetacardDefinition(metacardDefinitionName)
-      this.getDeprecatedEnumForMetacardDefinition(metacardDefinitionName)
+      // this.getDeprecatedEnumForMetacardDefinition(metacardDefinitionName)
       this.metacardDefinitions[metacardDefinitionName] = metacardDefinition
       for (const type in metacardDefinition) {
         if (metacardDefinition.hasOwnProperty(type)) {

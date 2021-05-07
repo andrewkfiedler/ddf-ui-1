@@ -14,7 +14,7 @@
  **/
 
 import _ from 'underscore'
-const Cesium = require('cesium')
+const Cesium = require('cesium/Build/Cesium/Cesium.js')
 const DistanceUtils = require('../../../../js/DistanceUtils')
 const ShapeUtils = require('../../../../js/ShapeUtils.js')
 const Turf = require('@turf/turf')

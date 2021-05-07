@@ -3130,6 +3130,16 @@
     "@types/source-list-map" "*"
     source-map "^0.7.3"
 
+"@types/webpack@4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.1.4.tgz#553fe3f7ac1d8b403ebb01f25b31272b234d5ef6"
+  integrity sha512-/4sQPb5QVB3kYWaNRoFmVrCkWI+PEuHPACXE79RUx/igiVd72x7hHlA7SCql9QbnjBEUEjYtpSjFDu65gybcWQ==
+  dependencies:
+    "@types/node" "*"
+    "@types/tapable" "*"
+    "@types/uglify-js" "*"
+    source-map "^0.6.0"
+
 "@types/webpack@^4.41.8":
   version "4.41.21"
   resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.41.21.tgz#cc685b332c33f153bb2f5fc1fa3ac8adeb592dee"

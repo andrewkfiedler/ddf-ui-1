@@ -14,7 +14,7 @@
  **/
 
 const Marionette = require('marionette')
-const Cesium = require('cesium')
+const Cesium = require('cesium/Build/Cesium/Cesium.js')
 const _ = require('underscore')
 const wreqr = require('../wreqr.js')
 const NotificationView = require('./notification.view')

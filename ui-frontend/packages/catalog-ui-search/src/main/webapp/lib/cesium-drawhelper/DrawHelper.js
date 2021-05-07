@@ -23,7 +23,7 @@
  */
 /* eslint-disable */
 
-const Cesium = require('cesium')
+const Cesium = require('cesium/Build/Cesium/Cesium.js')
 
 const DrawHelper = (module.exports = (function () {
   // static variables

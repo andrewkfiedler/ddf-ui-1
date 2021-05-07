@@ -15,7 +15,7 @@
 
 /*jshint newcap: false, bitwise: false */
 
-const Cesium = require('cesium')
+const Cesium = require('cesium/Build/Cesium/Cesium.js')
 const CommonLayerController = require('./common.layerCollection.controller.js')
 const properties = require('../properties.js')
 import { addLayer, shiftLayers, getShift } from './cesium.layer-ordering'
