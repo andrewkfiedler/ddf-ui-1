@@ -230,7 +230,7 @@ export class LazyQueryResult {
   getPreview(): string {
     return this.plain.actions.filter(
       (action) => action.id === 'catalog.data.metacard.html.preview'
-    )[0].url
+    )[0]?.url
   }
   hasPreview(): boolean {
     return this.plain.metacard.properties['ext.extracted.text'] !== undefined

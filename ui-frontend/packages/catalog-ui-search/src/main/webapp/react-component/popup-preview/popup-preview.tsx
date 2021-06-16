@@ -12,67 +12,31 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
+import Button from '@material-ui/core/Button'
+import Paper from '@material-ui/core/Paper'
 import * as React from 'react'
 import { hot } from 'react-hot-loader'
 import styled from 'styled-components'
 import { useBackbone } from '../../component/selection-checkbox/useBackbone.hook'
-
-export type MetacardType = {
-  getPreview: Function
-  getTitle: Function
-  id: String
-  toJSON: () => any
-}
+import {
+  useLazyResultsFromSelectionInterface,
+  useLazyResultsSelectedResultsFromSelectionInterface,
+} from '../../component/selection-interface/hooks'
+import { Elevations } from '../../component/theme/theme'
+import { useSelectedResults } from '../../js/model/LazyQueryResult/hooks'
+import { LazyQueryResult } from '../../js/model/LazyQueryResult/LazyQueryResult'
 
 export type LocationType = {
   left: number
   top: number
 }
 
-const Root = styled.div`
-  font-family: 'Inconsolata', 'Lucida Console', monospace;
-  background: ${(props) => props.theme.backgroundModal};
-  display: block;
-  width: auto;
-  height: auto;
-  font-size: ${(props) => props.theme.mediumFontSize};
-  position: absolute;
-  text-align: left;
-  padding: 4px;
-  max-height: 290px;
-  max-width: 50%;
-  transform: translate(-51.25%, -100%);
-
-  &::before {
-    top: 100%;
-    content: ' ';
-    border-top: 15px solid ${(props) => props.theme.backgroundModal};
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    height: 0;
-    width: 0;
-    left: 50%;
-    position: absolute;
-    pointer-events: none;
-  }
-`
-
-const Title = styled.div`
-  font-size: 20px;
-  margin: 0;
-  padding: 2px 6px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: 'Open Sans', arial, sans-serif;
-`
-
 const Preview = styled.div`
   position: relative;
   min-width: 200px;
   height: 100%;
   min-height: 15px;
-  max-height: 250px;
+  max-height: 100px;
   padding: 2px;
   background-color: ${(props) => props.theme.backgroundContent};
   border: 1px solid;
@@ -88,29 +52,6 @@ const PreviewText = styled.p`
   white-space: pre-line;
 `
 
-const ClusterList = styled.ul`
-  margin: 1px;
-  padding: 1px;
-  border: 1px solid;
-`
-
-const ClusterTitle = styled.li`
-  font-size: 18px;
-  margin: 0;
-  padding: 2px 6px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: 'Open Sans', arial, sans-serif;
-
-  &:hover {
-    background-color: ${(props) => props.theme.backgroundSlideout};
-  }
-`
-
-const NO_PREVIEW = 'No preview text available.'
-const STATUS_OK = 200
-
 const TOP_OFFSET = 60
 
 const DRAG_SENSITIVITY = 10
@@ -119,66 +60,31 @@ type Props = {
   map: any
   selectionInterface: {
     getSelectedResults: () => {
-      models: MetacardType[]
-    } & Array<MetacardType>
+      models: LazyQueryResult[]
+    } & Array<LazyQueryResult>
     getActiveSearchResults: () => {
-      models: MetacardType[]
-    } & Array<MetacardType>
+      models: LazyQueryResult[]
+    } & Array<LazyQueryResult>
     clearSelectedResults: () => void
-    addSelectedResult: (metacard: MetacardType) => void
+    addSelectedResult: (metacard: LazyQueryResult) => void
   }
   mapModel: any
 }
 
 const getLeft = (location: undefined | LocationType) => {
-  return location ? location.left + 'px' : 0
+  return location ? location.left + 'px' : undefined
 }
 
 const getTop = (location: undefined | LocationType) => {
-  return location ? location.top - TOP_OFFSET + 'px' : 0
-}
-
-const extractPreviewText = (responseHtml: string) => {
-  const htmlElement = document.createElement('html')
-  htmlElement.innerHTML = responseHtml
-  const bodyElement = htmlElement!.querySelector('body')
-  if (bodyElement) {
-    bodyElement.innerHTML = bodyElement.innerHTML.replace(/<br\s*\/?>/gm, '\n')
-    return bodyElement.innerText
-  }
-  return NO_PREVIEW
-}
-
-const getPreviewText = ({
-  targetMetacard,
-  setPreviewText,
-}: {
-  targetMetacard: MetacardType | undefined
-  setPreviewText: React.Dispatch<React.SetStateAction<string | undefined>>
-}) => {
-  if (targetMetacard) {
-    const url = targetMetacard.getPreview() as string
-    const xhr = new XMLHttpRequest()
-    xhr.addEventListener('load', () => {
-      if (xhr.status === STATUS_OK) {
-        const previewText = extractPreviewText(xhr.responseText)
-        setPreviewText(previewText !== NO_PREVIEW ? previewText : undefined)
-      }
-    })
-
-    xhr.open('GET', url)
-    xhr.send()
-  } else {
-    setPreviewText(undefined)
-  }
+  return location ? location.top - TOP_OFFSET + 'px' : undefined
 }
 
 /**
  * Get the pixel location from a metacard(s)
  * returns { left, top } relative to the map view
  */
-const getLocation = (map: any, target: MetacardType[]) => {
-  if (target) {
+const getLocation = (map: any, target: LazyQueryResult[]) => {
+  if (target && target.length === 1) {
     const location = map.getWindowLocationsOfResults(target)
     const coordinates = location ? location[0] : undefined
     return coordinates
@@ -190,18 +96,21 @@ const getLocation = (map: any, target: MetacardType[]) => {
 
 const HookPopupPreview = (props: Props) => {
   const { map, selectionInterface } = props
+  const lazyResults = useLazyResultsFromSelectionInterface({
+    selectionInterface,
+  })
+  const selectedResults = useLazyResultsSelectedResultsFromSelectionInterface({
+    selectionInterface,
+  })
+  const selectedResultsArray = Object.values(selectedResults)
   const [location, setLocation] = React.useState(
     undefined as undefined | LocationType
   )
   const dragRef = React.useRef(0)
   const [open, setOpen] = React.useState(false)
-  const [previewText, setPreviewText] = React.useState(
-    undefined as undefined | string
-  )
-  const { listenTo } = useBackbone()
 
-  const getTarget = () => {
-    return selectionInterface.getSelectedResults()
+  const getTarget = (): LazyQueryResult[] => {
+    return Object.values(selectedResults)
   }
 
   let popupAnimationFrameId: any
@@ -222,22 +131,13 @@ const HookPopupPreview = (props: Props) => {
   }
 
   React.useEffect(() => {
-    listenTo(
-      selectionInterface.getSelectedResults(),
-      'reset add remove',
-      () => {
-        if (selectionInterface.getSelectedResults().length === 1) {
-          getPreviewText({
-            targetMetacard: selectionInterface.getSelectedResults().models[0],
-            setPreviewText,
-          })
-        }
-        setLocation(getLocation(map, getTarget()))
-        if (selectionInterface.getSelectedResults().length !== 0) {
-          setOpen(true)
-        }
-      }
-    )
+    setLocation(getLocation(map, getTarget()))
+    if (selectedResultsArray.length !== 0) {
+      setOpen(true)
+    }
+  }, [selectedResults])
+
+  React.useEffect(() => {
     map.onMouseTrackingForPopup(
       () => {
         dragRef.current = 0
@@ -251,64 +151,92 @@ const HookPopupPreview = (props: Props) => {
         }
       }
     )
-
-    map.onCameraMoveStart(() => {
-      startPopupAnimating(map)
-    })
-    map.onCameraMoveEnd(() => {
-      handleCameraMoveEnd()
-    })
-
-    return () => {
-      window.cancelAnimationFrame(popupAnimationFrameId)
-    }
   }, [])
 
-  if (!open) {
+  React.useEffect(() => {
+    const onCameraMoveStart = () => {
+      startPopupAnimating(map)
+    }
+
+    const onCameraMoveEnd = () => {
+      handleCameraMoveEnd()
+    }
+
+    map.onCameraMoveStart(onCameraMoveStart)
+    map.onCameraMoveEnd(onCameraMoveEnd)
+
+    return () => {
+      map.offCameraMoveStart(onCameraMoveStart)
+      map.offCameraMoveEnd(onCameraMoveEnd)
+      window.cancelAnimationFrame(popupAnimationFrameId)
+    }
+  }, [selectedResults])
+
+  if (!open || selectedResultsArray.length === 0) {
+    return null
+  }
+
+  const left = getLeft(location)
+  const top = getTop(location)
+  if (selectedResultsArray.length === 1 && (!left || !top)) {
     return null
   }
 
   return (
-    <Root style={{ left: getLeft(location), top: getTop(location) }}>
+    <Paper
+      elevation={Elevations.overlays}
+      className={`absolute p-2 overflow-auto max-w-sm transform -translate-x-1/2 ${
+        selectedResultsArray.length === 1
+          ? '-translate-y-1/2'
+          : '-translate-y-full'
+      }`}
+      style={{
+        left: selectedResultsArray.length === 1 ? left : 'calc(50%)',
+        top: selectedResultsArray.length === 1 ? top : 'calc(50% - 20px)',
+        maxHeight: '150px',
+      }}
+    >
       {(function () {
-        if (selectionInterface.getSelectedResults().length === 1) {
-          const metacardJSON = selectionInterface
-            .getSelectedResults()
-            .models[0].toJSON()
+        if (selectedResultsArray.length === 1) {
+          const metacardJSON = selectedResultsArray[0].plain
+          const previewText =
+            metacardJSON.metacard.properties['ext.extracted.text']
           return (
             <>
-              <Title>{metacardJSON.metacard.properties.title}</Title>
+              <div className="truncate">
+                {metacardJSON.metacard.properties.title}
+              </div>
               {previewText && (
                 <Preview>
-                  <PreviewText>{previewText}</PreviewText>
+                  <PreviewText>
+                    {metacardJSON.metacard.properties['ext.extracted.text']}
+                  </PreviewText>
                 </Preview>
               )}
             </>
           )
-        } else if (selectionInterface.getSelectedResults().length > 1) {
+        } else if (selectedResultsArray.length > 1) {
           return (
-            <ClusterList>
-              {selectionInterface
-                .getSelectedResults()
-                .map((clusterModel: any) => {
-                  return (
-                    <ClusterTitle
-                      key={clusterModel.id}
-                      onClick={() => {
-                        selectionInterface.clearSelectedResults()
-                        selectionInterface.addSelectedResult(clusterModel)
-                      }}
-                    >
-                      {clusterModel.toJSON().metacard.properties.title}
-                    </ClusterTitle>
-                  )
-                })}
-            </ClusterList>
+            <div>
+              {selectedResultsArray.map((clusterModel) => {
+                return (
+                  <Button
+                    key={clusterModel.plain.id}
+                    onClick={() => {
+                      lazyResults.deselect()
+                      lazyResults.select(clusterModel)
+                    }}
+                  >
+                    {clusterModel.plain.metacard.properties.title}
+                  </Button>
+                )
+              })}
+            </div>
           )
         }
         return
       })()}
-    </Root>
+    </Paper>
   )
 }
 
