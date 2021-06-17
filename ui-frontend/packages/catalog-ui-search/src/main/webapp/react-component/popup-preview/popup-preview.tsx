@@ -17,14 +17,13 @@ import Paper from '@material-ui/core/Paper'
 import * as React from 'react'
 import { hot } from 'react-hot-loader'
 import styled from 'styled-components'
-import { useBackbone } from '../../component/selection-checkbox/useBackbone.hook'
 import {
   useLazyResultsFromSelectionInterface,
   useLazyResultsSelectedResultsFromSelectionInterface,
 } from '../../component/selection-interface/hooks'
 import { Elevations } from '../../component/theme/theme'
-import { useSelectedResults } from '../../js/model/LazyQueryResult/hooks'
 import { LazyQueryResult } from '../../js/model/LazyQueryResult/LazyQueryResult'
+import Tooltip from '@material-ui/core/Tooltip'
 
 export type LocationType = {
   left: number
@@ -72,11 +71,11 @@ type Props = {
 }
 
 const getLeft = (location: undefined | LocationType) => {
-  return location ? location.left + 'px' : undefined
+  return location ? location.left : undefined
 }
 
 const getTop = (location: undefined | LocationType) => {
-  return location ? location.top - TOP_OFFSET + 'px' : undefined
+  return location ? location.top - TOP_OFFSET : undefined
 }
 
 /**
@@ -182,10 +181,11 @@ const HookPopupPreview = (props: Props) => {
     return null
   }
 
+  console.log({ left, top })
+
   return (
-    <Paper
-      elevation={Elevations.overlays}
-      className={`absolute p-2 overflow-auto max-w-sm transform -translate-x-1/2 ${
+    <div
+      className={`absolute transform -translate-x-1/2 ${
         selectedResultsArray.length === 1
           ? '-translate-y-1/2'
           : '-translate-y-full'
@@ -193,50 +193,68 @@ const HookPopupPreview = (props: Props) => {
       style={{
         left: selectedResultsArray.length === 1 ? left : 'calc(50%)',
         top: selectedResultsArray.length === 1 ? top : 'calc(50% - 20px)',
-        maxHeight: '150px',
       }}
     >
-      {(function () {
-        if (selectedResultsArray.length === 1) {
-          const metacardJSON = selectedResultsArray[0].plain
-          const previewText =
-            metacardJSON.metacard.properties['ext.extracted.text']
-          return (
-            <>
-              <div className="truncate">
-                {metacardJSON.metacard.properties.title}
-              </div>
-              {previewText && (
-                <Preview>
-                  <PreviewText>
-                    {metacardJSON.metacard.properties['ext.extracted.text']}
-                  </PreviewText>
-                </Preview>
-              )}
-            </>
-          )
-        } else if (selectedResultsArray.length > 1) {
-          return (
-            <div>
-              {selectedResultsArray.map((clusterModel) => {
+      <Tooltip
+        open={true}
+        title={
+          <Paper
+            elevation={Elevations.overlays}
+            className={`p-1 overflow-auto max-w-sm`}
+            style={{
+              maxHeight: '150px',
+            }}
+          >
+            {(function () {
+              if (selectedResultsArray.length === 1) {
+                const metacardJSON = selectedResultsArray[0].plain
+                const previewText =
+                  metacardJSON.metacard.properties['ext.extracted.text']
                 return (
-                  <Button
-                    key={clusterModel.plain.id}
-                    onClick={() => {
-                      lazyResults.deselect()
-                      lazyResults.select(clusterModel)
-                    }}
-                  >
-                    {clusterModel.plain.metacard.properties.title}
-                  </Button>
+                  <>
+                    <div className="truncate">
+                      {metacardJSON.metacard.properties.title}
+                    </div>
+                    {previewText && (
+                      <Preview>
+                        <PreviewText>
+                          {
+                            metacardJSON.metacard.properties[
+                              'ext.extracted.text'
+                            ]
+                          }
+                        </PreviewText>
+                      </Preview>
+                    )}
+                  </>
                 )
-              })}
-            </div>
-          )
+              } else if (selectedResultsArray.length > 1) {
+                return (
+                  <div>
+                    {selectedResultsArray.map((clusterModel) => {
+                      return (
+                        <Button
+                          key={clusterModel.plain.id}
+                          onClick={() => {
+                            lazyResults.deselect()
+                            lazyResults.select(clusterModel)
+                          }}
+                        >
+                          {clusterModel.plain.metacard.properties.title}
+                        </Button>
+                      )
+                    })}
+                  </div>
+                )
+              }
+              return
+            })()}
+          </Paper>
         }
-        return
-      })()}
-    </Paper>
+      >
+        <div></div>
+      </Tooltip>
+    </div>
   )
 }
 
