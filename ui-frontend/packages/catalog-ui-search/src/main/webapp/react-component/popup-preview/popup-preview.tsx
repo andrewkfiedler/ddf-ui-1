@@ -24,6 +24,9 @@ import {
 import { Elevations } from '../../component/theme/theme'
 import { LazyQueryResult } from '../../js/model/LazyQueryResult/LazyQueryResult'
 import Tooltip from '@material-ui/core/Tooltip'
+import CloseIcon from '@material-ui/icons/Close'
+import { useListenTo } from '../../component/selection-checkbox/useBackbone.hook'
+import ResultItem from '../../component/results-visual/result-item'
 
 export type LocationType = {
   left: number
@@ -67,7 +70,13 @@ type Props = {
     clearSelectedResults: () => void
     addSelectedResult: (metacard: LazyQueryResult) => void
   }
-  mapModel: any
+  mapModel: Backbone.Model<
+    {
+      targetMetacard: LazyQueryResult
+    },
+    any,
+    any
+  >
 }
 
 const getLeft = (location: undefined | LocationType) => {
@@ -87,14 +96,14 @@ const getLocation = (map: any, target: LazyQueryResult[]) => {
     const location = map.getWindowLocationsOfResults(target)
     const coordinates = location ? location[0] : undefined
     return coordinates
-      ? { left: coordinates[0], top: coordinates[1] }
+      ? { left: coordinates[0], top: coordinates[1] - 20 }
       : undefined
   }
   return
 }
 
 const HookPopupPreview = (props: Props) => {
-  const { map, selectionInterface } = props
+  const { map, selectionInterface, mapModel } = props
   const lazyResults = useLazyResultsFromSelectionInterface({
     selectionInterface,
   })
@@ -109,8 +118,20 @@ const HookPopupPreview = (props: Props) => {
   const [open, setOpen] = React.useState(false)
 
   const getTarget = (): LazyQueryResult[] => {
+    return mapModel.get('targetMetacard')
+      ? [mapModel.get('targetMetacard')]
+      : []
     return Object.values(selectedResults)
   }
+
+  useListenTo(mapModel, 'change:targetMetacard', () => {
+    if (mapModel.get('targetMetacard')) {
+      setLocation(getLocation(map, getTarget()))
+      setOpen(true)
+    } else {
+      setOpen(false)
+    }
+  })
 
   let popupAnimationFrameId: any
   const startPopupAnimating = (map: any) => {
@@ -171,7 +192,7 @@ const HookPopupPreview = (props: Props) => {
     }
   }, [selectedResults])
 
-  if (!open || selectedResultsArray.length === 0) {
+  if (!open || selectedResultsArray.length === -1) {
     return null
   }
 
@@ -191,8 +212,8 @@ const HookPopupPreview = (props: Props) => {
           : '-translate-y-full'
       }`}
       style={{
-        left: selectedResultsArray.length === 1 ? left : 'calc(50%)',
-        top: selectedResultsArray.length === 1 ? top : 'calc(50% - 20px)',
+        left: selectedResultsArray.length >= 0 ? left : 'calc(50%)',
+        top: selectedResultsArray.length >= 0 ? top : 'calc(50% - 70px)',
       }}
     >
       <Tooltip
@@ -205,50 +226,53 @@ const HookPopupPreview = (props: Props) => {
               maxHeight: '150px',
             }}
           >
-            {(function () {
-              if (selectedResultsArray.length === 1) {
-                const metacardJSON = selectedResultsArray[0].plain
-                const previewText =
-                  metacardJSON.metacard.properties['ext.extracted.text']
-                return (
-                  <>
-                    <div className="truncate">
-                      {metacardJSON.metacard.properties.title}
-                    </div>
-                    {previewText && (
-                      <Preview>
-                        <PreviewText>
-                          {
-                            metacardJSON.metacard.properties[
-                              'ext.extracted.text'
-                            ]
-                          }
-                        </PreviewText>
-                      </Preview>
-                    )}
-                  </>
-                )
-              } else if (selectedResultsArray.length > 1) {
-                return (
-                  <div>
-                    {selectedResultsArray.map((clusterModel) => {
-                      return (
-                        <Button
-                          key={clusterModel.plain.id}
-                          onClick={() => {
-                            lazyResults.deselect()
-                            lazyResults.select(clusterModel)
-                          }}
-                        >
-                          {clusterModel.plain.metacard.properties.title}
-                        </Button>
-                      )
-                    })}
-                  </div>
-                )
-              }
-              return
-            })()}
+            <div className="flex flex-row flex-no-wrap items-center">
+              <div className="flex-shrink-1 truncate">
+                {(function () {
+                  if (selectedResultsArray.length >= 0) {
+                    const metacardJSON = getTarget()[0].plain
+                    const previewText =
+                      metacardJSON.metacard.properties['ext.extracted.text']
+                    return (
+                      <ResultItem
+                        lazyResult={getTarget()[0]}
+                        measure={() => {}}
+                        index={0}
+                        width={500}
+                      />
+                    )
+                  } else if (selectedResultsArray.length > 1) {
+                    return (
+                      <div>
+                        {selectedResultsArray.map((clusterModel) => {
+                          return (
+                            <Button
+                              key={clusterModel.plain.id}
+                              onClick={() => {
+                                lazyResults.deselect()
+                                lazyResults.select(clusterModel)
+                              }}
+                            >
+                              {clusterModel.plain.metacard.properties.title}
+                            </Button>
+                          )
+                        })}
+                      </div>
+                    )
+                  }
+                  return
+                })()}
+              </div>
+              <Button
+                className="flex-shrink-0"
+                onClick={() => {
+                  setOpen(false)
+                }}
+                size="small"
+              >
+                <CloseIcon />
+              </Button>
+            </div>
           </Paper>
         }
       >
