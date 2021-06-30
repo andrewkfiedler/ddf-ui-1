@@ -54,7 +54,7 @@ const PreviewText = styled.p`
   white-space: pre-line;
 `
 
-const TOP_OFFSET = 60
+const TOP_OFFSET = 0
 
 const DRAG_SENSITIVITY = 10
 
@@ -73,7 +73,7 @@ type Props = {
   mapModel: Backbone.Model<
     {
       targetMetacard: LazyQueryResult
-    },
+    } & MouseCoordinatesType,
     any,
     any
   >
@@ -102,60 +102,82 @@ const getLocation = (map: any, target: LazyQueryResult[]) => {
   return
 }
 
-const HookPopupPreview = (props: Props) => {
-  const { map, selectionInterface, mapModel } = props
-  const lazyResults = useLazyResultsFromSelectionInterface({
-    selectionInterface,
-  })
-  const selectedResults = useLazyResultsSelectedResultsFromSelectionInterface({
-    selectionInterface,
-  })
-  const selectedResultsArray = Object.values(selectedResults)
-  const [location, setLocation] = React.useState(
-    undefined as undefined | LocationType
-  )
-  const dragRef = React.useRef(0)
-  const [open, setOpen] = React.useState(false)
-
+const useMapTarget = ({ mapModel }: { mapModel: Props['mapModel'] }) => {
   const getTarget = (): LazyQueryResult[] => {
     return mapModel.get('targetMetacard')
       ? [mapModel.get('targetMetacard')]
       : []
-    return Object.values(selectedResults)
   }
-
+  const [target, setTarget] = React.useState(getTarget())
   useListenTo(mapModel, 'change:targetMetacard', () => {
-    if (mapModel.get('targetMetacard')) {
-      setLocation(getLocation(map, getTarget()))
-      setOpen(true)
-    } else {
-      setOpen(false)
+    setTarget(getTarget())
+  })
+  return target
+}
+
+type MouseCoordinatesType = {
+  mouseLat?: number
+  mouseLon?: number
+  mouseX?: number
+  mouseY?: number
+}
+
+const useMapMouseCoordinates = ({
+  mapModel,
+}: {
+  mapModel: Props['mapModel']
+}) => {
+  const getMouseCoordinates = (): MouseCoordinatesType => {
+    return {
+      mouseLat: mapModel.get('mouseLat'),
+      mouseLon: mapModel.get('mouseLon'),
+      mouseX: mapModel.get('mouseX'),
+      mouseY: mapModel.get('mouseY'),
+    }
+  }
+  const [mouseCoordinates, setMouseCoordinates] = React.useState(
+    getMouseCoordinates()
+  )
+  useListenTo(mapModel, 'change:mouseLat', () => {
+    const newCoordinates = getMouseCoordinates()
+    if (newCoordinates.mouseLat) {
+      setMouseCoordinates(newCoordinates)
     }
   })
+  return mouseCoordinates
+}
 
+const useTargetLocation = ({
+  map,
+  target,
+}: {
+  map: Props['map']
+  target: LazyQueryResult[]
+}) => {
+  const dragRef = React.useRef(0)
+  const [location, setLocation] = React.useState(
+    undefined as undefined | LocationType
+  )
   let popupAnimationFrameId: any
+
+  React.useEffect(() => {
+    setLocation(getLocation(map, target))
+  }, [target])
+
   const startPopupAnimating = (map: any) => {
-    if (getTarget().length !== 0) {
+    if (target.length !== 0) {
       popupAnimationFrameId = window.requestAnimationFrame(() => {
-        const location = getLocation(map, getTarget())
-        setLocation(location)
+        setLocation(getLocation(map, target))
         startPopupAnimating(map)
       })
     }
   }
 
   const handleCameraMoveEnd = () => {
-    if (getTarget().length !== 0) {
+    if (target.length !== 0) {
       window.cancelAnimationFrame(popupAnimationFrameId)
     }
   }
-
-  React.useEffect(() => {
-    setLocation(getLocation(map, getTarget()))
-    if (selectedResultsArray.length !== 0) {
-      setOpen(true)
-    }
-  }, [selectedResults])
 
   React.useEffect(() => {
     map.onMouseTrackingForPopup(
@@ -167,7 +189,7 @@ const HookPopupPreview = (props: Props) => {
       },
       (_event: any, mapTarget: any) => {
         if (DRAG_SENSITIVITY > dragRef.current) {
-          setOpen(mapTarget.mapTarget !== undefined)
+          // setOpen(mapTarget.mapTarget !== undefined)
         }
       }
     )
@@ -190,93 +212,84 @@ const HookPopupPreview = (props: Props) => {
       map.offCameraMoveEnd(onCameraMoveEnd)
       window.cancelAnimationFrame(popupAnimationFrameId)
     }
-  }, [selectedResults])
+  }, [target])
+  return location
+}
 
-  if (!open || selectedResultsArray.length === -1) {
+const HookPopupPreview = (props: Props) => {
+  const { map, selectionInterface, mapModel } = props
+  const lazyResults = useLazyResultsFromSelectionInterface({
+    selectionInterface,
+  })
+  const selectedResults = useLazyResultsSelectedResultsFromSelectionInterface({
+    selectionInterface,
+  })
+  const selectedResultsArray = Object.values(selectedResults)
+  const target = useMapTarget({ mapModel })
+  const location = useTargetLocation({ map, target })
+  const mouseCoordinates = useMapMouseCoordinates({ mapModel })
+  const [open, setOpen] = React.useState(false)
+
+  React.useEffect(() => {
+    let timeoutId = undefined as undefined | number
+    if (target.length > 0) {
+      setOpen(true)
+    }
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [target])
+
+  if (target.length === 0) {
     return null
   }
 
   const left = getLeft(location)
   const top = getTop(location)
-  if (selectedResultsArray.length === 1 && (!left || !top)) {
+  if (!left || !top) {
     return null
   }
 
-  console.log({ left, top })
+  console.log(mouseCoordinates)
 
   return (
     <div
-      className={`absolute transform -translate-x-1/2 ${
-        selectedResultsArray.length === 1
-          ? '-translate-y-1/2'
-          : '-translate-y-full'
-      }`}
+      className="absolute"
       style={{
-        left: selectedResultsArray.length >= 0 ? left : 'calc(50%)',
-        top: selectedResultsArray.length >= 0 ? top : 'calc(50% - 70px)',
+        left: mouseCoordinates.mouseX,
+        top: mouseCoordinates.mouseY - 20,
       }}
     >
       <Tooltip
         open={true}
+        placement="top"
         title={
           <Paper
             elevation={Elevations.overlays}
             className={`p-1 overflow-auto max-w-sm`}
-            style={{
-              maxHeight: '150px',
-            }}
+            style={
+              {
+                // maxHeight: '150px',
+              }
+            }
           >
-            <div className="flex flex-row flex-no-wrap items-center">
-              <div className="flex-shrink-1 truncate">
-                {(function () {
-                  if (selectedResultsArray.length >= 0) {
-                    const metacardJSON = getTarget()[0].plain
-                    const previewText =
-                      metacardJSON.metacard.properties['ext.extracted.text']
-                    return (
-                      <ResultItem
-                        lazyResult={getTarget()[0]}
-                        measure={() => {}}
-                        index={0}
-                        width={500}
-                      />
-                    )
-                  } else if (selectedResultsArray.length > 1) {
-                    return (
-                      <div>
-                        {selectedResultsArray.map((clusterModel) => {
-                          return (
-                            <Button
-                              key={clusterModel.plain.id}
-                              onClick={() => {
-                                lazyResults.deselect()
-                                lazyResults.select(clusterModel)
-                              }}
-                            >
-                              {clusterModel.plain.metacard.properties.title}
-                            </Button>
-                          )
-                        })}
-                      </div>
-                    )
-                  }
-                  return
-                })()}
-              </div>
-              <Button
-                className="flex-shrink-0"
-                onClick={() => {
-                  setOpen(false)
-                }}
-                size="small"
-              >
-                <CloseIcon />
-              </Button>
-            </div>
+            <ResultItem
+              lazyResult={target[0]}
+              measure={() => {}}
+              index={0}
+              width={500}
+            />
           </Paper>
         }
       >
-        <div></div>
+        <div
+          className="absolute z-0 pointer-events-none"
+          style={{
+            width: '2px',
+            height: '2px',
+            background: 'red',
+          }}
+        ></div>
       </Tooltip>
     </div>
   )

@@ -217,6 +217,7 @@ module.exports = function CesiumMap(
   setupTooltip(map, selectionInterface)
 
   function updateCoordinatesTooltip(position) {
+    console.log(position)
     const cartesian = map.camera.pickEllipsoid(
       position,
       map.scene.globe.ellipsoid
@@ -226,6 +227,8 @@ module.exports = function CesiumMap(
       mapModel.updateMouseCoordinates({
         lat: cartographic.latitude * Cesium.Math.DEGREES_PER_RADIAN,
         lon: cartographic.longitude * Cesium.Math.DEGREES_PER_RADIAN,
+        x: position.x,
+        y: position.y,
       })
     } else {
       mapModel.clearMouseCoordinates()

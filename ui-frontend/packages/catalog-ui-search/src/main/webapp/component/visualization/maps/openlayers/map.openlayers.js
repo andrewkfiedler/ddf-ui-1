@@ -103,10 +103,13 @@ export default function (
   function setupTooltip(map) {
     map.on('pointermove', (e) => {
       const point = unconvertPointCoordinate(e.coordinate)
+      console.log(e.pixel)
       if (!offMap(point)) {
         mapModel.updateMouseCoordinates({
           lat: point[1],
           lon: point[0],
+          x: e.pixel[0],
+          y: e.pixel[1],
         })
       } else {
         mapModel.clearMouseCoordinates()

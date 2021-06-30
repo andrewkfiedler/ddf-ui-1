@@ -131,12 +131,16 @@ module.exports = Backbone.AssociatedModel.extend({
     this.set({
       mouseLat: undefined,
       mouseLon: undefined,
+      mouseX: undefined,
+      mouseY: undefined,
     })
   },
   updateMouseCoordinates(coordinates) {
     this.set({
       mouseLat: Number(coordinates.lat.toFixed(6)), // wrap in Number to chop off trailing zero
       mouseLon: Number(wrapNum(coordinates.lon, -180, 180).toFixed(6)),
+      mouseX: coordinates.x,
+      mouseY: coordinates.y,
     })
   },
   updateClickCoordinates() {
