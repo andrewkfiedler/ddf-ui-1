@@ -103,7 +103,6 @@ export default function (
   function setupTooltip(map) {
     map.on('pointermove', (e) => {
       const point = unconvertPointCoordinate(e.coordinate)
-      console.log(e.pixel)
       if (!offMap(point)) {
         mapModel.updateMouseCoordinates({
           lat: point[1],
@@ -226,6 +225,8 @@ export default function (
     }
   }
 
+  let lastClick = Date.now()
+
   const exposedMethods = _.extend({}, Map, {
     drawLine(model) {
       drawingTools.line.draw(model)
@@ -245,8 +246,12 @@ export default function (
       drawingTools.circle.destroy()
       drawingTools.bbox.destroy()
     },
+    wasRecentlyClicked() {
+      return Date.now() - lastClick < 750
+    },
     onLeftClick(callback) {
       $(map.getTargetElement()).on('click', (e) => {
+        lastClick = Date.now()
         const boundingRect = map.getTargetElement().getBoundingClientRect()
         callback(e, {
           mapTarget: determineIdFromPosition(

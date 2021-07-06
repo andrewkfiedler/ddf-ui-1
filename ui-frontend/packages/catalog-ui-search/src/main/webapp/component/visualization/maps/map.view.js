@@ -35,6 +35,9 @@ import getDistance from 'geolib/es/getDistance'
 import { Drawing } from '../../singletons/drawing'
 import { GeometriesView } from './react/geometries.view'
 import MapToolbar from './map-toolbar'
+import PopupPreview from '../../../react-component/popup-preview'
+import { WaitForMapLoad } from './map.utils'
+import MapExtra from './map.extra'
 const DropdownModel = require('../../dropdown/dropdown.js')
 
 function findExtreme({ objArray, property, comparator }) {
@@ -154,8 +157,23 @@ module.exports = Marionette.LayoutView.extend({
         <div className="distanceInfo">
           <div className="info-feature"></div>
         </div>
+        <WaitForMapLoad mapView={this}>
+          {() => {
+            return <MapExtra mapView={this} />
+          }}
+        </WaitForMapLoad>
         <div className="popupPreview">
-          <div className="info-feature"></div>
+          <WaitForMapLoad mapView={this}>
+            {() => {
+              return (
+                <PopupPreview
+                  map={this.map}
+                  mapModel={this.mapModel}
+                  selectionInterface={this.options.selectionInterface}
+                />
+              )
+            }}
+          </WaitForMapLoad>
         </div>
         <div className="not-supported">
           <h3 align="center">The 3D Map is not supported by your browser.</h3>
@@ -175,7 +193,6 @@ module.exports = Marionette.LayoutView.extend({
     mapContextMenu: '.map-context-menu',
     mapInfo: '.mapInfo',
     distanceInfo: '.distanceInfo',
-    popupPreview: '.popupPreview',
   },
   geometriesView: undefined,
   map: undefined,
@@ -265,7 +282,6 @@ module.exports = Marionette.LayoutView.extend({
     this.setupRightClickMenu()
     this.setupMapInfo()
     this.setupDistanceInfo()
-    this.setupPopupPreview()
   },
   handleInitialZoom() {
     if (user.get('user').get('preferences').get('autoPan')) {
@@ -463,15 +479,6 @@ module.exports = Marionette.LayoutView.extend({
 
     this.mapModel.addDistanceInfo(distanceInfoView)
     this.distanceInfo.show(distanceInfoView)
-  },
-  setupPopupPreview() {
-    this.popupPreview.show(
-      new PopupPreviewView({
-        map: this.map,
-        mapModel: this.mapModel,
-        selectionInterface: this.options.selectionInterface,
-      })
-    )
   },
   /*
         Map creation is deferred to this method, so that all resources pertaining to the map can be loaded lazily and

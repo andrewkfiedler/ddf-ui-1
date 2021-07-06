@@ -217,7 +217,6 @@ module.exports = function CesiumMap(
   setupTooltip(map, selectionInterface)
 
   function updateCoordinatesTooltip(position) {
-    console.log(position)
     const cartesian = map.camera.pickEllipsoid(
       position,
       map.scene.globe.ellipsoid
@@ -347,6 +346,8 @@ module.exports = function CesiumMap(
     }
   }
 
+  let lastClick = Date.now()
+
   const exposedMethods = _.extend({}, Map, {
     drawLine(model) {
       drawingTools.line.draw(model)
@@ -366,8 +367,12 @@ module.exports = function CesiumMap(
       drawingTools.circle.destroy()
       drawingTools.bbox.destroy()
     },
+    wasRecentlyClicked() {
+      return Date.now() - lastClick < 750
+    },
     onLeftClick(callback) {
       $(map.scene.canvas).on('click', (e) => {
+        lastClick = Date.now()
         const boundingRect = map.scene.canvas.getBoundingClientRect()
         callback(e, {
           mapTarget: determineIdFromPosition(

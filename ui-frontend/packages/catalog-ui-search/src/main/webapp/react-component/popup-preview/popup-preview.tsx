@@ -12,6 +12,7 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
+import PopperJs from 'popper.js'
 import Button from '@material-ui/core/Button'
 import Paper from '@material-ui/core/Paper'
 import * as React from 'react'
@@ -27,6 +28,7 @@ import Tooltip from '@material-ui/core/Tooltip'
 import CloseIcon from '@material-ui/icons/Close'
 import { useListenTo } from '../../component/selection-checkbox/useBackbone.hook'
 import ResultItem from '../../component/results-visual/result-item'
+import { PopperProps } from '@material-ui/core'
 
 export type LocationType = {
   left: number
@@ -217,6 +219,7 @@ const useTargetLocation = ({
 }
 
 const HookPopupPreview = (props: Props) => {
+  const popperRef = React.useRef<PopperJs>(null)
   const { map, selectionInterface, mapModel } = props
   const lazyResults = useLazyResultsFromSelectionInterface({
     selectionInterface,
@@ -249,20 +252,27 @@ const HookPopupPreview = (props: Props) => {
   if (!left || !top) {
     return null
   }
-
-  console.log(mouseCoordinates)
+  console.log(popperRef)
 
   return (
     <div
       className="absolute"
       style={{
         left: mouseCoordinates.mouseX,
-        top: mouseCoordinates.mouseY - 20,
+        top: mouseCoordinates.mouseY - 0,
       }}
     >
       <Tooltip
         open={true}
         placement="top"
+        PopperProps={{
+          popperRef: popperRef,
+          modifiers: {
+            offset: {
+              offset: '0,20',
+            },
+          },
+        }}
         title={
           <Paper
             elevation={Elevations.overlays}
@@ -275,7 +285,11 @@ const HookPopupPreview = (props: Props) => {
           >
             <ResultItem
               lazyResult={target[0]}
-              measure={() => {}}
+              measure={() => {
+                if (popperRef.current) {
+                  popperRef.current.update()
+                }
+              }}
               index={0}
               width={500}
             />
