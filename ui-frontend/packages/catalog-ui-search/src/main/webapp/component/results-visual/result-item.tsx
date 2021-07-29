@@ -15,7 +15,7 @@
 
 import * as React from 'react'
 import LazyMetacardInteractions from './lazy-metacard-interactions'
-const IconHelper = require('../../js/IconHelper.js')
+import IconHelper from '../../js/IconHelper'
 const properties = require('../../js/properties.js')
 const user = require('../singletons/user-instance.js')
 const metacardDefinitions = require('../singletons/metacard-definitions.js')
@@ -95,7 +95,11 @@ const showRelevanceScore = ({
   return properties.showRelevanceScores && lazyResult.hasRelevance()
 }
 
-const getIconClassName = ({ lazyResult }: { lazyResult: LazyQueryResult }) => {
+export const getIconClassName = ({
+  lazyResult,
+}: {
+  lazyResult: LazyQueryResult
+}) => {
   if (lazyResult.isRevision()) {
     return 'fa fa-history'
   } else if (lazyResult.isResource()) {

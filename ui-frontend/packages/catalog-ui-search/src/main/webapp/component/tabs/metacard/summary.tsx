@@ -18,12 +18,10 @@ import DialogContent from '@material-ui/core/DialogContent'
 import useSnack from '../../hooks/useSnack'
 import LinearProgress from '@material-ui/core/LinearProgress'
 const $ = require('jquery')
-const ResultUtils = require('../../../js/ResultUtils.js')
 import PublishIcon from '@material-ui/icons/Publish'
 import Paper from '@material-ui/core/Paper'
 import useTheme from '@material-ui/core/styles/useTheme'
 import { LazyQueryResult } from '../../../js/model/LazyQueryResult/LazyQueryResult'
-import { useLazyResultsSelectedResultsFromSelectionInterface } from '../../selection-interface/hooks'
 import { useBackbone } from '../../selection-checkbox/useBackbone.hook'
 import TransferList, { useCustomReadOnlyCheck } from './transfer-list'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
@@ -34,11 +32,11 @@ import { Elevations } from '../../theme/theme'
 import { DarkDivider } from '../../dark-divider/dark-divider'
 import { displayHighlightedAttrInFull } from './highlightUtil'
 import DateTimePicker from '../../fields/date-time-picker'
-import Geometry from '../../../react-component/input-wrappers/geometry'
 import { useRerenderOnBackboneSync } from '../../../js/model/LazyQueryResult/hooks'
 import useCoordinateFormat from './useCoordinateFormat'
 import { MetacardAttribute } from '../../../js/model/Types'
 import ExtensionPoints from '../../../extension-points'
+import { LocationInputReact } from '../../location-new/location-new.view'
 
 function getSummaryShown(): string[] {
   const userchoices = user
@@ -55,7 +53,7 @@ function getSummaryShown(): string[] {
 }
 
 type Props = {
-  selectionInterface: any
+  result: LazyQueryResult
 }
 
 const ThumbnailInput = ({
@@ -164,7 +162,7 @@ const handleMetacardUpdate = ({
       contentType: 'application/json',
     }).then(
       (response: any) => {
-        ResultUtils.updateResults(lazyResult.getBackbone(), response)
+        lazyResult.refreshFromEditResponse(response)
         onSuccess()
       },
       () => onFailure()
@@ -301,12 +299,14 @@ export const Editor = ({
                       )
                     case 'GEOMETRY':
                       return (
-                        <Geometry
-                          label={label}
+                        <LocationInputReact
                           onChange={(location: any) => {
-                            location === null || location === 'INVALID'
-                              ? setMode(Mode.BadInput)
-                              : setMode(Mode.Normal)
+                            console.log(location)
+                            if (location === null || location === 'INVALID') {
+                              setMode(Mode.BadInput)
+                            } else {
+                              setMode(Mode.Normal)
+                            }
                             values[index] = location
                             setValues([...values])
                           }}
@@ -688,11 +688,8 @@ const getHiddenAttributes = (
 
 let globalExpanded = false // globally track if users want this since they may be clicking between results
 
-const Summary = ({ selectionInterface }: Props) => {
+const Summary = ({ result: selection }: Props) => {
   const theme = useTheme()
-  const selectedResults = useLazyResultsSelectedResultsFromSelectionInterface({
-    selectionInterface,
-  })
 
   const [forceRender, setForceRender] = React.useState(false)
   const [expanded, setExpanded] = React.useState(globalExpanded)
@@ -700,9 +697,6 @@ const Summary = ({ selectionInterface }: Props) => {
   const [fullyExpanded, setFullyExpanded] = React.useState(false)
   const [filter, setFilter] = React.useState(persistantFilter)
   const [summaryShown, setSummaryShown] = React.useState(getSummaryShown())
-  const selection = Object.values(selectedResults)[0] as
-    | LazyQueryResult
-    | undefined
   useRerenderOnBackboneSync({ lazyResult: selection })
 
   const dialogContext = useDialog()
