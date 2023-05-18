@@ -2,12 +2,14 @@ import * as React from 'react'
 import { hot } from 'react-hot-loader'
 import Button from '@mui/material/Button'
 import { useBackbone } from '../selection-checkbox/useBackbone.hook'
-import { useLazyResultsStatusFromSelectionInterface } from '../selection-interface/hooks'
 import { Elevations } from '../theme/theme'
 import CloseIcon from '@mui/icons-material/Close'
 import TableExport from '../table-export/table-export'
 import { useDialog } from '../dialog'
 import { DarkDivider } from '../dark-divider/dark-divider'
+import NextPageIcon from '@mui/icons-material/NavigateNextTwoTone'
+import PrevPageIcon from '@mui/icons-material/NavigateBeforeTwoTone'
+import { useSearchDetails } from '../hooks/useResults.rest'
 
 type Props = {
   selectionInterface: any
@@ -22,7 +24,9 @@ const determineIsOutdated = ({ selectionInterface }: Props) => {
 }
 
 const Paging = ({ selectionInterface }: Props) => {
-  const { isSearching } = useLazyResultsStatusFromSelectionInterface({
+  const {
+    state: { isSearching, startAndEnd },
+  } = useSearchDetails({
     selectionInterface,
   })
   const dialogContext = useDialog()
@@ -59,6 +63,9 @@ const Paging = ({ selectionInterface }: Props) => {
     selectionInterface.get('currentQuery').hasNextServerPage() === false
   return (
     <>
+      <div>
+        {startAndEnd.start} - {startAndEnd.end} of {startAndEnd.hits}
+      </div>
       <Button
         data-id="prev-page-button"
         className={`${isPreviousDisabled ? 'invisible' : ''}`}
@@ -67,7 +74,7 @@ const Paging = ({ selectionInterface }: Props) => {
           selectionInterface.get('currentQuery').getPreviousServerPage()
         }}
       >
-        Prev Page
+        <PrevPageIcon />
       </Button>
       <Button
         data-id="next-page-button"
@@ -77,7 +84,7 @@ const Paging = ({ selectionInterface }: Props) => {
           selectionInterface.get('currentQuery').getNextServerPage()
         }}
       >
-        Next Page
+        <NextPageIcon />
       </Button>
       <Button
         data-id="export-table-button"
