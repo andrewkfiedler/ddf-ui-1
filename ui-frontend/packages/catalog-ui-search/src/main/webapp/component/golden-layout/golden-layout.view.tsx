@@ -380,6 +380,7 @@ function registerComponent(
   viz: any
 ) {
   const options = _.extend({}, marionetteView.options, componentOptions)
+  delete marionetteView.goldenLayout._components[name] // remove old one if it exists
   marionetteView.goldenLayout.registerComponent(
     name,
     (container: any, componentState: any) => {
@@ -737,6 +738,11 @@ const useUpdateGoldenLayoutSize = ({
   }, [goldenLayout])
 }
 
+const singletonGoldenLayout = new GoldenLayout(
+  DEFAULT_GOLDEN_LAYOUT_CONTENT,
+  undefined
+)
+
 const useSendGoldenLayoutReferenceUpwards = ({
   options,
   goldenLayout,
@@ -750,7 +756,7 @@ const useSendGoldenLayoutReferenceUpwards = ({
     }
     return () => {
       if (goldenLayout) {
-        goldenLayout.destroy()
+        // goldenLayout.destroy()
       }
     }
   }, [goldenLayout])
@@ -758,21 +764,18 @@ const useSendGoldenLayoutReferenceUpwards = ({
 
 const useAttachGoldenLayout = ({
   goldenLayoutAttachElement,
-  setGoldenLayout,
   options,
 }: {
   options: GoldenLayoutViewProps
-  setGoldenLayout: React.Dispatch<any>
   goldenLayoutAttachElement: HTMLDivElement | null
 }) => {
   React.useEffect(() => {
     if (goldenLayoutAttachElement) {
-      setGoldenLayout(
-        new GoldenLayout(
-          getGoldenLayoutConfig(options),
-          goldenLayoutAttachElement
-        )
-      )
+      singletonGoldenLayout.config = (
+        singletonGoldenLayout as any
+      )._createConfig(getGoldenLayoutConfig(options))
+      // @ts-ignore
+      singletonGoldenLayout.container = goldenLayoutAttachElement
     }
   }, [goldenLayoutAttachElement])
 }
@@ -1316,11 +1319,11 @@ const HandlePopoutsBlocked = ({
 export const GoldenLayoutViewReact = (options: GoldenLayoutViewProps) => {
   const [goldenLayoutAttachElement, setGoldenLayoutAttachElement] =
     React.useState<HTMLDivElement | null>(null)
-  const [goldenLayout, setGoldenLayout] = React.useState<any>(null)
+  const [goldenLayout] = React.useState<any>(singletonGoldenLayout)
   const lastConfig = React.useRef<any>(getGoldenLayoutConfig(options))
   useUpdateGoldenLayoutSize({ wreqr, goldenLayout })
   useSendGoldenLayoutReferenceUpwards({ options, goldenLayout })
-  useAttachGoldenLayout({ goldenLayoutAttachElement, setGoldenLayout, options })
+  useAttachGoldenLayout({ goldenLayoutAttachElement, options })
   const goldenLayoutComponentsRegistered = useRegisterGoldenLayoutComponents({
     options,
     goldenLayout,
