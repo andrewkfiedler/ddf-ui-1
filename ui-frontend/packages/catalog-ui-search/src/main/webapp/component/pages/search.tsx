@@ -6,7 +6,6 @@ import {
 } from '../resizable-grid/resizable-grid'
 import SelectionInterfaceModel from '../selection-interface/selection-interface.model'
 import { useQuery, useUserQuery } from '../../js/model/TypedQuery'
-import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import { QueryAddReact } from '../query-add/query-add'
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
@@ -236,6 +235,7 @@ const useSearchResults = ({
       }),
     },
   })
+
   const [selectionInterface] = React.useState(
     new SelectionInterfaceModel({
       currentQuery: queryModel,
@@ -886,46 +886,38 @@ const LeftBottom = () => {
     )
   }
   return (
-    <Grid
-      container
-      direction="row"
-      alignItems="center"
-      className="w-full min-h-16 py-1 px-2"
-    >
-      <Grid item>
-        <Button
-          variant="text"
-          color="primary"
-          size="small"
-          onClick={() => {
-            setClosed(true)
-          }}
-        >
-          Collapse
-          <KeyboardArrowLeftIcon
-            color="inherit"
-            className="Mui-text-text-primary Mui-icon-size-small"
-          />
-          <KeyboardArrowLeftIcon
-            color="inherit"
-            className="-ml-3 Mui-text-text-primary Mui-icon-size-small"
-          />
-        </Button>
-      </Grid>
-      <Grid item className="ml-auto">
-        <Button
-          disabled={typeof data === 'boolean' && searchPageMode === 'saved'}
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={() => {
-            selectionInterface.getCurrentQuery().startSearchFromFirstPage()
-          }}
-        >
-          Search
-        </Button>
-      </Grid>
-    </Grid>
+    <div className="w-full min-h-16 py-1 px-2 flex flex-row flex-nowrap items-center">
+      <Button
+        variant="text"
+        color="primary"
+        size="small"
+        onClick={() => {
+          setClosed(true)
+        }}
+      >
+        Collapse
+        <KeyboardArrowLeftIcon
+          color="inherit"
+          className="Mui-text-text-primary Mui-icon-size-small"
+        />
+        <KeyboardArrowLeftIcon
+          color="inherit"
+          className="-ml-3 Mui-text-text-primary Mui-icon-size-small"
+        />
+      </Button>
+      <Button
+        className="ml-auto"
+        disabled={typeof data === 'boolean' && searchPageMode === 'saved'}
+        variant="contained"
+        color="primary"
+        size="small"
+        onClick={() => {
+          selectionInterface.getCurrentQuery().startSearchFromFirstPage()
+        }}
+      >
+        Search
+      </Button>
+    </div>
   )
 }
 
@@ -1427,7 +1419,7 @@ export const HomePage = () => {
   React.useEffect(() => {
     let urlBasedQuery = location.search.split('?defaultQuery=')[1]
     if (urlBasedQuery) {
-      ;(selectionInterface.getCurrentQuery() as any).startSearchFromFirstPage()
+      ;(selectionInterface.getCurrentQuery() as any).startSearch()
     }
   }, [])
   const [selectionInterface] = React.useState(
@@ -1439,6 +1431,8 @@ export const HomePage = () => {
     queryModel: selectionInterface.getCurrentQuery(),
     on: searchPageMode === 'adhoc',
   })
+  // console.log('queryModel', selectionInterface.getCurrentQuery())
+  // console.log('queryModelJSON', selectionInterface.getCurrentQuery().toJSON())
   React.useEffect(() => {
     if (typeof data !== 'boolean') {
       selectionInterface.getCurrentQuery().set(data.plain.metacard.properties)

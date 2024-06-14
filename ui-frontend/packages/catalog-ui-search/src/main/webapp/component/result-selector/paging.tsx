@@ -7,6 +7,7 @@ import TableExport from '../table-export/table-export'
 import { useDialogState } from '../../component/hooks/useDialogState'
 import Divider from '@mui/material/Divider'
 import { Dialog, DialogActions, DialogTitle } from '@mui/material'
+import { Pagination } from './pagination'
 
 type Props = {
   selectionInterface: any
@@ -61,6 +62,29 @@ const Paging = ({ selectionInterface }: Props) => {
   const isNextDisabled =
     isOutdated ||
     selectionInterface.get('currentQuery').hasNextServerPage() === false
+
+  const startAndEnd = selectionInterface
+    .get('currentQuery')
+    .getCurrentStartAndEndForSourceGroup()
+
+  const pageMessage = `${startAndEnd.start}-${startAndEnd.end} of ${startAndEnd.hits}`
+
+  return (
+    <Pagination
+      setPageSize={() => {}}
+      pageSize={0}
+      pageSizes={[]}
+      pageLabel={pageMessage}
+      hasNextPage={!isNextDisabled}
+      hasPreviousPage={!isPreviousDisabled}
+      nextPage={selectionInterface.get('currentQuery').getNextServerPage}
+      previousPage={
+        selectionInterface.get('currentQuery').getPreviousServerPage
+      }
+      lastPage={selectionInterface.get('currentQuery').getLastServerPage}
+      firstPage={selectionInterface.get('currentQuery').getFirstServerPage}
+    />
+  )
   return (
     <>
       <Button
